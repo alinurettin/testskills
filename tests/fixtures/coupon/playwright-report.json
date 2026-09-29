@@ -1,0 +1,200 @@
+{
+ "config": {},
+ "suites": [
+  {
+   "title": "req-001.spec.ts",
+   "file": "req-001.spec.ts",
+   "specs": [],
+   "suites": [
+    {
+     "title": "REQ-001 Kupon ile %10 indirim",
+     "file": "req-001.spec.ts",
+     "specs": [
+      {
+       "title": "TC-001 Kupon 100,00 TL sınırında uygulanır",
+       "tags": [
+        "TC-001",
+        "REQ-001",
+        "high",
+        "smoke"
+       ],
+       "file": "req-001.spec.ts",
+       "line": 7,
+       "tests": [
+        {
+         "projectName": "chromium",
+         "status": "expected",
+         "annotations": [
+          {
+           "type": "qa_id",
+           "description": "TC-001"
+          }
+         ],
+         "results": [
+          {
+           "status": "passed",
+           "duration": 800
+          }
+         ]
+        },
+        {
+         "projectName": "firefox",
+         "status": "unexpected",
+         "annotations": [
+          {
+           "type": "qa_id",
+           "description": "TC-001"
+          }
+         ],
+         "results": [
+          {
+           "status": "failed",
+           "duration": 5200,
+           "errors": [
+            {
+             "message": "Error: \u001b[2mexpect(\u001b[22mlocator).toHaveText(expected) failed\nLocator: getByTestId('discount')"
+            }
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "title": "TC-002 Kupon 99,99 TL sepette reddedilir",
+       "tags": [
+        "TC-002",
+        "REQ-001"
+       ],
+       "file": "req-001.spec.ts",
+       "line": 30,
+       "tests": [
+        {
+         "projectName": "chromium",
+         "status": "flaky",
+         "annotations": [],
+         "results": [
+          {
+           "status": "failed",
+           "duration": 900
+          },
+          {
+           "status": "passed",
+           "duration": 700
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "title": "TC-003 Süresi dolmuş kupon reddedilir",
+       "tags": [
+        "TC-003",
+        "REQ-002"
+       ],
+       "file": "req-001.spec.ts",
+       "line": 50,
+       "tests": [
+        {
+         "projectName": "chromium",
+         "status": "skipped",
+         "annotations": [
+          {
+           "type": "fixme",
+           "description": "QA Suite skeleton TC-003: implement the steps, then delete this line"
+          }
+         ],
+         "results": [
+          {
+           "status": "skipped",
+           "duration": 0
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "title": "TC-004 Bilinen hata",
+       "tags": [
+        "TC-004"
+       ],
+       "file": "req-001.spec.ts",
+       "line": 60,
+       "tests": [
+        {
+         "projectName": "chromium",
+         "status": "expected",
+         "annotations": [
+          {
+           "type": "fail",
+           "description": "SHOP-481"
+          }
+         ],
+         "results": [
+          {
+           "status": "failed",
+           "duration": 300
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "title": "TC-005 Düzelmiş bilinen hata",
+       "tags": [
+        "TC-005"
+       ],
+       "file": "req-001.spec.ts",
+       "line": 65,
+       "tests": [
+        {
+         "projectName": "chromium",
+         "status": "unexpected",
+         "annotations": [
+          {
+           "type": "fail",
+           "description": "SHOP-482"
+          }
+         ],
+         "results": [
+          {
+           "status": "passed",
+           "duration": 300
+          }
+         ]
+        }
+       ]
+      },
+      {
+       "title": "smoke without tag",
+       "tags": [],
+       "file": "req-001.spec.ts",
+       "line": 70,
+       "tests": [
+        {
+         "projectName": "chromium",
+         "status": "expected",
+         "annotations": [],
+         "results": [
+          {
+           "status": "passed",
+           "duration": 10
+          }
+         ]
+        }
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "stats": {
+  "startTime": "2026-09-29T13:07:43.792Z",
+  "duration": 14856,
+  "expected": 1,
+  "skipped": 1,
+  "unexpected": 1,
+  "flaky": 1
+ }
+}

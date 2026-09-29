@@ -1,0 +1,18 @@
+{
+  "id": "DS-001",
+  "title": "Kredi başvurusu girdileri",
+  "language": "tr",
+  "requirement_ids": ["REQ-003", "REQ-004"],
+  "bva": "3-value",
+  "parameters": [
+    {"name": "yas", "type": "integer", "min": 18, "max": 65, "extra_invalid": ["boş", "sayısal olmayan 'abc'"]},
+    {"name": "tutar", "type": "decimal", "step": "0.01", "min": "1000.00", "max": "50000.00"},
+    {"name": "kredi_notu", "type": "integer", "partitions": [
+      {"label": "red", "min": 0, "max": 499},
+      {"label": "manuel inceleme", "min": 500, "max": 699},
+      {"label": "otomatik onay", "min": 701, "max": 1900}
+    ]},
+    {"name": "kullanici_adi", "type": "length", "min": 3, "max": 20},
+    {"name": "para_birimi", "type": "enum", "valid": ["TRY", "EUR"], "invalid": ["USD"]}
+  ]
+}

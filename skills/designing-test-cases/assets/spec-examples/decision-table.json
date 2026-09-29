@@ -1,0 +1,19 @@
+{
+  "id": "DS-002",
+  "title": "Coupon eligibility",
+  "language": "en",
+  "requirement_ids": ["REQ-001", "REQ-002"],
+  "conditions": [
+    {"name": "registered", "values": ["Y", "N"]},
+    {"name": "basket_total", "values": ["<100", ">=100"]},
+    {"name": "coupon", "values": ["valid", "expired", "unknown"]}
+  ],
+  "actions": ["discount", "message"],
+  "rules": [
+    {"id": "R1", "when": {"registered": "Y", "basket_total": ">=100", "coupon": "valid"}, "then": {"discount": "10%", "message": "Coupon applied"}},
+    {"id": "R2", "when": {"coupon": "expired"}, "then": {"discount": "none", "message": "Coupon expired"}},
+    {"id": "R3", "when": {"coupon": "unknown"}, "then": {"discount": "none", "message": "Invalid coupon"}},
+    {"id": "R4", "when": {"basket_total": "<100", "coupon": "valid"}, "then": {"discount": "none", "message": "Minimum basket 100 TRY"}},
+    {"id": "R5", "when": {"registered": "Y", "basket_total": "<100", "coupon": "expired"}, "then": {"discount": "none", "message": "Minimum basket 100 TRY"}}
+  ]
+}

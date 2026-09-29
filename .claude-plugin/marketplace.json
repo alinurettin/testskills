@@ -1,0 +1,13 @@
+{
+  "name": "qa-suite-marketplace",
+  "owner": {
+    "name": "QA Suite contributors"
+  },
+  "plugins": [
+    {
+      "name": "qa-suite",
+      "source": "./",
+      "description": "Requirements analysis, test design, traceability, export and Playwright/BDD automation skills (TR/EN)."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "id": "DS-003",
+  "title": "Sipariş yaşam döngüsü",
+  "language": "tr",
+  "requirement_ids": ["REQ-010"],
+  "initial": "Oluşturuldu",
+  "final": ["Teslim edildi", "İptal"],
+  "transitions": [
+    {"id": "T1", "from": "Oluşturuldu", "event": "öde", "to": "Ödendi", "guard": "ödeme onaylandı"},
+    {"id": "T2", "from": "Oluşturuldu", "event": "öde", "to": "Oluşturuldu", "guard": "ödeme reddedildi"},
+    {"id": "T3", "from": "Oluşturuldu", "event": "iptal", "to": "İptal"},
+    {"id": "T4", "from": "Ödendi", "event": "kargola", "to": "Kargoda", "action": "takip e-postası"},
+    {"id": "T5", "from": "Ödendi", "event": "iptal", "to": "İptal", "action": "iade başlat"},
+    {"id": "T6", "from": "Kargoda", "event": "teslim et", "to": "Teslim edildi"},
+    {"id": "T7", "from": "İade bekliyor", "event": "onayla", "to": "İptal"}
+  ]
+}

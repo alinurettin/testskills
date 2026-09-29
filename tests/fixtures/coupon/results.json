@@ -1,0 +1,1 @@
+{"run": "Sprint 14 – RC2", "results": {"TC-001": {"status": "passed"}, "TC-002": {"status": "failed", "defects": ["SHOP-481"]}, "TC-003": {"status": "passed"}}}

@@ -1,0 +1,19 @@
+{
+  "id": "DS-004",
+  "title": "Checkout compatibility",
+  "language": "en",
+  "requirement_ids": ["REQ-020"],
+  "strength": 2,
+  "parameters": [
+    {"name": "browser", "values": ["Chrome", "Firefox", "Safari", "Edge"]},
+    {"name": "os", "values": ["Windows", "macOS", "iOS", "Android"]},
+    {"name": "payment", "values": ["card", "wallet", "transfer"]},
+    {"name": "user", "values": ["guest", "registered"]},
+    {"name": "language", "values": ["tr", "en"]}
+  ],
+  "forbidden": [
+    {"os": "Windows", "browser": "Safari"},
+    {"os": ["iOS", "Android"], "browser": "Edge"},
+    {"user": "guest", "payment": "wallet"}
+  ]
+}

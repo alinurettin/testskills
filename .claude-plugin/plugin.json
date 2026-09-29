@@ -1,0 +1,23 @@
+{
+  "name": "qa-suite",
+  "version": "0.3.0",
+  "description": "Professional software testing skills: requirements analysis, risk-based test design with ISTQB techniques (computed by scripts), traceability matrix, Xray/Zephyr/Excel export, and Playwright + BDD automation whose results flow back into the traceability matrix. Bilingual (Turkish/English).",
+  "author": {
+    "name": "QA Suite contributors"
+  },
+  "keywords": [
+    "automation",
+    "bdd",
+    "gherkin",
+    "istqb",
+    "playwright",
+    "qa",
+    "requirements",
+    "test-design",
+    "testing",
+    "traceability",
+    "turkish",
+    "xray",
+    "zephyr"
+  ]
+}

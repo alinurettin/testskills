@@ -1,0 +1,38 @@
+name: e2e
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      grep:
+        description: 'Tag filter, e.g. @smoke or @TC-012'
+        required: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: {{AUTOMATION_DIR}}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npx playwright install --with-deps
+      - run: npx playwright test ${{ github.event.inputs.grep && format('--grep {0}', github.event.inputs.grep) || '' }}
+        env:
+          BASE_URL: ${{ vars.BASE_URL }}
+          TEST_USER: ${{ secrets.TEST_USER }}
+          TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() }}
+        with:
+          name: playwright-report
+          path: |
+            {{AUTOMATION_DIR}}/playwright-report
+            {{AUTOMATION_DIR}}/test-results
+          retention-days: 14

@@ -1,0 +1,170 @@
+{
+  "skill_name": "qa-suite",
+  "evals": [
+    {
+      "id": 1,
+      "name": "tr-kupon-uctan-uca",
+      "prompt": "Ekteki kupon user story'si (evals/files/kupon-user-story.md) için baştan sona test analizi yap: gereksinimleri analiz et, test case'leri çıkar ve Xray'e import edebileceğim CSV'yi hazırla. Sorulara cevap bekleme, makul varsayımlarla ilerle ama varsayımları belirt.",
+      "expected_output": "Turkish QA package: normalized requirements with IDs, flagged issues (vague 'hızlı', TBD guest rule, open-ended 'vb.'), clarification questions, boundary tests at 100 TL and at the 500 TL cap point, negative tests (expired, reuse), traceability, and an Xray CSV with step rows.",
+      "files": [
+        "evals/files/kupon-user-story.md"
+      ],
+      "assertions": [
+        {
+          "id": "a1-reqs-with-ids",
+          "text": "Requirements are normalized into a structured list/file where each has a stable ID (e.g. REQ-001) and at least 6 requirements exist"
+        },
+        {
+          "id": "a1-vague-hizli",
+          "text": "The analysis flags AC-5 'hızlı' as unmeasurable/vague and proposes a measurable threshold or asks a question"
+        },
+        {
+          "id": "a1-guest-tbd",
+          "text": "The analysis flags the guest-user rule (AC-6, 'belirlenecek') as unresolved/contradicting the registered-customer story and raises it as a question"
+        },
+        {
+          "id": "a1-questions-log",
+          "text": "A clarification question list exists with at least 5 questions, and questions include options or a default assumption"
+        },
+        {
+          "id": "a1-bva-100",
+          "text": "Test cases include boundary values around the 100 TL threshold (both 100,00 and a value just below such as 99,99)"
+        },
+        {
+          "id": "a1-cap-500",
+          "text": "Test cases cover the 50 TL maximum-discount cap including the point where 10% equals 50 TL (a 500 TL basket) and a value above it"
+        },
+        {
+          "id": "a1-negative-reuse",
+          "text": "There is a negative test for using the same coupon a second time by the same user"
+        },
+        {
+          "id": "a1-all-linked",
+          "text": "Every test case references at least one requirement ID"
+        },
+        {
+          "id": "a1-xray-csv",
+          "text": "An Xray-importable CSV file exists with a test identifier column plus step columns (Action / Data / Expected Result) and multi-step tests span multiple rows under the same test id"
+        },
+        {
+          "id": "a1-turkish",
+          "text": "Human-readable artifacts (test titles, steps, questions) are written in Turkish"
+        },
+        {
+          "id": "a1-priority-calibrated",
+          "text": "Priorities are calibrated: at most 20% of test cases are critical and critical+high together are at most 60% (count programmatically)"
+        },
+        {
+          "id": "a1-proportionate-size",
+          "text": "The suite is proportionate for a 6-AC story: between 15 and 45 test cases"
+        },
+        {
+          "id": "a1-derived-restraint",
+          "text": "Derived/inferred requirements are limited (at most 8) and each is explicitly marked as unconfirmed"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "en-loan-requirements-review",
+      "prompt": "We're about to start testing the loan application feature. Please review the requirements in evals/files/loan-srs.md for quality and testability before we write any tests. I need a list of the problems and the questions I should send to the product owner.",
+      "expected_output": "English requirements review: TBD (FR-7), age contradiction FR-1 vs FR-4, vague/compound FR-5 with 'etc.', unmeasurable NFR-1, missing upper bound / inclusivity for score, undefined withdraw target state and missing transitions, plus a prioritized question list with options/defaults; missing NFRs (performance, accessibility, privacy).",
+      "files": [
+        "evals/files/loan-srs.md"
+      ],
+      "assertions": [
+        {
+          "id": "a2-tbd",
+          "text": "FR-7 is flagged as incomplete because of 'TBD'"
+        },
+        {
+          "id": "a2-age-conflict",
+          "text": "The overlap/contradiction between FR-1 (18-65) and FR-4 (over 21 online, others at branch) is identified"
+        },
+        {
+          "id": "a2-fr5",
+          "text": "FR-5 is flagged both as vague ('quickly') and as compound/open-ended ('etc.' or multiple obligations)"
+        },
+        {
+          "id": "a2-nfr1",
+          "text": "NFR-1 is flagged as unmeasurable ('secure', 'highly available') with a proposal for measurable criteria"
+        },
+        {
+          "id": "a2-boundaries",
+          "text": "Boundary ambiguity is raised: inclusivity of ranges (e.g. 'between 18 and 65', 'between 1,000 and 50,000') and/or the missing upper limit of the credit score"
+        },
+        {
+          "id": "a2-state-model",
+          "text": "FR-6 is analysed as a state model: the target state of 'withdrawn' and/or other undefined transitions (e.g. withdraw from In Review, re-submission after Rejected) are raised"
+        },
+        {
+          "id": "a2-missing-nfr",
+          "text": "Missing requirement areas are identified beyond the text (at least two of: performance thresholds, accessibility, data privacy/KVKK/GDPR, audit, error handling, roles/permissions)"
+        },
+        {
+          "id": "a2-questions",
+          "text": "A prioritized question list for the product owner exists with at least 7 questions, each tied to a requirement ID"
+        },
+        {
+          "id": "a2-actionable-questions",
+          "text": "Every question sent to the product owner offers concrete options or a default assumption (not just an open question)"
+        },
+        {
+          "id": "a2-fr3-fr6-conflict",
+          "text": "The conflict between FR-3 automatic approve/reject and FR-6's mandatory 'In Review' step is identified"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "tr-odeme-tasarim",
+      "prompt": "evals/files/odeme-kurallari.md dosyasındaki ödeme ekranı için test tasarımı yap. Taksit kurallarını karar tablosuyla, ortam uyumluluğunu kombinasyon (pairwise) tekniğiyle ele al. Test case'leri ve gereksinim-test kapsam matrisini ver.",
+      "expected_output": "Turkish test design: decision table over card type / basket ≥500 / campaign / foreign card with gaps (e.g. wallet installments, 500 inclusivity) surfaced; boundary tests at 500 TL; pairwise set covering all valid pairs while respecting Safari/Edge constraints with far fewer than 96 rows; test cases linked to R1-R5; coverage matrix.",
+      "files": [
+        "evals/files/odeme-kurallari.md"
+      ],
+      "assertions": [
+        {
+          "id": "a3-dt-conditions",
+          "text": "A decision table is produced whose conditions include card type, basket amount ≥ 500 TL, campaign product presence and domestic/foreign card"
+        },
+        {
+          "id": "a3-dt-gap",
+          "text": "At least one rule gap or ambiguity is surfaced as a question (e.g. installments for digital wallet, foreign debit card, whether exactly 500 TL counts, what 'taksit seçenekleri' shows under 500 TL)"
+        },
+        {
+          "id": "a3-bva-500",
+          "text": "Test cases include boundary values at the 500 TL threshold (500,00 and 499,99)"
+        },
+        {
+          "id": "a3-pairwise-constraints",
+          "text": "The pairwise combination table contains no Safari+Windows/Android rows and no Edge+iOS/Android rows"
+        },
+        {
+          "id": "a3-pairwise-complete",
+          "text": "The pairwise table covers every valid pair of browser/OS/payment/language values (verified) with fewer than 30 rows"
+        },
+        {
+          "id": "a3-linked",
+          "text": "Every test case is linked to at least one requirement (R1-R5 or REQ IDs)"
+        },
+        {
+          "id": "a3-rtm",
+          "text": "A requirement-to-test coverage matrix is provided showing every requirement R1-R5 with its tests"
+        },
+        {
+          "id": "a3-turkish",
+          "text": "Test cases and matrix are written in Turkish"
+        },
+        {
+          "id": "a3-r1-r4-conflict",
+          "text": "The R1/R4 conflict (foreign credit card with basket >= 500 TL: R1 shows installments, R4 forbids them) is explicitly surfaced as a conflict or question, not silently resolved"
+        },
+        {
+          "id": "a3-priority-calibrated",
+          "text": "Priorities are calibrated: at most 20% of test cases are critical and critical+high together are at most 60% (count programmatically; for runs without explicit priorities, FAIL)"
+        }
+      ]
+    }
+  ]
+}

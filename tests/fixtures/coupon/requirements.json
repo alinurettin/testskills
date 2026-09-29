@@ -1,0 +1,13 @@
+{
+  "project": "Online Mağaza – Kupon",
+  "language": "tr",
+  "version": 1,
+  "requirements": [
+    {"id": "REQ-001", "external_id": "SHOP-101", "title": "Kupon ile %10 indirim", "text": "Kayıtlı kullanıcı, sepet tutarı 100 TL ve üzerindeyse geçerli bir kupon kodu ile %10 indirim almalıdır.", "type": "business-rule", "source": "US-12 AC-1", "priority": "high", "risk": {"likelihood": 3, "impact": 4, "rationale": "Gelir etkisi, çok koşullu kural"}, "status": "ready", "derived": false},
+    {"id": "REQ-002", "external_id": "SHOP-102", "title": "Süresi dolmuş kupon reddi", "text": "Süresi dolmuş kupon uygulandığında sistem 'Bu kuponun süresi dolmuştur' mesajını göstermeli ve indirim uygulamamalıdır.", "type": "functional", "source": "US-12 AC-2", "priority": "high", "risk": {"likelihood": 3, "impact": 3}, "status": "ready", "derived": false},
+    {"id": "REQ-003", "external_id": "", "title": "Kupon kodu büyük/küçük harf duyarsız", "text": "Kupon kodu büyük/küçük harfe duyarsız doğrulanmalıdır (Türkçe İ/ı dahil).", "type": "functional", "source": "Analiz – örtük gereksinim", "priority": "medium", "risk": {"likelihood": 4, "impact": 2}, "status": "clarification-needed", "derived": true, "questions": ["Q-001"]},
+    {"id": "REQ-004", "external_id": "SHOP-104", "title": "Kupon doğrulama yanıt süresi", "text": "Kupon doğrulama isteği 200 eşzamanlı kullanıcı altında p95 ≤ 800 ms içinde yanıtlanmalıdır.", "type": "non-functional", "quality_characteristic": "performance-efficiency", "source": "NFR-3", "priority": "medium", "risk": {"likelihood": 2, "impact": 3}, "status": "ready", "derived": false},
+    {"id": "REQ-005", "external_id": "SHOP-105", "title": "Kupon tek kullanımlık", "text": "Bir kupon aynı kullanıcı tarafından yalnızca bir kez kullanılabilmelidir.", "type": "business-rule", "source": "US-13", "priority": "critical", "risk": {"likelihood": 4, "impact": 5}, "status": "ready", "derived": false},
+    {"id": "REQ-006", "title": "Eski kampanya ekranı", "text": "Eski kampanya ekranı kaldırılacak.", "type": "functional", "source": "US-9", "priority": "low", "status": "deferred", "derived": false}
+  ]
+}
