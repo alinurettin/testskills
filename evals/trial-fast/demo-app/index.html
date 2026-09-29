@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="tr">
+<head><meta charset="utf-8"><title>Demo Bank – FAST Transfer</title>
+<style>body{font-family:sans-serif;max-width:560px;margin:2rem auto}label{display:block;margin-top:.8rem}input{width:100%;padding:.4rem}button{margin-top:1rem;padding:.5rem 1rem}#receipt,#otp-step,#dup{display:none;border:1px solid #999;padding:1rem;margin-top:1rem}</style>
+</head>
+<body>
+<main>
+  <h1>FAST ile Para Gönder</h1>
+  <p>Bakiye: <strong data-testid="balance">120.000,00 TL</strong> · Günlük kalan limit: <strong data-testid="daily-remaining">100.000,00 TL</strong></p>
+  <form id="form" novalidate>
+    <label for="iban">Alıcı IBAN</label><input id="iban" autocomplete="off">
+    <label for="name">Alıcı adı</label><input id="name">
+    <label for="amount">Tutar (TL)</label><input id="amount" inputmode="decimal">
+    <label for="desc">Açıklama</label><input id="desc">
+    <button type="submit">Devam</button>
+  </form>
+  <p role="alert" id="msg"></p>
+  <section id="dup" aria-label="Tekrar uyarısı"><p id="dup-text"></p><button id="dup-yes" type="button">Yine de gönder</button> <button id="dup-no" type="button">Vazgeç</button></section>
+  <section id="otp-step" aria-label="SMS doğrulama">
+    <p>Telefonunuza gönderilen kodu girin. <small>(Test ortamı kodu: 123456)</small></p>
+    <label for="otp">SMS kodu</label><input id="otp" inputmode="numeric">
+    <button id="otp-ok" type="button">Onayla</button>
+  </section>
+  <section id="receipt" aria-label="Dekont">
+    <h2>Dekont</h2>
+    <p>Tutar: <span data-testid="receipt-amount"></span></p>
+    <p>İşlem ücreti: <span data-testid="receipt-fee"></span></p>
+    <p>Toplam: <span data-testid="receipt-total"></span></p>
+    <p>Alıcı: <span data-testid="receipt-iban"></span></p>
+    <p>Açıklama: <span data-testid="receipt-desc"></span></p>
+    <button id="new" type="button">Yeni transfer</button>
+  </section>
+</main>
+<script src="/app.js"></script>
+</body>
+</html>

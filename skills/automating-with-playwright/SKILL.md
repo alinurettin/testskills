@@ -104,6 +104,8 @@ Classify every failure:
 - **Product bug** (the behaviour contradicts the requirement): keep the assertion. Report the defect, add its key to `qa/results.json`, and optionally mark the test with `test.fail(true, 'KEY: summary')`.
 - **Flaky** (passes only on retry): fix the root cause. Never raise timeouts blindly.
 
+Check stability with `--repeat-each=3`. Keep any `--output` folder inside the automation project, so that runs never write outside the repository.
+
 ### 7. Close the loop
 ```bash
 python scripts/pw_results.py test-results/results.json --out ../qa/results.json --run "<label>"
