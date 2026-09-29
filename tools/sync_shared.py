@@ -23,6 +23,10 @@ SHARED = {
     "scripts/qa_compact.py": ("scripts", ["analyzing-requirements", "designing-test-cases", "reviewing-test-cases",
                                           "testing-nonfunctional"]),
 }
+# shared folder -> (target folder inside each skill, skills that receive every file of it)
+SHARED_DIRS = {
+    "domains": ("references/domains", ["analyzing-requirements", "designing-test-cases"]),
+}
 
 
 def main() -> int:
@@ -30,7 +34,11 @@ def main() -> int:
     ap.add_argument("--check", action="store_true")
     a = ap.parse_args()
     stale = []
-    for name, (folder, skills) in SHARED.items():
+    items = dict(SHARED)
+    for d, (folder, skills) in SHARED_DIRS.items():
+        for f in sorted((ROOT / "shared" / d).glob("*.md")):
+            items[f"{d}/{f.name}"] = (folder, skills)
+    for name, (folder, skills) in items.items():
         src = (ROOT / "shared" / name).read_bytes()
         for skill in skills:
             dst = ROOT / "skills" / skill / folder / Path(name).name

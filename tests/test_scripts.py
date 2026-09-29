@@ -694,6 +694,26 @@ class ReviewAndImportTests(unittest.TestCase):
             self.assertEqual(qc.validate(items, "tc", lenient=True), [])  # lenient import passes
 
 
+class CheckIdsTests(unittest.TestCase):
+    ids = load(SK / "designing-test-cases" / "scripts" / "check_ids.py")
+
+    def test_known_examples(self):
+        self.assertTrue(self.ids.tckn("10000000146")[0])           # widely documented test TCKN
+        self.assertFalse(self.ids.tckn("12345678901")[0])
+        self.assertFalse(self.ids.tckn("00000000146")[0])
+        self.assertTrue(self.ids.iban("TR33 0006 1005 1978 6457 8413 26")[0])  # standard TR example
+        self.assertTrue(self.ids.iban("GB82 WEST 1234 5698 7654 32")[0])
+        self.assertFalse(self.ids.iban("TR330006100519786457841327")[0])
+
+    def test_variants_are_invalid(self):
+        for kind, val in (("tckn", "10000000146"), ("iban", "TR330006100519786457841326")):
+            for v, note in self.ids.variants(kind, val):
+                if "usually accepted" in note or "clarify" in note and kind == "iban":
+                    self.assertIn("VALID", note)
+                else:
+                    self.assertIn("invalid", note, (kind, v))
+
+
 class ExportTests(unittest.TestCase):
     def run_export(self, *args, tests=None):
         base = [sys.executable, str(EXPORT), "--tests", str(tests or FIX / "test-cases.json")]

@@ -35,6 +35,7 @@ Going beyond the budget is fine when the input really demands it. Say why.
 - **Light mode:** this file is enough. Open `references/quality-criteria.md` only if you need the full writing rules.
 - **Full mode:** also read `references/quality-criteria.md`, and the relevant sections of `references/implicit-requirements.md` and `references/nfr-checklist.md`.
 - **When proposing rewrites:** read `references/ears-and-stories.md` (EARS patterns, Gherkin TR/EN).
+- **Domain packs, in both modes:** when the product is in banking/payments, e-commerce, health or the public sector, read the matching pack in `references/domains/` and use its implicit-requirements checklist and regulations list during the completeness walk. The packs are `fintech.md`, `ecommerce.md`, `health.md` and `public-sector.md`.
 - **Compact format syntax:** run `python scripts/qa_compact.py --help`. You do not need `references/data-model.md` unless you read the JSON directly.
 
 ## Inputs this skill handles
@@ -174,5 +175,6 @@ If test cases come next, continue with the `designing-test-cases` skill.
 - `references/implicit-requirements.md`: discovery questions by area, and domain packs.
 - `references/nfr-checklist.md`: ISO 25010:2023 with measurable examples, and WCAG/OWASP baselines.
 - `references/ears-and-stories.md`: EARS (EN/TR), INVEST, Gherkin (EN/TR), rewrites.
+- `references/domains/fintech.md`, `references/domains/ecommerce.md`, `references/domains/health.md`, `references/domains/public-sector.md`: domain packs covering regulations, implicit requirements, high-risk rules, test data and typical defects.
 - `references/data-model.md`: the generated JSON schema.
 - `assets/analysis-report-template.md`, `assets/clarifications-template.md`: bilingual templates.

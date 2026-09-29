@@ -101,11 +101,8 @@ Do not dump the whole list on the user. Choose the areas that are relevant to th
 - Configurable parameters: who can change them, and what are the defaults and limits?
 
 ## 13. Domain packs
-
-**E-commerce**: stock reservation timing, price change between cart and checkout, coupon stacking and exclusivity, minimum basket amount, shipping thresholds, returns and partial refunds, taxes, guest checkout, abandoned carts.
-
-**Finance and banking**: transaction limits (daily, per transaction), cut-off times and holidays, idempotency of transfers, double-entry consistency, interest and rounding, two-factor authentication and step-up auth, fraud checks, regulatory reporting, reconciliation.
-
-**Health**: patient identity matching, consent, data sensitivity levels, clinical safety (fail safe), audit trail, interoperability standards (HL7/FHIR).
-
-**Public sector**: e-Devlet integration, identity number validation (the TC Kimlik No checksum), accessibility obligations, archival rules.
+Regulated or specialised domains have their own detailed checklists. Each one covers regulations to check, implicit requirements, high-risk rules, test data and typical defects. Read the pack that matches the product:
+- `domains/fintech.md`: banking, payments, lending, cards
+- `domains/ecommerce.md`: catalogue, campaigns, checkout, orders, returns, marketplaces
+- `domains/health.md`: patient data, clinical workflows, health integrations
+- `domains/public-sector.md`: e-government, e-signature, citizen services

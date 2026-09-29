@@ -27,6 +27,7 @@ Write test cases in the user's language: Turkish if the user writes Turkish, oth
   - the sections of `references/techniques.md` for the techniques you actually apply (find them via its Contents list);
   - the relevant categories of `references/error-guessing-checklist.md`.
 - **Read `references/test-case-standard.md` sections 2 and 4** (writing rules and priority) before your first test. Use section 6 as the final checklist.
+- **Domain packs:** for banking/payments, e-commerce, health or the public sector, read sections 3–4 of the matching pack in `references/domains/` (high-risk rules → techniques, and test data such as TCKN/IBAN validation partitions).
 - **Compact format syntax:** run `python scripts/qa_compact.py --help`. You do not need `references/data-model.md` unless you read the JSON directly.
 
 ## Inputs
@@ -165,9 +166,11 @@ Tell the user:
 - `scripts/decision_table.py`: expansion, gaps, conflicts, dead rules, collapsing.
 - `scripts/state_transition.py`: state table, model defects, 0/1-switch sequences, invalid transitions.
 - `scripts/pairwise.py`: t-wise covering array with constraints and verification.
+- `scripts/check_ids.py`: validates TCKN/VKN/IBAN test data and derives single-fault invalid variants (it never generates new valid IDs).
 - `assets/spec-examples/`: one example spec per script.
 - `references/technique-selection.md`: which technique to use when, risk-based depth, test budget.
 - `references/techniques.md`: procedures, coverage measures and pitfalls for each technique.
 - `references/test-case-standard.md`: fields, writing rules, priority calibration, review checklist, dedupe.
 - `references/error-guessing-checklist.md`: fault taxonomy with a Turkish-locale focus.
 - `references/data-model.md`: generated JSON schema; only needed for reading the JSON directly.
+- `references/domains/fintech.md`, `references/domains/ecommerce.md`, `references/domains/health.md`, `references/domains/public-sector.md`: domain packs.
