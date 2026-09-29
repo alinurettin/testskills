@@ -77,16 +77,16 @@ MSG = {
 }
 
 
-def review(t: dict) -> list[tuple[str, str, str]]:
+def review(t: dict, other_ids: frozenset = frozenset()) -> list[tuple[str, str, str]]:
     f: list[tuple[str, str, str]] = []
     steps = t.get("steps") or []
     for i, s in enumerate(steps, 1):
         act, exp, data = str(s.get("action", "")), str(s.get("expected", "")).strip(), str(s.get("data", "") or "")
-        if (not exp or exp.lower() in PLACEHOLDER) and t.get("technique") != "exploratory":
-            f.append(("MISSING_EXPECTED", str(i), ""))
-            continue
+        missing = (not exp or exp.lower() in PLACEHOLDER) and t.get("technique") != "exploratory"
+        if missing:
+            f.append(("MISSING_EXPECTED", str(i), ""))  # keep checking the action: data may be missing too
         m = VAGUE.search(exp)
-        if m and not OBSERVABLE.search(VAGUE.sub("", exp)):
+        if not missing and m and not OBSERVABLE.search(VAGUE.sub("", exp)):
             f.append(("VAGUE_EXPECTED", str(i), m.group(0)))
         if INPUT.search(act) and not data and not CONCRETE.search(act) and not t.get("test_data"):
             f.append(("NO_DATA", str(i), ""))
@@ -95,9 +95,14 @@ def review(t: dict) -> list[tuple[str, str, str]]:
         if exp and re.sub(r"\W", "", exp.lower()) == re.sub(r"\W", "", act.lower()):
             f.append(("EXPECTED_ECHO", str(i), ""))
     text = " ".join([str(t.get("preconditions", ""))] + [str(s.get("action", "")) for s in steps])
-    dm = DEP.search(text.replace(t.get("id", "@@"), ""))
-    if dm:
-        f.append(("DEPENDENT", "", dm.group(0)))
+    own = {t.get("id", "@@")} | {x[4:] for x in t.get("tags", []) if x.startswith("src-")}
+    for o in own:
+        text = text.replace(o, "")
+    dm = DEP.search(text)
+    # references to other tests of the suite by any ID scheme (e.g. imported "K-02"), not only TC-###
+    other = next((i for i in other_ids if re.search(rf"(?<![\w-]){re.escape(i)}(?![\w-])", text)), None)
+    if dm or other:
+        f.append(("DEPENDENT", "", dm.group(0) if dm else other))
     reqs = [r for r in t.get("requirement_ids", []) if r and r.upper() != "UNLINKED"]
     if not reqs and "exploratory" not in t.get("tags", []):
         f.append(("NO_REQ", "", ""))
@@ -130,9 +135,10 @@ def main() -> int:
     lang = lang if lang in L else "en"
     t_, msg = L[lang], MSG[lang]
 
+    all_ids = {t.get("id") for t in tests} | {x[4:] for t in tests for x in t.get("tags", []) if x.startswith("src-")}
     rows = []
     for t in tests:
-        f = review(t)
+        f = review(t, frozenset(i for i in all_ids if i))
         score = max(0, 100 - sum(W[SEV[c]] for c, _, _ in f))
         rows.append({"id": t.get("id", "?"), "title": t.get("title", ""), "score": score,
                      "findings": [{"rule": c, "severity": SEV[c], "message": msg[c].format(s=s, m=m)} for c, s, m in f]})

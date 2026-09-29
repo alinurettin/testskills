@@ -1,0 +1,9 @@
+Test No;Başlık;Ön Koşul;Adımlar;Beklenen Sonuç;Öncelik;Gereksinim
+K-01;Kupon testi;Kullanıcı giriş yapmış;"1. Sepete ürün ekle 2. Kupon kodunu gir 3. Uygula'ya tıkla";"1. Ürün eklenir 2. - 3. Başarılı olmalı";Yüksek;SHOP-42
+K-02;150 TL sepette YAZ10 ile %10 indirim;Kullanıcı giriş yapmış, sepet 150,00 TL;"1. Kupon alanına YAZ10 yaz 2. Uygula'ya tıkla";"1. Kod alana yazılır 2. ""Kupon uygulandı."" mesajı; indirim -15,00 TL; toplam 135,00 TL";Yüksek;SHOP-42
+K-03;99,99 TL sepette kupon uygulanır;Sepet 99,99 TL;"1. YAZ10 kodunu uygula";"1. İndirim -10,00 TL uygulanır";Orta;SHOP-42
+K-04;Süresi dolmuş kupon;;"1. Süresi dolmuş kuponu gir 2. Uygula";"1. - 2. Hata mesajı çıkmalı";Orta;SHOP-42
+K-05;Kupon ikinci kez kullanılamaz;K-02 testi çalıştırılmış ve sipariş tamamlanmış olmalı;"1. Aynı kuponu tekrar uygula";"1. Uygun hata mesajı gösterilir";Yüksek;SHOP-42
+K-06;150 TL sepette YAZ10 ile %10 indirim;Kullanıcı giriş yapmış, sepet 150,00 TL;"1. Kupon alanına YAZ10 yaz 2. Uygula'ya tıkla";"1. Kod alana yazılır 2. ""Kupon uygulandı."" mesajı; indirim -15,00 TL; toplam 135,00 TL";Yüksek;SHOP-42
+K-07;Geçersiz kupon;;"1. Geçersiz bir kod gir ve uygula ve sonra sepeti yenile";"1. Doğru çalışır";Düşük;
+K-08;Kupon küçük harfle girilir;Sepet 200,00 TL;"1. yaz10 yaz 2. Uygula'ya tıkla";"1. Kod yazılır 2. Kupon uygulanır, indirim -20,00 TL";Orta;SHOP-42

@@ -652,6 +652,19 @@ class ReviewAndImportTests(unittest.TestCase):
             self.assertEqual(res["TC-002"], {"DEPENDENT"})  # "Giriş" is not the verb "gir"; e-mail is concrete data
             self.assertTrue({"VAGUE_EXPECTED", "MULTI_ACTION", "NO_REQ", "NO_PRIORITY"} <= res["TC-003"])
 
+    def test_imported_suite_dependency_and_missing_data(self):
+        # found by the agent eval: foreign IDs ("K-02 testi …") and data missing on a step without expected result
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            run_py(REV / "import_tests.py", ROOT / "evals" / "files" / "kupon-test-seti.csv", "--out", tmp / "t.src.md")
+            run_py(COMPACT, "tc", tmp / "t.src.md", "--out", tmp / "t.json", "--lenient")
+            res = json.loads(run_py(REV / "review_tests.py", "--tests", tmp / "t.json", "--json").stdout)
+            rules = {x["id"]: {f["rule"] for f in x["findings"]} for x in res["results"]}
+            self.assertIn("DEPENDENT", rules["TC-005"])                       # "K-02 testi çalıştırılmış olmalı"
+            self.assertTrue({"MISSING_EXPECTED", "NO_DATA"} <= rules["TC-004"])  # "Süresi dolmuş kuponu gir" => -
+            self.assertEqual(res["duplicate_titles"], ["150 tl sepette yaz10 ile %10 indirim"])
+            self.assertNotIn("DEPENDENT", rules["TC-002"])                    # its own src-K-02 tag is not a dependency
+
     def test_import_row_per_test_and_row_per_step(self):
         with tempfile.TemporaryDirectory() as d:
             tmp = Path(d)
