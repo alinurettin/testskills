@@ -4,7 +4,7 @@ description: Designs professional manual test cases from requirements using ISTQ
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Designing test cases

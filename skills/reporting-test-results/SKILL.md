@@ -4,7 +4,7 @@ description: Produces professional test reporting from QA Suite artifacts. It wr
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Reporting test results

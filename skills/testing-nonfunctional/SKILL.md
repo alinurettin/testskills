@@ -4,7 +4,7 @@ description: Designs and runs non-functional tests traced to requirements. Perfo
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Testing non-functional requirements

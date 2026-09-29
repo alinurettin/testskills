@@ -1,0 +1,22 @@
+[
+ {"query": "şu story için test case yaz: kullanıcı profil fotoğrafını değiştirebilir, max 5 MB, jpg/png", "expect": ["designing-test-cases", "qa-orchestrator"]},
+ {"query": "test case'leri çıkar sonra da Xray'e yükleyeceğim dosyayı ver", "expect": ["qa-orchestrator", "designing-test-cases"]},
+ {"query": "Excel'deki eski test case'lerimizi Xray'e taşımamız lazım, nasıl yaparız?", "expect": ["reviewing-test-cases", "exporting-test-cases"]},
+ {"query": "performans gereksinimimiz 'sistem hızlı yanıt vermeli' diyor, bu test edilebilir mi, nasıl yazmalıyız?", "expect": ["analyzing-requirements", "testing-nonfunctional"]},
+ {"query": "ödeme sayfasında ekran okuyucu 'Öde' butonunu okumuyor, bunun için bug kaydı yaz", "expect": "reporting-test-results"},
+ {"query": "regresyon setimiz çok büyüdü, 800 test var, hangilerini her sprintte koşmalıyız?", "expect": ["planning-tests", "tracing-requirements", "reviewing-test-cases"]},
+ {"query": "QA olarak bu sprintte ne test edeceğimizi ve ne kadar süreceğini planlamam lazım", "expect": "planning-tests"},
+ {"query": "kabul kriterleri yazar mısın bu story için: kullanıcı favori ürünlerini listeleyebilir", "expect": ["analyzing-requirements", "writing-bdd-scenarios"]},
+ {"query": "yazdığımız Playwright testleri sürekli flaky, bazen geçiyor bazen kalıyor, ne yapmalıyız", "expect": ["automating-with-playwright", "none"]},
+ {"query": "karar tablosu çıkar: üye tipi (gold/silver/standart), sepet tutarı, kampanya kodu → kargo ücreti", "expect": "designing-test-cases"},
+ {"query": "bu hafta kaç bug bulduk, hangi gereksinimler riskli, yöneticiye özet lazım", "expect": "reporting-test-results"},
+ {"query": "IDOR açığı var mı diye API'mizi nasıl test ederiz? kendi staging ortamımız", "expect": "testing-nonfunctional"},
+ {"query": "SRS'teki gereksinimlere ID ver ve her birini atomik hale getir", "expect": "analyzing-requirements"},
+ {"query": "gereksinimlerimiz Jira'da, test case'lerimiz TestRail'de; hangi story'nin testi eksik görmek istiyorum", "expect": ["tracing-requirements", "reviewing-test-cases"]},
+ {"query": "TCKN alanı için geçerli ve geçersiz test verileri lazım", "expect": "designing-test-cases"},
+ {"query": "e-ticaret sitemizin kampanya modülü için gözden kaçan gereksinim var mı, sektöre özel neler sorulmalı?", "expect": "analyzing-requirements"},
+ {"query": "Cypress ile yazılmış testlerimizi Playwright'a taşımak istiyoruz", "expect": ["automating-with-playwright", "none"]},
+ {"query": "write a Python function that validates Turkish IBAN numbers for our backend", "expect": "none"},
+ {"query": "SonarQube'da kod kapsamı %60, bunu nasıl %80'e çıkarırız?", "expect": "none"},
+ {"query": "bu pull request'teki değişiklikleri incele, bug var mı", "expect": "none"}
+]

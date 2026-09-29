@@ -4,7 +4,7 @@ description: Writes a concrete, risk-based test plan in the ISO/IEC/IEEE 29119-3
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Planning tests

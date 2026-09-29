@@ -4,7 +4,7 @@ description: Exports QA Suite test cases (test-cases.json) into import-ready fil
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Exporting test cases
@@ -17,6 +17,11 @@ The export is where test design meets the team's tooling. A wrong column mapping
 - `qa/requirements.json`, strongly recommended. Its `external_id` values (Jira keys such as `SHOP-123`) become real requirement links in Xray and Zephyr. Without them, the links survive only as labels.
 
 If the test cases exist only as prose or a table in the conversation, first convert them into `qa/test-cases.json`. The `designing-test-cases` skill does this through its compact format.
+
+If they live in Excel, TestRail or another tool's CSV (for example, "move our Excel tests into Xray"), import them first with the `reviewing-test-cases` skill:
+1. Run `../reviewing-test-cases/scripts/import_tests.py`, then `qa_compact.py --lenient`.
+2. Run `review_tests.py`. Otherwise vague steps and missing expected results migrate into Jira unchanged.
+3. Export the result.
 
 When all requirements come from one Jira story or epic, derived and split requirements can carry that story's key as their `external_id`. The Xray/Zephyr link then points to the story. The exporter writes each key only once per test.
 

@@ -4,7 +4,7 @@ description: Professional requirements analysis for software testing. Normalizes
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # Analyzing requirements

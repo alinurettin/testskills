@@ -4,7 +4,7 @@ description: Entry point of the QA Suite. Runs the end-to-end testing workflow f
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.4.0"
+  version: "0.5.0"
 ---
 
 # QA Suite orchestrator
