@@ -241,7 +241,8 @@ def apply_field(cur: dict, kind: str, key: str, val: str) -> str | None:
     return None
 
 
-def validate(items: list[dict], kind: str) -> list[str]:
+def validate(items: list[dict], kind: str, lenient: bool = False) -> list[str]:
+    """lenient (imports): missing expected results are left for review_tests.py to report instead of blocking."""
     errs, seen = [], set()
     for it in items:
         where = f"{it['id']} (line {it.get('_line', '?')})"
@@ -255,7 +256,7 @@ def validate(items: list[dict], kind: str) -> list[str]:
             if not it.get("steps"):
                 errs.append(f"{where}: no steps ('N. action [data] => expected')")
             nums = [s for s in it.get("steps", []) if not s["expected"] and it.get("technique") != "exploratory"]
-            if nums:
+            if nums and not lenient:
                 errs.append(f"{where}: step without expected result")
         else:
             for f in ("text", "type", "priority", "source"):
@@ -354,6 +355,7 @@ def main() -> int:
     ap.add_argument("--out", required=True)
     ap.add_argument("--merge", action="store_true", help="keep items of an existing --out file not in the source")
     ap.add_argument("--to-compact", action="store_true", help="convert JSON -> compact text instead")
+    ap.add_argument("--lenient", action="store_true", help="imports: allow steps without expected result (reported by review_tests.py)")
     a = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
     try:
@@ -368,7 +370,7 @@ def main() -> int:
         print(f"wrote {out}")
         return 0
     header, items, errors = parse(raw, a.kind)
-    errors += validate(items, a.kind)
+    errors += validate(items, a.kind, a.lenient)
     if errors:
         print("validation failed, nothing written:", file=sys.stderr)
         for e in errors:

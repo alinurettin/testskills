@@ -9,12 +9,16 @@ Gereksinimden içe aktarılabilir test paketine ve çalışan Playwright otomasy
 | Skill | Ne yapar | Script |
 |---|---|---|
 | `qa-orchestrator` | Uçtan uca akışı yönetir: aşamalar, kapılar, final özeti | – |
+| `planning-tests` | ISO 29119-3 yapısında, riske dayalı test planı yazar. Ölçülebilir giriş/çıkış kriterleri (`exit-criteria.json`), ortam ve veri ihtiyaçları ile efor aralığı içerir. | `plan_facts.py` |
 | `analyzing-requirements` | Gereksinimleri atomik ve izlenebilir hale getirir. ISO 29148 kalite incelemesi, belirsizlik ve çelişki taraması, örtük ve fonksiyonel olmayan gereksinim keşfi (ISO 25010:2023), risk puanlama ve netleştirme soruları üretir. | `lint_requirements.py` (TR/EN belirsizlik linter'ı) |
 | `designing-test-cases` | ISTQB tekniklerini kullanarak risk bazlı test tasarımı yapar ve standart formatta manuel test case'ler yazar. | `ep_bva.py`, `decision_table.py`, `state_transition.py`, `pairwise.py` |
+| `testing-nonfunctional` | Fonksiyonel olmayan testleri gereksinime bağlı olarak tasarlar: performans (eşikleri gereksinimden gelen k6 script'leri; smoke, load, stress, spike ve soak profilleri), erişilebilirlik (WCAG 2.2 A/AA'nın 55 kriteri) ve güvenlik (OWASP ASVS 5.0 bölümleri). Taslaklar TR/EN üretilir. | `generate_k6.py`, `nfr_checklist.py` |
 | `tracing-requirements` | Çift yönlü izlenebilirlik matrisi (RTM) üretir. Şema doğrulaması, risk sıralı kapsam boşlukları, sahipsiz ve kopya testler ile değişiklik etki analizi yapar. | `build_rtm.py` |
 | `exporting-test-cases` | Xray, Zephyr Scale, Excel (.xlsx), CSV ve Markdown formatlarına export eder. Türkçe karakterleri güvenli şekilde kodlar. | `export_tests.py` |
 | `automating-with-playwright` | Test case'leri Playwright (TypeScript) otomasyonuna dönüştürür. Proje iskeleti, Page Object ve fixture'lar, `@TC` etiketli spec'ler üretir ve koşum sonuçlarını RTM'ye geri besler. Xray'e sonuç aktarımını da destekler. | `scaffold_project.py`, `generate_specs.py`, `check_automation.py`, `pw_results.py` |
 | `writing-bdd-scenarios` | Test case'lerden TR/EN Gherkin `.feature` dosyaları üretir, bunları bildirimsel dile çevirir ve playwright-bdd ile koşturur. | `generate_features.py` |
+| `reporting-test-results` | ISTQB alanlarına uygun hata raporları yazar. Test durum ve tamamlama raporlarında çıkış kriterlerini otomatik değerlendirir (karşılandı / karşılanmadı / bilinmiyor) ve kalan riskleri risk sırasıyla listeler. | `completion_report.py` |
+| `reviewing-test-cases` | Mevcut test setlerini (Excel, TestRail, Xray, Zephyr CSV) içe aktarır ve deterministik kontroller ile bir değerlendirme rubriğine göre denetler. | `import_tests.py`, `review_tests.py` |
 
 Tüm script'ler **yalnızca Python standart kütüphanesini** kullanır (Python 3.9+). Ek kurulum gerekmez. Otomasyonu koşturmak için ayrıca Node.js 18+ ve `@playwright/test` gerekir. BDD için `playwright-bdd` de gerekir.
 
@@ -24,10 +28,9 @@ Gereksinimler ve test case'ler elle JSON olarak yazılmaz. Kompakt bir metin for
 
 **Claude Code (plugin olarak):**
 ```bash
-claude plugin marketplace add C:/projeler/TestSkills
+claude plugin marketplace add alinurettin/testskills
 claude plugin install qa-suite@qa-suite-marketplace
 ```
-Depo GitHub'a yüklendiğinde yerel yol yerine `kullanici/repo` yazılır.
 
 **Claude Code (tek tek skill olarak):** `skills/<skill-adı>` klasörlerini `~/.claude/skills/` (kişisel) veya projedeki `.claude/skills/` klasörüne kopyalayın.
 
@@ -88,6 +91,16 @@ Skill kalite değerlendirmeleri (evals) `evals/` klasöründedir.
 
 ## Sürüm notları
 
+**0.4.0**: Faz 3, planlama, fonksiyonel olmayan testler, raporlama ve inceleme
+- **4 yeni skill ve 7 yeni script.** Paket artık 11 skill içeriyor:
+  - `planning-tests`: sayıları QA artefaktlarından hesaplanan test planı ve makine tarafından kontrol edilebilen çıkış kriterleri.
+  - `testing-nonfunctional`: gereksinim eşiklerinden k6 script'i (Node sözdizimi kontrolünden geçti), WCAG 2.2 A/AA'nın 55 kriteri (31 A + 24 AA, TR/EN), ASVS 5.0'ın 17 bölümüne göre güvenlik testleri.
+  - `reporting-test-results`: hata raporu standardı; tamamlama raporunda eksik veri "bilinmiyor" olarak gösterilir, asla 0 varsayılmaz.
+  - `reviewing-test-cases`: Excel/TestRail CSV içe aktarımı ve Türkçe/İngilizce yazım kalitesi kontrolleri.
+- **Ek iyileştirmeler:**
+  - `qa_compact.py --lenient`: içe aktarılan setler için.
+  - `.gitattributes`: satır sonları LF'ye sabitlendi.
+
 **0.3.0**: Faz 2, Playwright ve BDD otomasyonu
 - **2 yeni skill ve 5 yeni script.** Proje iskeleti, `@TC` etiketli spec üretimi (veri güdümlü gruplar dahil), otomasyon kapsam raporu ve Playwright sonuçlarının RTM'ye aktarımı. Türkçe/İngilizce Gherkin üretimi.
 - **Gerçek bir koşuyla doğrulandı (Playwright 1.63, playwright-bdd 9.2):**
@@ -111,7 +124,7 @@ Skill kalite değerlendirmeleri (evals) `evals/` klasöründedir.
 
 - **Faz 1 (tamam):** Gereksinim analizi, test tasarımı, RTM, Xray/Zephyr/Excel export, evals
 - **Faz 2 (tamam, 0.3.0):** Playwright (TypeScript) otomasyonu ve BDD/Gherkin (TR/EN). Aynı TC ID'leri korunuyor, sonuçlar RTM'ye aktarılıyor.
-- **Faz 3:** Fonksiyonel olmayan testler (performans senaryoları, WCAG 2.2 eşlemesi, OWASP ASVS eşlemesi), test planı ve strateji (29119-3), hata raporu ve test tamamlama raporu, test case denetleyicisi
+- **Faz 3 (tamam, 0.4.0):** Test planı, fonksiyonel olmayan testler (k6, WCAG 2.2, ASVS 5.0), hata ve tamamlama raporları, test case incelemesi
 - **Faz 4:** Tetiklenme (description) optimizasyonu, alan paketleri (fintech, e-ticaret, sağlık, kamu), marketplace'te yayın
 
 ## Lisans
@@ -128,5 +141,6 @@ QA Suite is a bilingual (TR/EN) set of Agent Skills. It turns requirements into 
 - an RTM with a gap report
 - import-ready exports for Xray, Zephyr Scale and Excel
 - Playwright (TypeScript) and BDD automation. Every automated test keeps its `@TC-###` tag, and the results flow back into the RTM.
+- Test planning with machine-checkable exit criteria, non-functional testing (k6 thresholds from requirements, WCAG 2.2 A/AA, OWASP ASVS 5.0), defect and completion reports, and review of existing suites imported from CSV.
 
 Install it as a Claude Code plugin (`claude plugin marketplace add <path-or-repo>`), or copy the `skills/*` folders into any client that supports Agent Skills.

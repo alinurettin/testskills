@@ -1,0 +1,19 @@
+{
+  "id": "DS-010",
+  "title": "Kupon doğrulama performansı",
+  "requirement_ids": ["REQ-006"],
+  "test_id": "TC-027",
+  "base_url": "https://staging.example.com",
+  "profile": "load",
+  "target": {"type": "arrival-rate", "rate": 50},
+  "duration": "10m",
+  "ramp": "2m",
+  "thresholds": {"p95_ms": 1000, "p99_ms": 2000, "error_rate": 0.01, "checks_rate": 0.99},
+  "auth": {"type": "bearer", "env": "K6_TOKEN"},
+  "think_time_s": 1,
+  "requests": [
+    {"name": "get_cart", "method": "GET", "path": "/api/cart", "expect_status": 200},
+    {"name": "apply_coupon", "method": "POST", "path": "/api/cart/coupon", "json": {"code": "YAZ10"}, "expect_status": 200,
+     "thresholds": {"p95_ms": 800}}
+  ]
+}

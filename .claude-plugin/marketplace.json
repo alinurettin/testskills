@@ -7,7 +7,7 @@
     {
       "name": "qa-suite",
       "source": "./",
-      "description": "Requirements analysis, test design, traceability, export and Playwright/BDD automation skills (TR/EN)."
+      "description": "End-to-end QA skills (TR/EN): planning, analysis, test design, NFR (k6/WCAG/ASVS), traceability, export, Playwright/BDD automation, reporting and review."
     }
   ]
 }

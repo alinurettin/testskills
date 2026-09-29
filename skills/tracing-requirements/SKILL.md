@@ -4,7 +4,7 @@ description: Builds and maintains a bidirectional Requirements Traceability Matr
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Tracing requirements

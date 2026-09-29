@@ -1,10 +1,10 @@
 ---
 name: qa-orchestrator
-description: Entry point of the QA Suite. Runs the end-to-end testing workflow from raw requirements to import-ready and executable test artifacts - requirements analysis with clarification questions, risk-based ISTQB test design, traceability matrix, Xray/Zephyr/Excel export, and Playwright/BDD automation feeding results back - with one set of stable IDs. Use this whenever someone hands over a feature, user story, PRD/SRS, ticket or spec and wants it "tested", wants "all test cases", a test analysis or a QA package, or asks how to test something end to end, for manual testing or as groundwork for automation. Also use it for Turkish requests such as "bu gereksinimleri test et", "baştan sona test analizi", "tüm test senaryolarını çıkar", "QA paketi hazırla", "test sürecini yürüt". Prefer the specialised skills (analyzing-requirements, designing-test-cases, tracing-requirements, exporting-test-cases) when only one stage is requested.
+description: Entry point of the QA Suite. Runs the end-to-end testing workflow from raw requirements to import-ready and executable test artifacts - requirements analysis with clarification questions, risk-based ISTQB test design, traceability matrix, Xray/Zephyr/Excel export, and Playwright/BDD automation feeding results back - with one set of stable IDs. Use this whenever someone hands over a feature, user story, PRD/SRS, ticket or spec and wants it "tested", wants "all test cases", a test analysis or a QA package, or asks how to test something end to end, for manual testing or as groundwork for automation. Also use it for Turkish requests such as "bu gereksinimleri test et", "baştan sona test analizi", "tüm test senaryolarını çıkar", "QA paketi hazırla", "test sürecini yürüt". Prefer the specialised QA Suite skills when only one stage is requested (plan, analysis, design, NFR, traceability, export, automation, BDD, reporting, review).
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # QA Suite orchestrator
@@ -45,12 +45,15 @@ A QA package is only useful if people read it. Its cost also scales with every f
 
 | # | Stage | Skill | Main outputs | Gate to continue |
 |---|---|---|---|---|
+| 0 | Test plan (optional) | `planning-tests` | `qa/test-plan.md`, `qa/exit-criteria.json` | Scope, approach and measurable exit criteria agreed |
 | 1 | Requirements analysis | `analyzing-requirements` | `qa/requirements.src.md` → `.json`, `qa/clarifications.md`, in full mode also `qa/analysis-report.md` | Blocking questions surfaced. The user chooses: wait for answers, or proceed on the documented defaults. |
 | 2 | Test design | `designing-test-cases` | `qa/design/DS-*.json/.md`, `qa/test-cases.src.md` → `.json` | Calibration passed: no PRIORITY_SKEW; REDUNDANT items resolved or justified |
+| 2b | Non-functional (when NFRs exist) | `testing-nonfunctional` | k6 scripts, WCAG 2.2 / ASVS 5.0 test drafts merged into `qa/test-cases.src.md` | Every NFR has a measurable target or an open question |
 | 3 | Traceability | `tracing-requirements` | `qa/rtm.md`, `qa/rtm.csv` | No validation errors. Every gap is fixed or justified. |
 | 4 | Export | `exporting-test-cases` | `qa/exports/*` | The user has picked the target tool |
 | 5 | Automation (Playwright) | `automating-with-playwright` | `automation/` project, `tests/*.spec.ts` with `@TC-###` tags, `qa/results.json`, `qa/automation-coverage.md` | Tests implemented without `test.fixme`; failures classified as product vs test bugs |
 | 5b | BDD (optional) | `writing-bdd-scenarios` | `features/*.feature` (TR/EN) with `@TC-###` tags, step definitions | Scenarios reviewed by the business if they are the audience |
+| 6 | Reporting | `reporting-test-results` | defect reports, `qa/status-report.md` / `qa/completion-report.md` | Exit criteria evaluated; residual risks stated for the release decision |
 
 If the skills cannot be invoked by name in your environment, read `../<skill-name>/SKILL.md` and follow it. The scripts sit in each skill's `scripts/` folder.
 
@@ -67,6 +70,10 @@ If the skills cannot be invoked by name in your environment, read `../<skill-nam
 - **"Automate this" / "Playwright testleri yaz"**:
   - If `qa/test-cases.json` exists: stage 5, then the results loop into stage 3.
   - If it does not exist: stages 1–3 first. Automating tests that were never designed produces click-scripts with no oracle.
+- **"Test planı / strateji / çıkış kriterleri"** → stage 0. The plan's numbers come from `qa/`, so analyse and design first when those files do not exist yet.
+- **Performance, accessibility or security** → stage 2b, after stage 1 has identified the NFRs.
+- **"Hata raporu yaz" / "yayına hazır mıyız" / "test özet raporu"** → stage 6.
+- **"Mevcut test case'lerimizi incele" (Excel, TestRail…)** → `reviewing-test-cases`, then stage 2 for the missing tests it finds.
 - **"Gherkin/BDD senaryoları"** → stage 5b. It uses stage 2's test cases when they exist; otherwise the acceptance criteria.
 - **"Test sonuçlarını gereksinimlere bağla"** → run `pw_results.py` from stage 5, then stage 3 with `--results`.
 

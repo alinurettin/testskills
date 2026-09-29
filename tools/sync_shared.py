@@ -19,8 +19,9 @@ ROOT = Path(__file__).resolve().parent.parent
 # shared file -> (target folder inside each skill, skills that receive it)
 SHARED = {
     "data-model.md": ("references", ["qa-orchestrator", "analyzing-requirements", "designing-test-cases",
-                                     "tracing-requirements", "exporting-test-cases"]),
-    "scripts/qa_compact.py": ("scripts", ["analyzing-requirements", "designing-test-cases"]),
+                                     "tracing-requirements", "exporting-test-cases", "reporting-test-results"]),
+    "scripts/qa_compact.py": ("scripts", ["analyzing-requirements", "designing-test-cases", "reviewing-test-cases",
+                                          "testing-nonfunctional"]),
 }
 
 

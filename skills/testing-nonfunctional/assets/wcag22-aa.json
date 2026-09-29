@@ -1,0 +1,710 @@
+{
+ "source": "WCAG 2.2 (W3C Recommendation, also ISO/IEC 40500:2025) - success criteria numbers, names and levels; checks are QA Suite paraphrases",
+ "features": {
+  "all": "every page",
+  "images": "images/icons/charts",
+  "media": "audio/video",
+  "forms": "forms and inputs",
+  "navigation": "menus, links, multi-page",
+  "keyboard": "interactive widgets",
+  "color": "visual design",
+  "text": "text content",
+  "timing": "time limits/auto-updating",
+  "motion": "animation/gestures/sensors",
+  "auth": "login/registration",
+  "errors": "validation/errors",
+  "status": "toasts/dynamic updates",
+  "help": "help/contact"
+ },
+ "criteria": [
+  {
+   "sc": "1.1.1",
+   "name": "Non-text Content",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "images",
+    "forms"
+   ],
+   "method": "both",
+   "check": "Every informative image/icon/button has an accurate text alternative; decorative images are hidden from AT.",
+   "check_tr": "Bilgi taşıyan her görsel/ikon/butonun doğru bir metin alternatifi var; dekoratif görseller yardımcı teknolojiden gizli."
+  },
+  {
+   "sc": "1.2.1",
+   "name": "Audio-only and Video-only (Prerecorded)",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "media"
+   ],
+   "method": "manual",
+   "check": "Prerecorded audio-only has a transcript; video-only has a transcript or audio track.",
+   "check_tr": "Kayıtlı yalnızca-ses içeriğin transkripti, yalnızca-video içeriğin transkripti veya ses kaydı var."
+  },
+  {
+   "sc": "1.2.2",
+   "name": "Captions (Prerecorded)",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "media"
+   ],
+   "method": "manual",
+   "check": "Prerecorded video with audio has accurate, synchronised captions.",
+   "check_tr": "Sesli kayıtlı videolarda doğru ve senkron altyazı var."
+  },
+  {
+   "sc": "1.2.3",
+   "name": "Audio Description or Media Alternative (Prerecorded)",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "media"
+   ],
+   "method": "manual",
+   "check": "Visual-only information in video is available via audio description or a text alternative.",
+   "check_tr": "Videodaki yalnızca görsel bilgi sesli betimleme veya metin alternatifiyle sunuluyor."
+  },
+  {
+   "sc": "1.2.4",
+   "name": "Captions (Live)",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "media"
+   ],
+   "method": "manual",
+   "check": "Live audio in synchronised media has captions.",
+   "check_tr": "Canlı yayınlarda sesli içerik için altyazı var."
+  },
+  {
+   "sc": "1.2.5",
+   "name": "Audio Description (Prerecorded)",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "media"
+   ],
+   "method": "manual",
+   "check": "Prerecorded video provides audio description of important visual content.",
+   "check_tr": "Kayıtlı videolarda önemli görsel içerik için sesli betimleme var."
+  },
+  {
+   "sc": "1.3.1",
+   "name": "Info and Relationships",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "all",
+    "forms"
+   ],
+   "method": "both",
+   "check": "Headings, lists, tables, labels and groups are expressed in markup (not only visually); form fields are programmatically labelled.",
+   "check_tr": "Başlıklar, listeler, tablolar, etiketler ve gruplar yalnızca görsel değil, işaretleme (markup) ile ifade ediliyor; form alanları programatik olarak etiketli."
+  },
+  {
+   "sc": "1.3.2",
+   "name": "Meaningful Sequence",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "all"
+   ],
+   "method": "manual",
+   "check": "Reading/DOM order preserves meaning when styles are removed or a screen reader linearises the page.",
+   "check_tr": "Stiller kaldırıldığında veya ekran okuyucu sayfayı doğrusal okuduğunda okuma/DOM sırası anlamı koruyor."
+  },
+  {
+   "sc": "1.3.3",
+   "name": "Sensory Characteristics",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "text"
+   ],
+   "method": "manual",
+   "check": "Instructions do not rely only on shape, colour, size, position or sound ('click the green button on the right').",
+   "check_tr": "Talimatlar yalnızca şekil, renk, boyut, konum veya sese dayanmıyor ('sağdaki yeşil butona tıklayın' gibi)."
+  },
+  {
+   "sc": "1.3.4",
+   "name": "Orientation",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "all"
+   ],
+   "method": "manual",
+   "check": "Content works in portrait and landscape unless an orientation is essential.",
+   "check_tr": "İçerik dikey ve yatay yönlendirmede çalışıyor (yönlendirme zorunlu değilse)."
+  },
+  {
+   "sc": "1.3.5",
+   "name": "Identify Input Purpose",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "forms",
+    "auth"
+   ],
+   "method": "both",
+   "check": "Fields for user data (name, email, phone, address, card) have correct autocomplete attributes.",
+   "check_tr": "Kullanıcı verisi alanlarında (ad, e-posta, telefon, adres, kart) doğru autocomplete öznitelikleri var."
+  },
+  {
+   "sc": "1.4.1",
+   "name": "Use of Color",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "color",
+    "errors",
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Colour is not the only way to convey state, errors, links or required fields.",
+   "check_tr": "Durum, hata, bağlantı veya zorunlu alan bilgisi yalnızca renkle iletilmiyor."
+  },
+  {
+   "sc": "1.4.2",
+   "name": "Audio Control",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "media"
+   ],
+   "method": "manual",
+   "check": "Audio that plays automatically for more than 3 s can be paused/stopped or its volume controlled.",
+   "check_tr": "3 saniyeden uzun otomatik çalan ses durdurulabiliyor veya sesi ayarlanabiliyor."
+  },
+  {
+   "sc": "1.4.3",
+   "name": "Contrast (Minimum)",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "color",
+    "text"
+   ],
+   "method": "both",
+   "check": "Text contrast ≥ 4.5:1 (large text ≥ 3:1), including placeholder, disabled-looking but active, and error text.",
+   "check_tr": "Metin kontrastı ≥ 4.5:1 (büyük metinde ≥ 3:1); placeholder ve hata metinleri dahil."
+  },
+  {
+   "sc": "1.4.4",
+   "name": "Resize Text",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "text"
+   ],
+   "method": "manual",
+   "check": "At 200% browser zoom no content or function is lost or overlaps.",
+   "check_tr": "%200 tarayıcı yakınlaştırmasında içerik veya işlev kaybolmuyor, üst üste binmiyor."
+  },
+  {
+   "sc": "1.4.5",
+   "name": "Images of Text",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "images",
+    "text"
+   ],
+   "method": "manual",
+   "check": "Text is real text, not images of text (except logos/essential).",
+   "check_tr": "Metinler görsel değil gerçek metin (logo ve zorunlu durumlar hariç)."
+  },
+  {
+   "sc": "1.4.10",
+   "name": "Reflow",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "all"
+   ],
+   "method": "manual",
+   "check": "At 320 CSS px width (400% zoom) content reflows without two-dimensional scrolling (except tables/maps).",
+   "check_tr": "320 CSS px genişlikte (%400 yakınlaştırma) içerik iki yönlü kaydırma gerektirmeden yeniden akıyor (tablo/harita hariç)."
+  },
+  {
+   "sc": "1.4.11",
+   "name": "Non-text Contrast",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "color",
+    "forms",
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Input borders, focus indicators, icons and chart elements have ≥ 3:1 contrast against adjacent colours.",
+   "check_tr": "Alan kenarlıkları, odak göstergeleri, ikonlar ve grafik öğeleri komşu renklere karşı ≥ 3:1 kontrasta sahip."
+  },
+  {
+   "sc": "1.4.12",
+   "name": "Text Spacing",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "text"
+   ],
+   "method": "manual",
+   "check": "Increased line/letter/word/paragraph spacing (bookmarklet) causes no clipping or overlap.",
+   "check_tr": "Satır/harf/kelime/paragraf aralığı artırıldığında (bookmarklet) içerik kesilmiyor veya üst üste binmiyor."
+  },
+  {
+   "sc": "1.4.13",
+   "name": "Content on Hover or Focus",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Tooltips/popovers on hover or focus are dismissible (Esc), hoverable and persistent.",
+   "check_tr": "Üzerine gelince/odakta açılan araç ipuçları kapatılabiliyor (Esc), üzerine gelinebiliyor ve kalıcı."
+  },
+  {
+   "sc": "2.1.1",
+   "name": "Keyboard",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "all",
+    "keyboard",
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Every function (incl. custom widgets, date pickers, drag-and-drop alternatives) works with keyboard only.",
+   "check_tr": "Tüm işlevler (özel bileşenler, tarih seçiciler, sürükle-bırak alternatifleri dahil) yalnızca klavyeyle kullanılabiliyor."
+  },
+  {
+   "sc": "2.1.2",
+   "name": "No Keyboard Trap",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Focus can always leave any component (dialogs, embedded players, editors) with standard keys.",
+   "check_tr": "Odak hiçbir bileşende (diyalog, gömülü oynatıcı, editör) hapsolmuyor; standart tuşlarla çıkılabiliyor."
+  },
+  {
+   "sc": "2.1.4",
+   "name": "Character Key Shortcuts",
+   "level": "A",
+   "since": "2.1",
+   "features": [
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Single-character shortcuts can be turned off, remapped, or work only on focus.",
+   "check_tr": "Tek karakterli kısayollar kapatılabiliyor, değiştirilebiliyor veya yalnızca odaktayken çalışıyor."
+  },
+  {
+   "sc": "2.2.1",
+   "name": "Timing Adjustable",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "timing",
+    "auth"
+   ],
+   "method": "manual",
+   "check": "Time limits (session timeout, OTP, checkout timer) can be turned off, adjusted or extended with a warning ≥ 20 s before expiry.",
+   "check_tr": "Süre sınırları (oturum zaman aşımı, OTP, ödeme sayacı) kapatılabiliyor, ayarlanabiliyor ya da bitişten ≥ 20 sn önce uyarıyla uzatılabiliyor."
+  },
+  {
+   "sc": "2.2.2",
+   "name": "Pause, Stop, Hide",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "timing",
+    "motion"
+   ],
+   "method": "manual",
+   "check": "Carousels, auto-scrolling or auto-updating content longer than 5 s can be paused, stopped or hidden.",
+   "check_tr": "5 saniyeden uzun kayan/otomatik güncellenen içerik (karusel vb.) duraklatılabiliyor, durdurulabiliyor veya gizlenebiliyor."
+  },
+  {
+   "sc": "2.3.1",
+   "name": "Three Flashes or Below Threshold",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "motion",
+    "media"
+   ],
+   "method": "manual",
+   "check": "Nothing flashes more than three times per second.",
+   "check_tr": "Hiçbir içerik saniyede üç defadan fazla yanıp sönmüyor."
+  },
+  {
+   "sc": "2.4.1",
+   "name": "Bypass Blocks",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "navigation"
+   ],
+   "method": "both",
+   "check": "A skip link or landmarks let keyboard users bypass repeated navigation.",
+   "check_tr": "'İçeriğe atla' bağlantısı veya landmark'lar klavye kullanıcısının tekrarlanan menüleri atlamasını sağlıyor."
+  },
+  {
+   "sc": "2.4.2",
+   "name": "Page Titled",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "all"
+   ],
+   "method": "auto",
+   "check": "Each page/view has a descriptive, unique title (also after SPA route changes).",
+   "check_tr": "Her sayfa/görünümün açıklayıcı ve benzersiz bir başlığı var (SPA rota değişimlerinden sonra da)."
+  },
+  {
+   "sc": "2.4.3",
+   "name": "Focus Order",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "keyboard",
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Tab order follows a logical sequence; focus moves into opened dialogs and returns on close.",
+   "check_tr": "Sekme sırası mantıklı; odak açılan diyaloğa giriyor ve kapanınca geri dönüyor."
+  },
+  {
+   "sc": "2.4.4",
+   "name": "Link Purpose (In Context)",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "navigation"
+   ],
+   "method": "both",
+   "check": "Link text (with context) says where it goes; no ambiguous 'tıklayın/click here' lists.",
+   "check_tr": "Bağlantı metni (bağlamıyla) nereye gittiğini söylüyor; belirsiz 'tıklayın' listeleri yok."
+  },
+  {
+   "sc": "2.4.5",
+   "name": "Multiple Ways",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "navigation"
+   ],
+   "method": "manual",
+   "check": "Pages are reachable in more than one way (menu, search, sitemap), except process steps.",
+   "check_tr": "Sayfalara birden fazla yolla (menü, arama, site haritası) ulaşılabiliyor (süreç adımları hariç)."
+  },
+  {
+   "sc": "2.4.6",
+   "name": "Headings and Labels",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "forms",
+    "text"
+   ],
+   "method": "manual",
+   "check": "Headings and labels describe topic or purpose.",
+   "check_tr": "Başlıklar ve etiketler konuyu veya amacı açıklıyor."
+  },
+  {
+   "sc": "2.4.7",
+   "name": "Focus Visible",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "keyboard",
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Keyboard focus is always visible on every interactive element.",
+   "check_tr": "Klavye odağı her etkileşimli öğede her zaman görünür."
+  },
+  {
+   "sc": "2.4.11",
+   "name": "Focus Not Obscured (Minimum)",
+   "level": "AA",
+   "since": "2.2",
+   "features": [
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "The focused element is not entirely hidden by sticky headers, cookie banners or chat widgets.",
+   "check_tr": "Odaklanan öğe yapışkan başlık, çerez bandı veya sohbet penceresi tarafından tamamen gizlenmiyor."
+  },
+  {
+   "sc": "2.5.1",
+   "name": "Pointer Gestures",
+   "level": "A",
+   "since": "2.1",
+   "features": [
+    "motion",
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Multipoint or path-based gestures (pinch, swipe) have a single-pointer alternative.",
+   "check_tr": "Çok noktalı veya yol tabanlı hareketlerin (yakınlaştırma, kaydırma) tek işaretçili alternatifi var."
+  },
+  {
+   "sc": "2.5.2",
+   "name": "Pointer Cancellation",
+   "level": "A",
+   "since": "2.1",
+   "features": [
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Actions fire on up-event (or can be aborted/undone); no irreversible action on mouse-down.",
+   "check_tr": "Eylemler bırakma (up) olayında tetikleniyor veya iptal edilebiliyor; basma anında geri alınamaz eylem yok."
+  },
+  {
+   "sc": "2.5.3",
+   "name": "Label in Name",
+   "level": "A",
+   "since": "2.1",
+   "features": [
+    "forms",
+    "keyboard"
+   ],
+   "method": "both",
+   "check": "The accessible name of a control contains its visible label text (speech-input users say what they see).",
+   "check_tr": "Kontrolün erişilebilir adı görünen etiket metnini içeriyor (sesli komut kullanıcıları gördüğünü söyler)."
+  },
+  {
+   "sc": "2.5.4",
+   "name": "Motion Actuation",
+   "level": "A",
+   "since": "2.1",
+   "features": [
+    "motion"
+   ],
+   "method": "manual",
+   "check": "Functions triggered by device motion (shake to undo) have a UI alternative and can be disabled.",
+   "check_tr": "Cihaz hareketiyle tetiklenen işlevlerin (sallayarak geri al) arayüz alternatifi var ve kapatılabiliyor."
+  },
+  {
+   "sc": "2.5.7",
+   "name": "Dragging Movements",
+   "level": "AA",
+   "since": "2.2",
+   "features": [
+    "motion",
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Every drag operation (sliders, sortable lists, maps) has a single-pointer alternative without dragging.",
+   "check_tr": "Her sürükleme işleminin (kaydırıcı, sıralanabilir liste, harita) sürüklemesiz tek işaretçili alternatifi var."
+  },
+  {
+   "sc": "2.5.8",
+   "name": "Target Size (Minimum)",
+   "level": "AA",
+   "since": "2.2",
+   "features": [
+    "keyboard",
+    "forms"
+   ],
+   "method": "both",
+   "check": "Pointer targets are at least 24×24 CSS px or have sufficient spacing (exceptions: inline links, essential).",
+   "check_tr": "Tıklama hedefleri en az 24×24 CSS px veya yeterli aralıklı (satır içi bağlantılar ve zorunlu durumlar hariç)."
+  },
+  {
+   "sc": "3.1.1",
+   "name": "Language of Page",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "all"
+   ],
+   "method": "auto",
+   "check": "The page has a correct lang attribute (tr / en) so screen readers pronounce Turkish correctly.",
+   "check_tr": "Sayfanın lang özniteliği doğru (tr / en); ekran okuyucu Türkçeyi doğru telaffuz ediyor."
+  },
+  {
+   "sc": "3.1.2",
+   "name": "Language of Parts",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "text"
+   ],
+   "method": "manual",
+   "check": "Passages in another language are marked with lang (e.g. English terms in Turkish pages where pronunciation matters).",
+   "check_tr": "Başka dildeki bölümler lang ile işaretli (telaffuzun önemli olduğu İngilizce terimler vb.)."
+  },
+  {
+   "sc": "3.2.1",
+   "name": "On Focus",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "forms",
+    "keyboard"
+   ],
+   "method": "manual",
+   "check": "Moving focus alone never triggers a change of context (navigation, submit, new window).",
+   "check_tr": "Yalnızca odağın taşınması bağlam değişikliği (yönlendirme, gönderim, yeni pencere) tetiklemiyor."
+  },
+  {
+   "sc": "3.2.2",
+   "name": "On Input",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Changing a field value does not unexpectedly change context unless the user was told beforehand.",
+   "check_tr": "Alan değerinin değişmesi, kullanıcı önceden bilgilendirilmedikçe beklenmedik bağlam değişikliği yapmıyor."
+  },
+  {
+   "sc": "3.2.3",
+   "name": "Consistent Navigation",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "navigation"
+   ],
+   "method": "manual",
+   "check": "Repeated navigation appears in the same relative order across pages.",
+   "check_tr": "Tekrarlanan gezinme öğeleri sayfalar arasında aynı göreli sırada."
+  },
+  {
+   "sc": "3.2.4",
+   "name": "Consistent Identification",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "navigation",
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Components with the same function are labelled consistently across pages.",
+   "check_tr": "Aynı işlevdeki bileşenler sayfalar arasında tutarlı adlandırılmış."
+  },
+  {
+   "sc": "3.2.6",
+   "name": "Consistent Help",
+   "level": "A",
+   "since": "2.2",
+   "features": [
+    "help"
+   ],
+   "method": "manual",
+   "check": "Help mechanisms (contact, chat, FAQ link) appear in the same relative place on every page that has them.",
+   "check_tr": "Yardım mekanizmaları (iletişim, sohbet, SSS bağlantısı) bulundukları her sayfada aynı göreli yerde."
+  },
+  {
+   "sc": "3.3.1",
+   "name": "Error Identification",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "forms",
+    "errors"
+   ],
+   "method": "both",
+   "check": "Input errors are identified in text and associated with the field (not only red borders).",
+   "check_tr": "Giriş hataları metinle belirtiliyor ve ilgili alanla ilişkilendiriliyor (yalnızca kırmızı çerçeve değil)."
+  },
+  {
+   "sc": "3.3.2",
+   "name": "Labels or Instructions",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "forms"
+   ],
+   "method": "both",
+   "check": "Inputs have labels/instructions including required format (e.g. 'GG.AA.YYYY', 'TC Kimlik No 11 hane').",
+   "check_tr": "Alanların etiketi/talimatı var; beklenen biçim dahil ('GG.AA.YYYY', 'TC Kimlik No 11 hane')."
+  },
+  {
+   "sc": "3.3.3",
+   "name": "Error Suggestion",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "forms",
+    "errors"
+   ],
+   "method": "manual",
+   "check": "When an error is detected and a correction is known, the message suggests it.",
+   "check_tr": "Hata tespit edildiğinde ve düzeltme biliniyorsa mesaj düzeltmeyi öneriyor."
+  },
+  {
+   "sc": "3.3.4",
+   "name": "Error Prevention (Legal, Financial, Data)",
+   "level": "AA",
+   "since": "2.0",
+   "features": [
+    "forms",
+    "errors"
+   ],
+   "method": "manual",
+   "check": "Legal/financial/data submissions are reversible, checked, or confirmed before final submission.",
+   "check_tr": "Hukuki/finansal/veri gönderimleri geri alınabiliyor, kontrol ediliyor veya son gönderimden önce onaylanıyor."
+  },
+  {
+   "sc": "3.3.7",
+   "name": "Redundant Entry",
+   "level": "A",
+   "since": "2.2",
+   "features": [
+    "forms"
+   ],
+   "method": "manual",
+   "check": "Information already entered in the same process is auto-filled or selectable (e.g. billing = delivery address).",
+   "check_tr": "Aynı süreçte daha önce girilen bilgi otomatik dolduruluyor veya seçilebiliyor (fatura = teslimat adresi gibi)."
+  },
+  {
+   "sc": "3.3.8",
+   "name": "Accessible Authentication (Minimum)",
+   "level": "AA",
+   "since": "2.2",
+   "features": [
+    "auth"
+   ],
+   "method": "manual",
+   "check": "Login does not require a cognitive function test (memorising, transcribing, puzzles) unless an alternative exists; paste and password managers are allowed.",
+   "check_tr": "Giriş, alternatifi olmadan bilişsel test (ezber, yeniden yazma, bulmaca) gerektirmiyor; yapıştırma ve şifre yöneticisi serbest."
+  },
+  {
+   "sc": "4.1.2",
+   "name": "Name, Role, Value",
+   "level": "A",
+   "since": "2.0",
+   "features": [
+    "all",
+    "keyboard",
+    "forms"
+   ],
+   "method": "both",
+   "check": "Custom controls expose correct name, role, state and value (checked, expanded, selected) to assistive technology.",
+   "check_tr": "Özel kontroller doğru ad, rol, durum ve değeri (seçili, genişletilmiş vb.) yardımcı teknolojiye iletiyor."
+  },
+  {
+   "sc": "4.1.3",
+   "name": "Status Messages",
+   "level": "AA",
+   "since": "2.1",
+   "features": [
+    "status",
+    "errors"
+   ],
+   "method": "both",
+   "check": "Status messages (toast 'Kupon uygulandı', result counts, errors) are announced via live regions/role=alert without moving focus.",
+   "check_tr": "Durum mesajları ('Kupon uygulandı', sonuç sayısı, hatalar) odağı taşımadan canlı bölge/role=alert ile duyuruluyor."
+  }
+ ]
+}

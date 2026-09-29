@@ -4,7 +4,7 @@ description: Exports QA Suite test cases (test-cases.json) into import-ready fil
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Exporting test cases

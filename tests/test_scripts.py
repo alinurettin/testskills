@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import csv
 import re
+import shutil
+from collections import Counter
 import importlib.util
 import io
 import json
@@ -491,6 +493,192 @@ class GenerateFeaturesTests(unittest.TestCase):
             self.assertFalse(feat.startswith("# language"))
             self.assertIn("Scenario: TC-004", feat)
             self.assertIn("When API ile kupon uygula", feat)
+
+
+PLAN = SK / "planning-tests" / "scripts"
+REP = SK / "reporting-test-results" / "scripts"
+NFR = SK / "testing-nonfunctional" / "scripts"
+REV = SK / "reviewing-test-cases" / "scripts"
+
+
+def qa_dir(tmp: Path, results=True, defects=None, criteria=None) -> Path:
+    """A qa/ folder built from the coupon fixture (8 tests, TC-006 deprecated)."""
+    qa = tmp / "qa"
+    (qa / "design").mkdir(parents=True)
+    for f in ("requirements.json", "test-cases.json") + (("results.json",) if results else ()):
+        (qa / f).write_text((FIX / f).read_text(encoding="utf-8"), encoding="utf-8")
+    (qa / "clarifications.md").write_text(
+        "| ID | Öncelik | REQ | Soru |\n|---|---|---|---|\n| Q-001 | bloke eden | REQ-003 | Harf duyarlılığı? |\n"
+        "| Q-002 | önemli | REQ-001 | Kargo dahil mi? |\n", encoding="utf-8")
+    (qa / "design" / "DS-004-compat.json").write_text((SPECS / "pairwise.json").read_text(encoding="utf-8"), encoding="utf-8")
+    if defects is not None:
+        (qa / "defects.json").write_text(json.dumps({"defects": defects}), encoding="utf-8")
+    if criteria is not None:
+        (qa / "exit-criteria.json").write_text(json.dumps(criteria), encoding="utf-8")
+    return qa
+
+
+class PlanFactsTests(unittest.TestCase):
+    def test_facts_from_artifacts(self):
+        with tempfile.TemporaryDirectory() as d:
+            qa = qa_dir(Path(d))
+            r = run_py(PLAN / "plan_facts.py", "--qa", qa, "--format", "json")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            f = json.loads(r.stdout)
+            self.assertEqual(f["tests"]["total"], 7)  # deprecated TC-006 excluded
+            self.assertEqual(f["requirements"]["in_scope"], 5)
+            self.assertEqual(f["questions"]["blocking"], 1)
+            self.assertEqual(f["questions"]["blocking_ids"], ["Q-001"])
+            self.assertEqual(f["environments"][0]["parameters"]["browser"], ["Chrome", "Firefox", "Safari", "Edge"])
+            self.assertEqual(f["risk"]["top"][0]["id"], "REQ-005")
+            self.assertGreater(f["effort_estimate"]["manual_hours_total"], f["effort_estimate"]["manual_hours_one_cycle"])
+
+
+class CompletionReportTests(unittest.TestCase):
+    CRIT = {"min_requirement_coverage_pct": 100, "min_execution_pct": 95, "min_pass_rate_pct": 50,
+            "max_open_defects": {"critical": 0, "high": 0}, "all_critical_requirements_passed": True,
+            "max_blocking_questions_open": 0}
+
+    def test_metrics_and_criteria(self):
+        with tempfile.TemporaryDirectory() as d:
+            defects = [{"id": "SHOP-481", "severity": "high", "status": "open", "test_ids": ["TC-002"]},
+                       {"id": "SHOP-400", "severity": "critical", "status": "closed"}]
+            qa = qa_dir(Path(d), defects=defects, criteria=self.CRIT)
+            r = run_py(REP / "completion_report.py", "--qa", qa, "--json")
+            self.assertEqual(r.returncode, 1)
+            f = json.loads(r.stdout)
+            m = f["metrics"]
+            self.assertEqual(m["coverage_pct"], 80.0)          # REQ-004 uncovered, REQ-006 deferred
+            self.assertEqual((m["executed"], m["passed"], m["failed"]), (3, 2, 1))
+            self.assertAlmostEqual(m["pass_rate_pct"], 66.7)
+            self.assertEqual(m["open_defects_by_severity"], {"high": 1})  # closed critical not counted
+            got = {e["criterion"]: e["met"] for e in f["exit_criteria"]}
+            self.assertFalse(got["min_requirement_coverage_pct"])
+            self.assertFalse(got["min_execution_pct"])
+            self.assertTrue(got["min_pass_rate_pct"])
+            self.assertTrue(got["max_open_defects.critical"])
+            self.assertFalse(got["max_open_defects.high"])
+            self.assertFalse(got["all_critical_requirements_passed"])  # REQ-005 critical, not run
+            self.assertFalse(got["max_blocking_questions_open"])
+            self.assertEqual(f["residual_risks"][0]["id"], "REQ-005")
+            failed = [x for x in f["residual_risks"] if x["verdict"] == "failed"][0]
+            self.assertEqual((failed["id"], failed["defects"]), ("REQ-001", ["SHOP-481"]))
+
+    def test_unknown_severity_without_defect_register(self):
+        with tempfile.TemporaryDirectory() as d:
+            qa = qa_dir(Path(d), criteria={"max_open_defects": {"high": 0}})
+            f = json.loads(run_py(REP / "completion_report.py", "--qa", qa, "--json").stdout)
+            self.assertIsNone(f["exit_criteria"][0]["met"])  # never assume 0 when severity is unknown
+
+    def test_markdown_turkish(self):
+        with tempfile.TemporaryDirectory() as d:
+            qa = qa_dir(Path(d), criteria=self.CRIT)
+            out = qa / "completion-report.md"
+            run_py(REP / "completion_report.py", "--qa", qa, "--out", out)
+            text = out.read_text(encoding="utf-8")
+            self.assertIn("# Test Tamamlama Raporu", text)
+            self.assertIn("✘ karşılanmadı", text)
+            self.assertIn("| Gereksinim kapsamı ≥ | 100 | 80.0 |", text)
+
+
+class NfrChecklistTests(unittest.TestCase):
+    def test_wcag_axe_plus_manual_and_valid_compact(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "a11y.src.md"
+            r = run_py(NFR / "nfr_checklist.py", "wcag", "--features", "forms", "--page", "Sepet", "--req", "REQ-012",
+                       "--tests", FIX / "test-cases.json", "--lang", "tr", "--out", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            _, items, errors = qc.parse(out.read_text(encoding="utf-8"), "tc")
+            self.assertEqual(errors + qc.validate(items, "tc"), [])
+            self.assertEqual(items[0]["id"], "TC-009")  # continues after TC-008
+            self.assertIn("axe", items[0]["title"])
+            data = json.loads((SK / "testing-nonfunctional" / "assets" / "wcag22-aa.json").read_text(encoding="utf-8"))
+            sel = [c for c in data["criteria"] if "forms" in c["features"] or "all" in c["features"]]
+            self.assertEqual(len(items) - 1, sum(1 for c in sel if c["method"] != "auto"))
+            self.assertTrue(all(t["category"] == "accessibility" for t in items))
+
+    def test_wcag_data_complete(self):
+        data = json.loads((SK / "testing-nonfunctional" / "assets" / "wcag22-aa.json").read_text(encoding="utf-8"))
+        levels = Counter(c["level"] for c in data["criteria"])
+        self.assertEqual((levels["A"], levels["AA"]), (31, 24))
+        self.assertNotIn("4.1.1", {c["sc"] for c in data["criteria"]})  # obsolete in 2.2
+        self.assertTrue(all(c.get("check_tr") for c in data["criteria"]))
+
+    def test_asvs_selects_authorization(self):
+        r = run_py(NFR / "nfr_checklist.py", "asvs", "--features", "authz", "--req", "REQ-013", "--start", "100")
+        self.assertIn("## TC-100 | ASVS V8 Authorization", r.stdout)
+        self.assertIn("pol: - | tech: cl | cat: security", r.stdout)
+        self.assertNotIn("ASVS V5", r.stdout)
+
+    def test_requires_req(self):
+        self.assertEqual(run_py(NFR / "nfr_checklist.py", "asvs", "--features", "auth").returncode, 2)
+
+
+class GenerateK6Tests(unittest.TestCase):
+    def test_thresholds_from_requirement(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "perf.mjs"
+            r = run_py(NFR / "generate_k6.py", SK / "testing-nonfunctional" / "assets" / "spec-examples" / "k6-perf.json", "--out", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            js = out.read_text(encoding="utf-8")
+            self.assertIn("executor: 'ramping-arrival-rate'", js)
+            self.assertIn('"http_req_duration{name:apply_coupon}": ["p(95)<800", "p(99)<2000"]', js)
+            self.assertIn('"http_req_duration{name:get_cart}": ["p(95)<1000", "p(99)<2000"]', js)
+            self.assertIn('"http_req_failed": ["rate<0.01"]', js)
+            self.assertIn("__ENV.K6_TOKEN", js)
+            node = shutil.which("node")
+            if node:
+                self.assertEqual(subprocess.run([node, "--check", str(out)], capture_output=True).returncode, 0)
+
+
+class ReviewAndImportTests(unittest.TestCase):
+    def test_review_rules(self):
+        tests = [
+            {"id": "TC-001", "title": "Login testi", "requirement_ids": ["REQ-1"], "priority": "high", "polarity": "positive",
+             "steps": [{"action": "Kullanıcı adını gir", "expected": "-"}, {"action": "Giriş butonuna tıkla", "expected": "Başarılı olmalı"}]},
+            {"id": "TC-002", "title": "Hatalı şifre ile giriş reddedilir", "requirement_ids": ["REQ-1"], "priority": "high",
+             "polarity": "negative", "preconditions": ["TC-001 çalıştırılmış olmalı"],
+             "steps": [{"action": "E-posta ayse@test.com gir", "expected": "Alan dolar"},
+                       {"action": "Giriş butonuna tıkla", "expected": "'Şifre hatalı' mesajı görünür"}]},
+            {"id": "TC-003", "title": "Sepete ürün ekleme akışı", "requirement_ids": [], "polarity": "positive",
+             "steps": [{"action": "Sepete ekle ve sonra sepete git", "expected": "Doğru çalışır"}]}]
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "t.json"
+            p.write_text(json.dumps({"language": "tr", "test_cases": tests}, ensure_ascii=False), encoding="utf-8")
+            r = run_py(REV / "review_tests.py", "--tests", p, "--json")
+            self.assertEqual(r.returncode, 1)  # MISSING_EXPECTED is critical
+            res = {x["id"]: {f["rule"] for f in x["findings"]} for x in json.loads(r.stdout)["results"]}
+            self.assertTrue({"MISSING_EXPECTED", "VAGUE_EXPECTED", "WEAK_TITLE"} <= res["TC-001"])
+            self.assertEqual(res["TC-002"], {"DEPENDENT"})  # "Giriş" is not the verb "gir"; e-mail is concrete data
+            self.assertTrue({"VAGUE_EXPECTED", "MULTI_ACTION", "NO_REQ", "NO_PRIORITY"} <= res["TC-003"])
+
+    def test_import_row_per_test_and_row_per_step(self):
+        with tempfile.TemporaryDirectory() as d:
+            tmp = Path(d)
+            a = tmp / "a.csv"
+            a.write_text('Test No;Başlık;Adımlar;Beklenen Sonuç;Öncelik;Gereksinim\n'
+                         '1;Hatalı şifre reddedilir;"1. Şifre Yanlis1 gir 2. Giriş yap";"1. Alan dolar 2. ""Hatalı"" mesajı";Kritik;SHOP-10\n',
+                         encoding="utf-8-sig")
+            r = run_py(REV / "import_tests.py", a, "--out", tmp / "a.src.md")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            _, items, errors = qc.parse((tmp / "a.src.md").read_text(encoding="utf-8"), "tc")
+            self.assertEqual(errors, [])
+            t = items[0]
+            self.assertEqual((t["priority"], t["polarity"], t["requirement_ids"], len(t["steps"])),
+                             ("critical", "negative", ["SHOP-10"], 2))
+            b = tmp / "b.csv"
+            b.write_text("TCID,Summary,Action,Data,Expected Result,Priority\n"
+                         "T1,Kupon uygulanır,Sepeti aç,,Toplam 150 TL,High\nT1,,Kodu uygula,YAZ10,İndirim -15 TL,\n"
+                         "T2,Kod boş bırakılır,Uygula'ya tıkla,,,Low\n", encoding="utf-8")
+            r = run_py(REV / "import_tests.py", b, "--out", tmp / "b.src.md", "--lang", "en")
+            self.assertIn("row per step", r.stdout)
+            self.assertIn("steps without expected 1", r.stdout)
+            text = (tmp / "b.src.md").read_text(encoding="utf-8")
+            _, items, errors = qc.parse(text, "tc")
+            self.assertEqual([len(t["steps"]) for t in items], [2, 1])
+            self.assertEqual(items[0]["steps"][1]["data"], "YAZ10")
+            self.assertTrue(qc.validate(items, "tc"))            # strict: missing expected is an error
+            self.assertEqual(qc.validate(items, "tc", lenient=True), [])  # lenient import passes
 
 
 class ExportTests(unittest.TestCase):

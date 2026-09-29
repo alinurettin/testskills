@@ -4,7 +4,7 @@ description: Writes BDD Gherkin scenarios (.feature files, Turkish or English) f
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.3.0"
+  version: "0.4.0"
 ---
 
 # Writing BDD scenarios

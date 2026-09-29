@@ -1,0 +1,341 @@
+{
+ "source": "OWASP ASVS 5.0.0 chapter structure (V1–V17). Test ideas are QA Suite paraphrases for verifying YOUR OWN application in a test environment; cite exact ASVS requirement IDs from the official document when reporting.",
+ "levels": {
+  "L1": "baseline for all applications; mostly verifiable with black-box testing",
+  "L2": "applications handling sensitive data (personal, financial, health) - the recommended default for most business apps",
+  "L3": "high-assurance (critical infrastructure, high-value finance, safety); needs design review and code access"
+ },
+ "features": {
+  "all": "every application",
+  "input": "forms/APIs accepting user input",
+  "web": "browser front-end",
+  "api": "REST/GraphQL APIs",
+  "upload": "file upload/download",
+  "auth": "login/registration/password/MFA",
+  "session": "sessions/cookies",
+  "authz": "roles/permissions/multi-user data",
+  "token": "JWT or other self-contained tokens",
+  "oauth": "OAuth/OIDC/SSO",
+  "crypto": "encryption/hashing/random tokens",
+  "tls": "network communication",
+  "config": "deployment/configuration",
+  "pii": "personal/financial/health data",
+  "logging": "logs/errors/monitoring",
+  "webrtc": "real-time audio/video",
+  "payment": "payments/money movement"
+ },
+ "chapters": [
+  {
+   "id": "V1",
+   "name": "Encoding and Sanitization",
+   "features": [
+    "input",
+    "web",
+    "api"
+   ],
+   "ideas": [
+    "Enter HTML/script markup in every text field that is echoed back; verify it is rendered as text (output encoding), not executed.",
+    "Enter SQL/NoSQL meta characters (' \" ; -- $ne) in search/filter fields; verify normal behaviour and no database error leaks.",
+    "Verify rich-text/markdown inputs are sanitised with an allow-list (no event handlers, javascript: URLs)."
+   ],
+   "ideas_tr": [
+    "Geri yansıtılan her metin alanına HTML/script işaretlemesi gir; çalıştırılmadan metin olarak gösterildiğini (çıktı kodlaması) doğrula.",
+    "Arama/filtre alanlarına SQL/NoSQL meta karakterleri (' \" ; -- $ne) gir; normal davranış olduğunu ve veritabanı hatası sızmadığını doğrula.",
+    "Zengin metin/markdown girdilerinin izin listesiyle temizlendiğini doğrula (olay işleyicisi, javascript: URL yok)."
+   ],
+   "name_tr": "Kodlama ve Temizleme"
+  },
+  {
+   "id": "V2",
+   "name": "Validation and Business Logic",
+   "features": [
+    "input",
+    "payment",
+    "all"
+   ],
+   "ideas": [
+    "Replay or reorder steps of a multi-step flow (e.g. pay before cart validation) directly via API; verify the server enforces the sequence.",
+    "Tamper with prices, discounts, quantities or limits in requests; verify the server recalculates and rejects manipulated values.",
+    "Submit the same business action concurrently (double coupon use, double transfer); verify limits hold (idempotency, locking).",
+    "Verify server-side validation exists for every client-side rule (length, range, format, allowed values)."
+   ],
+   "ideas_tr": [
+    "Çok adımlı akışın adımlarını API üzerinden tekrarla veya sırasını boz (sepet doğrulamadan ödeme gibi); sıranın sunucuda zorlandığını doğrula.",
+    "İsteklerde fiyat, indirim, adet veya limitleri değiştir; sunucunun yeniden hesapladığını ve manipüle değerleri reddettiğini doğrula.",
+    "Aynı iş işlemini eşzamanlı gönder (çift kupon kullanımı, çift transfer); limitlerin korunduğunu doğrula (idempotency, kilitleme).",
+    "Her istemci tarafı kural (uzunluk, aralık, biçim, izinli değerler) için sunucu tarafı doğrulama olduğunu kontrol et."
+   ],
+   "name_tr": "Doğrulama ve İş Mantığı"
+  },
+  {
+   "id": "V3",
+   "name": "Web Frontend Security",
+   "features": [
+    "web"
+   ],
+   "ideas": [
+    "Check security headers: Content-Security-Policy, X-Content-Type-Options, frame-ancestors / X-Frame-Options, Referrer-Policy.",
+    "Verify cookies set Secure, HttpOnly and an appropriate SameSite value.",
+    "Verify state-changing requests are protected against cross-site request forgery (SameSite and/or tokens, no GET for changes).",
+    "Verify no sensitive data is stored in localStorage/sessionStorage or exposed in URLs."
+   ],
+   "ideas_tr": [
+    "Güvenlik başlıklarını kontrol et: Content-Security-Policy, X-Content-Type-Options, frame-ancestors / X-Frame-Options, Referrer-Policy.",
+    "Çerezlerin Secure, HttpOnly ve uygun SameSite değeriyle ayarlandığını doğrula.",
+    "Durum değiştiren isteklerin CSRF'ye karşı korunduğunu doğrula (SameSite ve/veya token; değişiklik için GET yok).",
+    "Hassas verinin localStorage/sessionStorage'da tutulmadığını ve URL'de görünmediğini doğrula."
+   ],
+   "name_tr": "Web Ön Yüz Güvenliği"
+  },
+  {
+   "id": "V4",
+   "name": "API and Web Service",
+   "features": [
+    "api"
+   ],
+   "ideas": [
+    "Call endpoints with unexpected methods, content types and extra/unknown fields; verify strict handling and consistent error bodies.",
+    "Verify rate limiting / throttling on expensive or sensitive endpoints (429 with retry information).",
+    "For GraphQL: verify introspection is disabled in production and query depth/complexity is limited."
+   ],
+   "ideas_tr": [
+    "Uç noktaları beklenmeyen metot, içerik tipi ve bilinmeyen alanlarla çağır; katı işlendiğini ve hata gövdelerinin tutarlı olduğunu doğrula.",
+    "Pahalı veya hassas uç noktalarda hız sınırlaması olduğunu doğrula (retry bilgisiyle 429).",
+    "GraphQL için: üretimde introspection kapalı, sorgu derinliği/karmaşıklığı sınırlı olmalı."
+   ],
+   "name_tr": "API ve Web Servisi"
+  },
+  {
+   "id": "V5",
+   "name": "File Handling",
+   "features": [
+    "upload"
+   ],
+   "ideas": [
+    "Upload files with a disallowed type disguised by extension or content type; verify content-based validation.",
+    "Upload oversize, zero-byte and archive files; verify size limits and that archives are not blindly extracted.",
+    "Verify uploaded files are not executable/served from the application origin and that download paths cannot be traversed (../)."
+   ],
+   "ideas_tr": [
+    "Uzantı veya içerik tipiyle gizlenmiş izinsiz dosya türü yükle; içerik tabanlı doğrulama yapıldığını kontrol et.",
+    "Çok büyük, sıfır baytlık ve arşiv dosyaları yükle; boyut sınırlarını ve arşivlerin körü körüne açılmadığını doğrula.",
+    "Yüklenen dosyaların uygulama kökeninden çalıştırılabilir olarak sunulmadığını ve indirme yollarında dizin geçişi (../) yapılamadığını doğrula."
+   ],
+   "name_tr": "Dosya İşleme"
+  },
+  {
+   "id": "V6",
+   "name": "Authentication",
+   "features": [
+    "auth"
+   ],
+   "ideas": [
+    "Verify password rules: minimum length (at least 8, 15+ recommended), no arbitrary composition rules, breached-password check, paste allowed.",
+    "Verify brute-force protection (throttling/lockout) and that error messages do not reveal whether the account exists.",
+    "Verify MFA for sensitive roles/actions and that recovery flows (reset link, OTP) are single-use and expire.",
+    "Verify re-authentication is required before changing password, e-mail or MFA settings."
+   ],
+   "ideas_tr": [
+    "Şifre kurallarını doğrula: asgari uzunluk (en az 8, önerilen 15+), keyfi bileşim kuralı yok, sızmış şifre kontrolü, yapıştırma serbest.",
+    "Kaba kuvvet korumasını (yavaşlatma/kilitleme) ve hata mesajlarının hesabın var olup olmadığını ele vermediğini doğrula.",
+    "Hassas roller/işlemler için MFA olduğunu, kurtarma akışlarının (sıfırlama bağlantısı, OTP) tek kullanımlık ve süreli olduğunu doğrula.",
+    "Şifre, e-posta veya MFA ayarı değiştirilmeden önce yeniden kimlik doğrulama istendiğini doğrula."
+   ],
+   "name_tr": "Kimlik Doğrulama"
+  },
+  {
+   "id": "V7",
+   "name": "Session Management",
+   "features": [
+    "session",
+    "auth"
+   ],
+   "ideas": [
+    "Verify a new session identifier is issued after login and the old one is invalid.",
+    "Verify logout and password change invalidate the session server-side (reuse old cookie/token → rejected).",
+    "Verify idle and absolute session timeouts match the requirement (use clock control, not waiting)."
+   ],
+   "ideas_tr": [
+    "Girişten sonra yeni oturum kimliği verildiğini ve eskisinin geçersiz olduğunu doğrula.",
+    "Çıkış ve şifre değişikliğinin oturumu sunucu tarafında geçersiz kıldığını doğrula (eski çerez/token reddedilmeli).",
+    "Boşta ve mutlak oturum zaman aşımlarının gereksinime uyduğunu doğrula (beklemek yerine saat kontrolü kullan)."
+   ],
+   "name_tr": "Oturum Yönetimi"
+  },
+  {
+   "id": "V8",
+   "name": "Authorization",
+   "features": [
+    "authz",
+    "api"
+   ],
+   "ideas": [
+    "Access another user's object by changing its ID in URL/body (BOLA / IDOR); verify 403/404 and no data leak.",
+    "Call admin-only functions with a normal user's session directly via API; verify rejection (function-level authorization).",
+    "Verify field-level rules: a user cannot set properties they may not change (e.g. role, price) via mass assignment."
+   ],
+   "ideas_tr": [
+    "URL/gövdedeki kimliği değiştirerek başka kullanıcının nesnesine eriş (BOLA/IDOR); 403/404 döndüğünü ve veri sızmadığını doğrula.",
+    "Yalnızca yöneticiye açık işlevleri normal kullanıcı oturumuyla doğrudan API'den çağır; reddedildiğini doğrula (işlev düzeyi yetkilendirme).",
+    "Alan düzeyi kuralları doğrula: kullanıcı değiştirmemesi gereken özellikleri (rol, fiyat) toplu atama ile ayarlayamamalı."
+   ],
+   "name_tr": "Yetkilendirme"
+  },
+  {
+   "id": "V9",
+   "name": "Self-contained Tokens",
+   "features": [
+    "token"
+   ],
+   "ideas": [
+    "Verify tokens with a modified payload, 'none' algorithm or wrong signature are rejected.",
+    "Verify expiry (exp/nbf) and audience/issuer are enforced, and that revoked tokens stop working as specified."
+   ],
+   "ideas_tr": [
+    "Gövdesi değiştirilmiş, 'none' algoritmalı veya yanlış imzalı token'ların reddedildiğini doğrula.",
+    "Süre (exp/nbf), audience/issuer kontrollerinin uygulandığını ve iptal edilen token'ların belirtildiği gibi çalışmayı bıraktığını doğrula."
+   ],
+   "name_tr": "Kendi İçinde Token'lar"
+  },
+  {
+   "id": "V10",
+   "name": "OAuth and OIDC",
+   "features": [
+    "oauth"
+   ],
+   "ideas": [
+    "Verify exact redirect_uri matching, state/nonce validation and PKCE for public clients.",
+    "Verify scopes are minimal and consent screens show the requested access."
+   ],
+   "ideas_tr": [
+    "redirect_uri'nin birebir eşleştirildiğini, state/nonce doğrulandığını ve genel istemcilerde PKCE kullanıldığını doğrula.",
+    "Kapsamların (scope) asgari olduğunu ve onay ekranlarının istenen erişimi gösterdiğini doğrula."
+   ],
+   "name_tr": "OAuth ve OIDC"
+  },
+  {
+   "id": "V11",
+   "name": "Cryptography",
+   "features": [
+    "crypto",
+    "pii",
+    "payment"
+   ],
+   "ideas": [
+    "Verify passwords are stored with a modern adaptive hash (design/code review evidence).",
+    "Verify security tokens (reset links, coupon codes, session IDs) are long and unpredictable.",
+    "Verify no deprecated algorithms/ciphers are used (review + configuration scan)."
+   ],
+   "ideas_tr": [
+    "Şifrelerin modern uyarlanabilir hash ile saklandığını doğrula (tasarım/kod inceleme kanıtı).",
+    "Güvenlik token'larının (sıfırlama bağlantısı, kupon kodu, oturum kimliği) uzun ve tahmin edilemez olduğunu doğrula.",
+    "Kullanımdan kalkmış algoritma/şifreleme takımları kullanılmadığını doğrula (inceleme + yapılandırma taraması)."
+   ],
+   "name_tr": "Kriptografi"
+  },
+  {
+   "id": "V12",
+   "name": "Secure Communication",
+   "features": [
+    "tls",
+    "all"
+   ],
+   "ideas": [
+    "Verify HTTPS everywhere with HSTS, no mixed content, TLS 1.2+ only (e.g. with a TLS scanner on the test host).",
+    "Verify service-to-service calls (payment, SMS, BIN) use TLS with certificate validation."
+   ],
+   "ideas_tr": [
+    "Her yerde HSTS'li HTTPS, karışık içerik yok, yalnızca TLS 1.2+ olduğunu doğrula (test sunucusunda TLS tarayıcısıyla).",
+    "Servisler arası çağrıların (ödeme, SMS, BIN) sertifika doğrulamalı TLS kullandığını doğrula."
+   ],
+   "name_tr": "Güvenli İletişim"
+  },
+  {
+   "id": "V13",
+   "name": "Configuration",
+   "features": [
+    "config",
+    "all"
+   ],
+   "ideas": [
+    "Verify debug modes, default accounts, directory listings and sample pages are disabled.",
+    "Verify secrets are not present in front-end bundles, repositories or error pages.",
+    "Verify dependency/component versions have no known critical vulnerabilities (SCA scan)."
+   ],
+   "ideas_tr": [
+    "Debug modlarının, varsayılan hesapların, dizin listelemenin ve örnek sayfaların kapalı olduğunu doğrula.",
+    "Gizli bilgilerin ön yüz paketlerinde, depolarda veya hata sayfalarında bulunmadığını doğrula.",
+    "Bağımlılık/bileşen sürümlerinde bilinen kritik zafiyet olmadığını doğrula (SCA taraması)."
+   ],
+   "name_tr": "Yapılandırma"
+  },
+  {
+   "id": "V14",
+   "name": "Data Protection",
+   "features": [
+    "pii",
+    "payment"
+   ],
+   "ideas": [
+    "Verify personal/financial data is masked in UI, logs, exports and error messages (e.g. card number, TCKN).",
+    "Verify caching headers prevent storage of sensitive pages; verify data retention/deletion rules (KVKK/GDPR).",
+    "Verify full card numbers and CVV are never stored or logged (PCI DSS scope)."
+   ],
+   "ideas_tr": [
+    "Kişisel/finansal verinin arayüzde, loglarda, dışa aktarımlarda ve hata mesajlarında maskelendiğini doğrula (kart no, TCKN).",
+    "Önbellek başlıklarının hassas sayfaların saklanmasını engellediğini; saklama/silme kurallarını (KVKK/GDPR) doğrula.",
+    "Tam kart numarası ve CVV'nin asla saklanmadığını veya loglanmadığını doğrula (PCI DSS kapsamı)."
+   ],
+   "name_tr": "Veri Koruma"
+  },
+  {
+   "id": "V15",
+   "name": "Secure Coding and Architecture",
+   "features": [
+    "all"
+   ],
+   "ideas": [
+    "Verify a threat model / security design review exists for the feature (evidence, not a test).",
+    "Verify resource consumption limits (payload size, pagination limits, timeouts) protect against abuse."
+   ],
+   "ideas_tr": [
+    "Özellik için tehdit modeli / güvenlik tasarım incelemesi olduğunu doğrula (test değil, kanıt).",
+    "Kaynak tüketim sınırlarının (gövde boyutu, sayfalama sınırı, zaman aşımları) kötüye kullanıma karşı koruduğunu doğrula."
+   ],
+   "name_tr": "Güvenli Kodlama ve Mimari"
+  },
+  {
+   "id": "V16",
+   "name": "Security Logging and Error Handling",
+   "features": [
+    "logging",
+    "all"
+   ],
+   "ideas": [
+    "Verify security events (login success/failure, permission denials, admin actions) are logged with who/what/when, without secrets.",
+    "Force errors (invalid input, dependency down); verify generic user-facing messages and no stack traces or internal IDs.",
+    "Verify alerts exist for repeated authentication failures or authorization violations (with Ops)."
+   ],
+   "ideas_tr": [
+    "Güvenlik olaylarının (başarılı/başarısız giriş, yetki reddi, yönetici işlemleri) kim/ne/ne zaman bilgisiyle ve gizli bilgi olmadan loglandığını doğrula.",
+    "Hata oluştur (geçersiz girdi, bağımlılık kapalı); kullanıcıya genel mesaj gösterildiğini, yığın izi veya iç kimlik sızmadığını doğrula.",
+    "Tekrarlanan kimlik doğrulama hataları veya yetki ihlalleri için alarm olduğunu doğrula (Ops ile)."
+   ],
+   "name_tr": "Güvenlik Loglama ve Hata Yönetimi"
+  },
+  {
+   "id": "V17",
+   "name": "WebRTC",
+   "features": [
+    "webrtc"
+   ],
+   "ideas": [
+    "Verify TURN credentials are short-lived and media streams are encrypted; verify signalling requires authentication."
+   ],
+   "ideas_tr": [
+    "TURN kimlik bilgilerinin kısa ömürlü, medya akışlarının şifreli ve sinyalleşmenin kimlik doğrulama gerektirdiğini doğrula."
+   ],
+   "name_tr": "WebRTC"
+  }
+ ]
+}

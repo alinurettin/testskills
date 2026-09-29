@@ -25,6 +25,9 @@ qa/
 ├── test-cases.json        test cases (generated; read by all scripts)
 ├── results.json           execution results (manual and/or from Playwright via pw_results.py)
 ├── automation-coverage.md automated / skeleton / missing per TC (check_automation.py)
+├── test-plan.md           test plan (planning-tests) + exit-criteria.json (machine-checkable exit criteria)
+├── defects.json           optional defect register (reporting-test-results)
+├── completion-report.md   test completion report with exit-criteria evaluation
 ├── rtm.md / rtm.csv       traceability matrix + gap report
 └── exports/               xray.csv, zephyr.csv, test-cases.xlsx, test-cases.md …
 ```
@@ -154,6 +157,39 @@ The field reference below describes the **generated JSON**. You only need it whe
 }
 ```
 Required per entry: `status`. Optional fields are `defects`, `source`, `projects`, `flaky`, `errors`, `note`, `spec` and `duration_ms`. `pw_results.py` writes the Playwright fields. It keeps manual entries and defect keys that are already in the file.
+
+## exit-criteria.json (optional)
+
+The planning skill writes this file and the completion report evaluates it. Leave out any criterion that does not apply.
+
+```json
+{
+  "min_requirement_coverage_pct": 100,
+  "min_execution_pct": 95,
+  "min_pass_rate_pct": 95,
+  "max_open_defects": { "critical": 0, "high": 0, "medium": 5 },
+  "all_critical_requirements_passed": true,
+  "max_blocking_questions_open": 0,
+  "min_automation_pct": 60
+}
+```
+
+## defects.json (optional)
+
+Use this when defects are tracked outside Jira, or when a snapshot is exported for the report.
+
+```json
+{
+  "defects": [
+    { "id": "SHOP-481", "title": "100,00 TL sınırında kupon reddediliyor", "severity": "high", "priority": "high",
+      "status": "open", "test_ids": ["TC-003"], "requirement_ids": ["REQ-002"], "found_in": "RC2", "environment": "staging" }
+  ]
+}
+```
+
+- `severity` records the technical impact: `critical`, `high`, `medium` or `low`.
+- `priority` records the urgency of the fix.
+- `status` is one of `open`, `in-progress`, `resolved`, `closed`, `rejected` or `deferred`. Only `open`, `in-progress` and `resolved` count as open until the defect is verified closed.
 
 ## Enumerations
 
