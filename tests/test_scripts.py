@@ -774,6 +774,42 @@ class ExportTests(unittest.TestCase):
             rows = list(csv.reader(io.StringIO(out.read_text(encoding="utf-8"))))
             self.assertEqual(rows[1][7], "SHOP-42")
 
+    def test_testrail_multirow(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "t.csv"
+            r = self.run_export("--format", "testrail", "--folder", "Cart > Coupon", "--out", str(out), "--only", "TC-001,TC-003")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            rows = list(csv.reader(io.StringIO(out.read_text(encoding="utf-8"))))
+            self.assertEqual(rows[0][0], "Title")
+            self.assertTrue(rows[1][0].startswith("TC-001 "))
+            self.assertEqual(rows[2][0], "")  # continuation row
+            self.assertEqual(rows[1][1], "Cart > Coupon")
+            self.assertIn("SHOP-101", rows[1][7])
+
+    def test_azure_devops_one_row_per_step(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "a.csv"
+            r = self.run_export("--format", "azure-devops", "--area-path", "Shop/Web", "--out", str(out), "--only", "TC-001")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            rows = list(csv.reader(io.StringIO(out.read_text(encoding="utf-8"))))
+            self.assertEqual(rows[0][:4], ["ID", "Work Item Type", "Title", "Test Step"])
+            self.assertEqual([x[3] for x in rows[1:]], ["1", "2"])
+            self.assertEqual(rows[1][2], rows[2][2])  # title repeated on every step row
+            self.assertEqual(rows[1][9], "2")          # high -> 2
+
+    def test_qase_suite_row_and_numbered_steps(self):
+        with tempfile.TemporaryDirectory() as d:
+            out = Path(d) / "q.csv"
+            r = self.run_export("--format", "qase", "--out", str(out), "--only", "TC-001")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            rows = list(csv.reader(io.StringIO(out.read_text(encoding="utf-8"))))
+            h = rows[0]
+            self.assertEqual(rows[1][h.index("suite_without_cases")], "1")
+            case = rows[2]
+            self.assertTrue(case[h.index("steps_actions")].startswith('1. "'))
+            self.assertIn('2. "', case[h.index("steps_actions")])
+            self.assertEqual(case[h.index("priority")], "high")
+
     def test_validation_blocks_bad_tests(self):
         with tempfile.TemporaryDirectory() as d:
             bad = Path(d) / "bad.json"
@@ -782,6 +818,128 @@ class ExportTests(unittest.TestCase):
             r = self.run_export("--format", "xray", "--out", str(out), tests=bad)
             self.assertEqual(r.returncode, 1)
             self.assertFalse(out.exists())
+
+
+class OpenApiTests(unittest.TestCase):
+    SCRIPT = SK / "testing-apis" / "scripts" / "openapi_tests.py"
+    DOC = ROOT / "evals" / "trial-api" / "api" / "openapi.json"
+
+    def generate(self, d, *extra):
+        out, spec_out = Path(d) / "api.src.md", Path(d) / "api.spec.ts"
+        r = subprocess.run([sys.executable, str(self.SCRIPT), str(self.DOC), "--req", "REQ-020", "--out", str(out),
+                            "--spec-out", str(spec_out), *extra], capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return out.read_text(encoding="utf-8"), spec_out.read_text(encoding="utf-8")
+
+    def test_compact_and_spec_share_ids(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, ts = self.generate(d)
+            _, items, errors = qc.parse(src, "tc")
+            self.assertEqual(errors, [])
+            ids = [t["id"] for t in items]
+            self.assertGreater(len(ids), 20)
+            self.assertEqual(len(ids), len(set(ids)))
+            for i in ids:
+                self.assertIn(f"@{i}", ts)
+            self.assertTrue(all(t["requirement_ids"] == ["REQ-020"] for t in items))
+
+    def test_contract_probes(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, ts = self.generate(d)
+            self.assertIn("50000.01", ts)         # just above the amount maximum
+            self.assertIn("toIban", ts)           # missing required field
+            self.assertIn("test.fixme", ts)       # BOLA skeleton
+            self.assertIn("toBe(401)", ts)        # secured operations
+            self.assertIn("toBe(201)", ts)        # documented create status
+            self.assertIn("checkSchema", ts)
+
+    def test_trial_feedback_features(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, ts = self.generate(d)
+            self.assertIn("'Bearer' scheme", ts)                       # malformed auth header, once per API
+            self.assertEqual(ts.count("'Bearer' scheme"), 1)
+            self.assertIn("not matching the pattern", ts)              # toIban pattern probe
+            self.assertIn("BOLA, body", ts)                            # fromAccountId body-level BOLA
+            self.assertIn("const createdId", ts)                       # GET by ID creates its resource first
+            self.assertIn("as: 'other'", ts)
+            self.assertIn("# QUESTION:", src)
+            self.assertIn("Idempotency-Key", src)
+            self.assertIn("generated", src)
+
+    def test_error_schema_checked_when_documented(self):
+        with tempfile.TemporaryDirectory() as d:
+            doc = json.loads(self.DOC.read_text(encoding="utf-8"))
+            op = doc["paths"]["/transfers"]["post"]
+            op["responses"]["400"] = {"description": "bad", "content": {"application/json": {"schema": {
+                "type": "object", "required": ["code"], "properties": {"code": {"type": "string"}}}}}}
+            spec_file = Path(d) / "o.json"
+            spec_file.write_text(json.dumps(doc), encoding="utf-8")
+            out = Path(d) / "o.ts"
+            subprocess.run([sys.executable, str(self.SCRIPT), str(spec_file), "--req", "REQ-1", "--out", str(Path(d) / "o.md"),
+                            "--spec-out", str(out)], check=True, capture_output=True)
+            self.assertIn('toBe(400); expect(checkSchema(await res.json(), {"type": "object", "required": ["code"]', out.read_text(encoding="utf-8"))
+
+    def test_continues_numbering(self):
+        with tempfile.TemporaryDirectory() as d:
+            src, _ = self.generate(d, "--tests", str(FIX / "test-cases.json"))
+            first = qc.parse(src, "tc")[1][0]["id"]
+            existing = json.loads((FIX / "test-cases.json").read_text(encoding="utf-8"))["test_cases"]
+            self.assertGreater(int(first.split("-")[1]), max(int(t["id"].split("-")[1]) for t in existing))
+
+    def test_rejects_swagger2(self):
+        with tempfile.TemporaryDirectory() as d:
+            bad = Path(d) / "s.json"
+            bad.write_text(json.dumps({"swagger": "2.0", "paths": {}}), encoding="utf-8")
+            r = subprocess.run([sys.executable, str(self.SCRIPT), str(bad), "--req", "REQ-1", "--out", str(Path(d) / "o.md")],
+                               capture_output=True, text=True, encoding="utf-8")
+            self.assertEqual(r.returncode, 2)
+
+
+class RegressionSelectionTests(unittest.TestCase):
+    SCRIPT = SK / "tracing-requirements" / "scripts" / "select_regression.py"
+
+    def run_sel(self, d, *extra):
+        out, js = Path(d) / "r.md", Path(d) / "r.json"
+        r = subprocess.run([sys.executable, str(self.SCRIPT), "--requirements", str(FIX / "requirements.json"),
+                            "--tests", str(FIX / "test-cases.json"), "--results", str(FIX / "results.json"),
+                            "--out", str(out), "--json", str(js), *extra], capture_output=True, text=True, encoding="utf-8")
+        self.assertEqual(r.returncode, 0, r.stderr)
+        return json.loads(js.read_text(encoding="utf-8")), out.read_text(encoding="utf-8"), r
+
+    def test_changed_requirement_tests_are_must(self):
+        with tempfile.TemporaryDirectory() as d:
+            data, _, _ = self.run_sel(d, "--changed", "REQ-001")
+            must = {x["id"] for x in data["selected"] if x["tier"] == "must"}
+            self.assertTrue({"TC-001", "TC-002", "TC-008"} <= must)
+            self.assertNotIn("TC-006", {x["id"] for x in data["selected"]})  # deprecated never selected
+
+    def test_budget_keeps_must_first_and_reports_residual_risk(self):
+        with tempfile.TemporaryDirectory() as d:
+            data, md, _ = self.run_sel(d, "--changed", "REQ-001", "--level", "could", "--budget", "2")
+            self.assertEqual(len(data["selected"]), 2)
+            self.assertTrue(all(x["tier"] == "must" for x in data["selected"]))
+            self.assertGreater(len(data["left_out"]), 0)
+            self.assertIn("TC-005", md)  # the highest-risk left-out test stays visible
+
+    def test_unknown_changed_id_is_reported(self):
+        with tempfile.TemporaryDirectory() as d:
+            data, _, r = self.run_sel(d, "--changed", "REQ-777")
+            self.assertEqual(data["unknown_changed"], ["REQ-777"])
+            self.assertIn("REQ-777", r.stderr)
+
+    def test_parent_child_related(self):
+        with tempfile.TemporaryDirectory() as d:
+            req = Path(d) / "req.json"
+            tc = Path(d) / "tc.json"
+            req.write_text(json.dumps({"requirements": [{"id": "REQ-001", "priority": "low"},
+                                                        {"id": "REQ-002", "priority": "low", "parent": "REQ-001"}]}), encoding="utf-8")
+            tc.write_text(json.dumps({"test_cases": [{"id": "TC-001", "requirement_ids": ["REQ-002"], "priority": "low",
+                                                      "steps": [{"action": "a", "expected": "b"}]}]}), encoding="utf-8")
+            js = Path(d) / "o.json"
+            subprocess.run([sys.executable, str(self.SCRIPT), "--requirements", str(req), "--tests", str(tc), "--changed",
+                            "REQ-001", "--out", str(Path(d) / "o.md"), "--json", str(js)], check=True, capture_output=True)
+            sel = json.loads(js.read_text(encoding="utf-8"))["selected"]
+            self.assertEqual(sel[0]["reasons"][0], "RELATED")
 
 
 if __name__ == "__main__":

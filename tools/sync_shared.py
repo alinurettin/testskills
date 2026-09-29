@@ -21,7 +21,8 @@ SHARED = {
     "data-model.md": ("references", ["qa-orchestrator", "analyzing-requirements", "designing-test-cases",
                                      "tracing-requirements", "exporting-test-cases", "reporting-test-results"]),
     "scripts/qa_compact.py": ("scripts", ["analyzing-requirements", "designing-test-cases", "reviewing-test-cases",
-                                          "testing-nonfunctional"]),
+                                          "testing-nonfunctional", "testing-apis", "running-exploratory-tests",
+                                          "testing-ai-features", "testing-mobile-apps"]),
 }
 # shared folder -> (target folder inside each skill, skills that receive every file of it)
 SHARED_DIRS = {

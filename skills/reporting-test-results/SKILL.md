@@ -4,7 +4,7 @@ description: Produces professional test reporting from QA Suite artifacts. It wr
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Reporting test results
@@ -38,7 +38,7 @@ python scripts/completion_report.py --qa qa --json                              
 
 Inputs are read from `qa/`:
 - **Required:** `requirements.json`, `test-cases.json`, `results.json`
-- **Optional:** `defects.json` (without it, open-defect criteria are *unknown*), `exit-criteria.json` (from `planning-tests`), `clarifications.md` (blocking questions)
+- **Optional:** `defects.json` (without it, open-defect criteria are *unknown*), `exit-criteria.json` (from `planning-tests`), `clarifications.md` (blocking questions: a `| Q-### |` table row counts as blocking when it contains "blocking" or "bloke" and is not marked closed/answered/kapalı/cevaplandı)
 
 The script computes:
 - coverage, execution %, and pass rate (passed ÷ (passed + failed));

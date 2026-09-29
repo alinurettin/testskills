@@ -1,0 +1,712 @@
+{
+ "method": "proxy: a model chose a skill from the name+description list (not the real Claude Code trigger mechanism)",
+ "skills": 17,
+ "sets": {
+  "trigger-queries": {
+   "ok": 42,
+   "n": 42,
+   "rows": [
+    {
+     "query": "Ekteki PRD'yi test ekibi için değerlendirmen lazım: belirsiz, test edilemeyen ifadeleri ve PO'ya sorulacak soruları çıkar. Dosya docs/prd-sepet-v2.md",
+     "expect": [
+      "analyzing-requirements"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "can you look at this user story and tell me if it's testable? 'As a user I want fast search so that I find products quickly' AC: results should be relevant",
+     "expect": [
+      "analyzing-requirements"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "SRS'teki fonksiyonel olmayan gereksinimler eksik mi? performans, güvenlik vs. ne gözden kaçmış olabilir, madde madde yaz",
+     "expect": [
+      "analyzing-requirements"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "Kredi başvuru formunda yaş 18-65, tutar 1.000-50.000 TL arası. Bu alanlar için sınır değer testlerini çıkar",
+     "expect": [
+      "designing-test-cases"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Havale ekranı için test senaryoları yazar mısın? kurallar: günlük limit 50.000 TL, mesai dışı işlemler ertesi güne kalır, aynı alıcıya 1 dk içinde ikinci işlem engellenir",
+     "expect": [
+      "designing-test-cases"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "I need negative test cases for our password reset flow - the link expires after 30 minutes and can only be used once",
+     "expect": [
+      "designing-test-cases"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "sipariş durumları: hazırlanıyor → kargoda → teslim edildi, iptal sadece hazırlanıyorken mümkün. bunun için durum geçiş testlerini çıkar",
+     "expect": [
+      "designing-test-cases"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Hangi gereksinimlerimizin hiç testi yok? qa/requirements.json ve qa/test-cases.json dosyalarından kapsama matrisini çıkar",
+     "expect": [
+      "tracing-requirements"
+     ],
+     "picked": "tracing-requirements",
+     "ok": true
+    },
+    {
+     "query": "REQ-014 değişti, hangi test case'leri tekrar koşmamız gerekiyor?",
+     "expect": [
+      "tracing-requirements"
+     ],
+     "picked": "tracing-requirements",
+     "ok": true
+    },
+    {
+     "query": "generate a requirements traceability matrix from our qa folder and highlight coverage gaps",
+     "expect": [
+      "tracing-requirements"
+     ],
+     "picked": "tracing-requirements",
+     "ok": true
+    },
+    {
+     "query": "test case'leri Xray'e import edebileceğim CSV formatına çevir, qa/test-cases.json içinde",
+     "expect": [
+      "exporting-test-cases"
+     ],
+     "picked": "exporting-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Zephyr Scale'e yükleyeceğiz, test-cases.json'dan import dosyası hazırla, klasör 'Checkout/Kupon' olsun",
+     "expect": [
+      "exporting-test-cases"
+     ],
+     "picked": "exporting-test-cases",
+     "ok": true
+    },
+    {
+     "query": "export our test cases to an Excel file so the business analysts can review them",
+     "expect": [
+      "exporting-test-cases"
+     ],
+     "picked": "exporting-test-cases",
+     "ok": true
+    },
+    {
+     "query": "qa/test-cases.json'daki smoke testleri Playwright ile otomatize et",
+     "expect": [
+      "automating-with-playwright"
+     ],
+     "picked": "automating-with-playwright",
+     "ok": true
+    },
+    {
+     "query": "set up a Playwright TypeScript project with page objects and CI for our checkout e2e tests",
+     "expect": [
+      "automating-with-playwright"
+     ],
+     "picked": "automating-with-playwright",
+     "ok": true
+    },
+    {
+     "query": "Playwright raporundaki sonuçları gereksinim matrisine nasıl bağlarım? test-results/results.json var",
+     "expect": [
+      "automating-with-playwright",
+      "tracing-requirements"
+     ],
+     "picked": "automating-with-playwright",
+     "ok": true
+    },
+    {
+     "query": "manuel test case'lerimizi otomasyona çevirmek istiyoruz, nereden başlamalıyız? Playwright kullanıyoruz",
+     "expect": [
+      "automating-with-playwright"
+     ],
+     "picked": "automating-with-playwright",
+     "ok": true
+    },
+    {
+     "query": "kupon kabul kriterlerini Türkçe Gherkin senaryolarına çevir (Diyelim ki / Eğer ki / O zaman)",
+     "expect": [
+      "writing-bdd-scenarios"
+     ],
+     "picked": "writing-bdd-scenarios",
+     "ok": true
+    },
+    {
+     "query": "write cucumber feature files for the login story, we use playwright-bdd",
+     "expect": [
+      "writing-bdd-scenarios"
+     ],
+     "picked": "writing-bdd-scenarios",
+     "ok": true
+    },
+    {
+     "query": "BDD senaryoları yazalım, iş birimi okuyacak, feature dosyası olarak",
+     "expect": [
+      "writing-bdd-scenarios"
+     ],
+     "picked": "writing-bdd-scenarios",
+     "ok": true
+    },
+    {
+     "query": "Mart sürümü için test planı hazırla: kapsam, riskler, çıkış kriterleri ve efor tahmini lazım",
+     "expect": [
+      "planning-tests"
+     ],
+     "picked": "planning-tests",
+     "ok": true
+    },
+    {
+     "query": "what exit criteria should we define for this release and how do we estimate test effort?",
+     "expect": [
+      "planning-tests"
+     ],
+     "picked": "planning-tests",
+     "ok": true
+    },
+    {
+     "query": "test stratejisi dokümanı yazmam gerekiyor, mobil bankacılıktaki yeni para transferi özelliği için",
+     "expect": [
+      "planning-tests"
+     ],
+     "picked": "planning-tests",
+     "ok": true
+    },
+    {
+     "query": "kupon doğrulama API'si için yük testi yazalım, gereksinim p95 800 ms, 50 istek/sn. k6 kullanıyoruz",
+     "expect": [
+      "testing-nonfunctional"
+     ],
+     "picked": "testing-nonfunctional",
+     "ok": true
+    },
+    {
+     "query": "ödeme sayfamızın WCAG 2.2 AA uyumluluğunu test etmek için test case'ler çıkar",
+     "expect": [
+      "testing-nonfunctional"
+     ],
+     "picked": "testing-nonfunctional",
+     "ok": true
+    },
+    {
+     "query": "OWASP ASVS'e göre login ve yetkilendirme için güvenlik test senaryoları hazırla, kendi test ortamımızda koşacağız",
+     "expect": [
+      "testing-nonfunctional"
+     ],
+     "picked": "testing-nonfunctional",
+     "ok": true
+    },
+    {
+     "query": "how should we test accessibility of our signup form? screen readers, keyboard navigation etc",
+     "expect": [
+      "testing-nonfunctional"
+     ],
+     "picked": "testing-nonfunctional",
+     "ok": true
+    },
+    {
+     "query": "TC-003 kaldı, 100 TL'lik sepette kupon reddediliyor. Jira'ya açmak için hata raporu yaz",
+     "expect": [
+      "reporting-test-results"
+     ],
+     "picked": "reporting-test-results",
+     "ok": true
+    },
+    {
+     "query": "sprint sonu test tamamlama raporu hazırla, çıkış kriterleri sağlandı mı?",
+     "expect": [
+      "reporting-test-results"
+     ],
+     "picked": "reporting-test-results",
+     "ok": true
+    },
+    {
+     "query": "are we ready to release? summarize test results, open defects and residual risks from the qa folder",
+     "expect": [
+      "reporting-test-results"
+     ],
+     "picked": "reporting-test-results",
+     "ok": true
+    },
+    {
+     "query": "günlük test durum raporu çıkar, kaç test koştu kaç tanesi kaldı",
+     "expect": [
+      "reporting-test-results"
+     ],
+     "picked": "reporting-test-results",
+     "ok": true
+    },
+    {
+     "query": "ekibin yazdığı test case'leri Excel'den CSV olarak aldım (testler.csv), kalitelerini değerlendir",
+     "expect": [
+      "reviewing-test-cases"
+     ],
+     "picked": "reviewing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "review these test cases, are they good enough? they're in our testrail export tests.csv",
+     "expect": [
+      "reviewing-test-cases"
+     ],
+     "picked": "reviewing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "bu testler yeterli mi? AI'ın ürettiği 40 test case var, eksik ve hatalı olanları bul",
+     "expect": [
+      "reviewing-test-cases"
+     ],
+     "picked": "reviewing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Bu user story için baştan sona QA paketi hazırla: analiz, test case'ler, izlenebilirlik ve Xray export",
+     "expect": [
+      "qa-orchestrator"
+     ],
+     "picked": "qa-orchestrator",
+     "ok": true
+    },
+    {
+     "query": "yeni kampanya özelliğinin SRS'i geldi, test sürecini baştan sona yürüt",
+     "expect": [
+      "qa-orchestrator"
+     ],
+     "picked": "qa-orchestrator",
+     "ok": true
+    },
+    {
+     "query": "Jest ile bu React bileşeni için unit test yaz: src/components/Cart.tsx",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "pytest'te bu fixture neden hata veriyor? conftest.py'de scope='module' kullandım",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "Godot projem için GUT ile unit test yazmak istiyorum, oyuncu hareket scripti için",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "what's the difference between smoke testing and sanity testing?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "Playwright'ta locator timeout hatası alıyorum: page.getByRole('button') bulunamıyor, nasıl debug ederim?",
+     "expect": [
+      "automating-with-playwright",
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "CI pipeline'ımız GitHub Actions'ta çok yavaş, npm cache nasıl eklerim?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    }
+   ]
+  },
+  "trigger-queries-hard": {
+   "ok": 20,
+   "n": 20,
+   "rows": [
+    {
+     "query": "şu story için test case yaz: kullanıcı profil fotoğrafını değiştirebilir, max 5 MB, jpg/png",
+     "expect": [
+      "designing-test-cases",
+      "qa-orchestrator"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "test case'leri çıkar sonra da Xray'e yükleyeceğim dosyayı ver",
+     "expect": [
+      "qa-orchestrator",
+      "designing-test-cases"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Excel'deki eski test case'lerimizi Xray'e taşımamız lazım, nasıl yaparız?",
+     "expect": [
+      "reviewing-test-cases",
+      "exporting-test-cases"
+     ],
+     "picked": "exporting-test-cases",
+     "ok": true
+    },
+    {
+     "query": "performans gereksinimimiz 'sistem hızlı yanıt vermeli' diyor, bu test edilebilir mi, nasıl yazmalıyız?",
+     "expect": [
+      "analyzing-requirements",
+      "testing-nonfunctional"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "ödeme sayfasında ekran okuyucu 'Öde' butonunu okumuyor, bunun için bug kaydı yaz",
+     "expect": [
+      "reporting-test-results"
+     ],
+     "picked": "reporting-test-results",
+     "ok": true
+    },
+    {
+     "query": "regresyon setimiz çok büyüdü, 800 test var, hangilerini her sprintte koşmalıyız?",
+     "expect": [
+      "planning-tests",
+      "tracing-requirements",
+      "reviewing-test-cases"
+     ],
+     "picked": "tracing-requirements",
+     "ok": true
+    },
+    {
+     "query": "QA olarak bu sprintte ne test edeceğimizi ve ne kadar süreceğini planlamam lazım",
+     "expect": [
+      "planning-tests"
+     ],
+     "picked": "planning-tests",
+     "ok": true
+    },
+    {
+     "query": "kabul kriterleri yazar mısın bu story için: kullanıcı favori ürünlerini listeleyebilir",
+     "expect": [
+      "analyzing-requirements",
+      "writing-bdd-scenarios"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "yazdığımız Playwright testleri sürekli flaky, bazen geçiyor bazen kalıyor, ne yapmalıyız",
+     "expect": [
+      "automating-with-playwright",
+      "none"
+     ],
+     "picked": "automating-with-playwright",
+     "ok": true
+    },
+    {
+     "query": "karar tablosu çıkar: üye tipi (gold/silver/standart), sepet tutarı, kampanya kodu → kargo ücreti",
+     "expect": [
+      "designing-test-cases"
+     ],
+     "picked": "designing-test-cases",
+     "ok": true
+    },
+    {
+     "query": "bu hafta kaç bug bulduk, hangi gereksinimler riskli, yöneticiye özet lazım",
+     "expect": [
+      "reporting-test-results"
+     ],
+     "picked": "reporting-test-results",
+     "ok": true
+    },
+    {
+     "query": "IDOR açığı var mı diye API'mizi nasıl test ederiz? kendi staging ortamımız",
+     "expect": [
+      "testing-apis",
+      "testing-nonfunctional"
+     ],
+     "picked": "testing-apis",
+     "ok": true
+    },
+    {
+     "query": "SRS'teki gereksinimlere ID ver ve her birini atomik hale getir",
+     "expect": [
+      "analyzing-requirements"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "gereksinimlerimiz Jira'da, test case'lerimiz TestRail'de; hangi story'nin testi eksik görmek istiyorum",
+     "expect": [
+      "tracing-requirements",
+      "reviewing-test-cases"
+     ],
+     "picked": "tracing-requirements",
+     "ok": true
+    },
+    {
+     "query": "TCKN alanı için geçerli ve geçersiz test verileri lazım",
+     "expect": [
+      "designing-test-cases",
+      "preparing-test-data"
+     ],
+     "picked": "preparing-test-data",
+     "ok": true
+    },
+    {
+     "query": "e-ticaret sitemizin kampanya modülü için gözden kaçan gereksinim var mı, sektöre özel neler sorulmalı?",
+     "expect": [
+      "analyzing-requirements"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "Cypress ile yazılmış testlerimizi Playwright'a taşımak istiyoruz",
+     "expect": [
+      "automating-with-playwright",
+      "none"
+     ],
+     "picked": "automating-with-playwright",
+     "ok": true
+    },
+    {
+     "query": "write a Python function that validates Turkish IBAN numbers for our backend",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "SonarQube'da kod kapsamı %60, bunu nasıl %80'e çıkarırız?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "bu pull request'teki değişiklikleri incele, bug var mı",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    }
+   ]
+  },
+  "trigger-queries-v06": {
+   "ok": 22,
+   "n": 22,
+   "rows": [
+    {
+     "query": "Swagger dosyamız var (openapi.yaml), bu servisin endpoint'leri için test çıkar ve otomatik koşabileceğimiz hale getir",
+     "expect": [
+      "testing-apis"
+     ],
+     "picked": "testing-apis",
+     "ok": true
+    },
+    {
+     "query": "Our REST API returns 200 for everything, even on create. Can you write contract tests from the OpenAPI spec and check status codes and response schemas?",
+     "expect": [
+      "testing-apis"
+     ],
+     "picked": "testing-apis",
+     "ok": true
+    },
+    {
+     "query": "Kullanıcı A, B'nin sipariş detayını ID'yi değiştirerek görebiliyor mu? API yetkilendirme testlerini (IDOR/BOLA) hazırla",
+     "expect": [
+      "testing-apis"
+     ],
+     "picked": "testing-apis",
+     "ok": true
+    },
+    {
+     "query": "Yarın 90 dakikalık keşif testi oturumu yapacağım, ödeme modülü için charter'ları ve oturum notu şablonunu hazırla",
+     "expect": [
+      "running-exploratory-tests"
+     ],
+     "picked": "running-exploratory-tests",
+     "ok": true
+    },
+    {
+     "query": "I did an exploratory session on the checkout yesterday, here are my notes. Summarise them and turn the bugs into defect reports and regression tests",
+     "expect": [
+      "running-exploratory-tests"
+     ],
+     "picked": "running-exploratory-tests",
+     "ok": true
+    },
+    {
+     "query": "Müşteri hizmetleri chatbot'umuz LLM tabanlı; prompt injection, halüsinasyon ve kişisel veri sızıntısı için nasıl test edelim, eval seti hazırla",
+     "expect": [
+      "testing-ai-features"
+     ],
+     "picked": "testing-ai-features",
+     "ok": true
+    },
+    {
+     "query": "We changed the prompt of our RAG assistant. Score these 200 outputs against our eval set and tell me if we regressed",
+     "expect": [
+      "testing-ai-features"
+     ],
+     "picked": "testing-ai-features",
+     "ok": true
+    },
+    {
+     "query": "Test ortamı için 500 sahte müşteri lazım: TCKN, IBAN, telefon geçerli formatta olsun, gerçek veri olmasın",
+     "expect": [
+      "preparing-test-data"
+     ],
+     "picked": "preparing-test-data",
+     "ok": true
+    },
+    {
+     "query": "We have to use a production extract in UAT. Mask names, emails and IBANs but keep joins between the files working",
+     "expect": [
+      "preparing-test-data"
+     ],
+     "picked": "preparing-test-data",
+     "ok": true
+    },
+    {
+     "query": "iOS ve Android uygulamamız için test kapsamı çıkar: kamera, konum, push bildirim var, hangi cihazlarda test edelim?",
+     "expect": [
+      "testing-mobile-apps"
+     ],
+     "picked": "testing-mobile-apps",
+     "ok": true
+    },
+    {
+     "query": "What should we test before submitting our React Native app to the App Store and Google Play? Offline mode and permissions worry me",
+     "expect": [
+      "testing-mobile-apps"
+     ],
+     "picked": "testing-mobile-apps",
+     "ok": true
+    },
+    {
+     "query": "Eski core bankacılık sisteminden yeni sisteme müşteri verisi taşınıyor. Kaynak ve hedef CSV'leri karşılaştırıp mutabakat raporu çıkar",
+     "expect": [
+      "testing-data-migrations"
+     ],
+     "picked": "testing-data-migrations",
+     "ok": true
+    },
+    {
+     "query": "How do we test our ETL pipeline from Oracle to Snowflake? Row counts match but finance says totals are off",
+     "expect": [
+      "testing-data-migrations"
+     ],
+     "picked": "testing-data-migrations",
+     "ok": true
+    },
+    {
+     "query": "REQ-004 ve REQ-009 değişti, sürüme 2 saat var. Hangi regresyon testlerini koşalım? Seçimi gerekçeleriyle ver",
+     "expect": [
+      "tracing-requirements"
+     ],
+     "picked": "tracing-requirements",
+     "ok": true
+    },
+    {
+     "query": "Test case'lerimizi TestRail'e import edilecek CSV'ye çevir",
+     "expect": [
+      "exporting-test-cases"
+     ],
+     "picked": "exporting-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Azure DevOps Test Plans'e bu testleri toplu yüklemek istiyorum, dosyayı hazırla",
+     "expect": [
+      "exporting-test-cases"
+     ],
+     "picked": "exporting-test-cases",
+     "ok": true
+    },
+    {
+     "query": "Sigorta poliçe teklif ekranı için gereksinimleri incele: yaş, araç değeri ve hasarsızlık basamağına göre prim hesaplanıyor",
+     "expect": [
+      "analyzing-requirements",
+      "designing-test-cases",
+      "qa-orchestrator"
+     ],
+     "picked": "analyzing-requirements",
+     "ok": true
+    },
+    {
+     "query": "Postman'de environment variable'ları nasıl tanımlarım?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "OpenAI API'sine istek atan Python kodumda timeout hatası alıyorum, nasıl düzeltirim?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "Write a SQL query that finds duplicate customer emails in our users table",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "Flutter uygulamamda setState neden widget'ı yeniden çizmiyor?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    },
+    {
+     "query": "Faker kütüphanesiyle Python'da rastgele isim nasıl üretilir?",
+     "expect": [
+      "none"
+     ],
+     "picked": "none",
+     "ok": true
+    }
+   ]
+  }
+ }
+}

@@ -1,0 +1,41 @@
+MUSTERI_NO;AD;SOYAD;DOGUM_TARIHI;SUBE_KODU;BAKIYE;DURUM;EPOSTA;FAKS
+0001001;Ayþe;Yýlmaz;14.02.1985;34;12.450,75;A;ayse.yilmaz@example.com;0212 555 01 01
+0001002;Mehmet;Kaya;03.11.1978;06;3.200,00;A;mehmet.kaya@example.com;
+0001003;  Zeynep;Çelik;22.07.1992;35;875,5;A;ZEYNEP.CELIK@EXAMPLE.COM;
+0001004;Ýbrahim;Þahin;09.09.1969;34;150.000,00;A;ibrahim.sahin@example.com;0212 555 01 04
+0001005;Iþýl;Kýlýç;30.01.1990;06;0,00;P;isil.kilic@example.com;
+0001006;Þükrü;Yýldýz;17.05.1955;35;-150,00;A;sukru.yildiz@example.com;
+0001007;Gökhan;Öztürk;01.12.1983;34;7.890,10;A;;
+0001008;Çaðrý;Aydýn;11.04.1995;06;450,25;A;cagri.aydin@example.com;
+0001009;Öykü;Arslan;25.06.1998;35;4.350,57;A;oyku.arslan@example.com;
+0001010;Ümit;Doðan;08.08.1972;34;1.234.567,89;A;umit.dogan@example.com;0216 555 01 10
+0001011;Emine;Aslan;19.03.1961;06;22.000,00;K;emine.aslan@example.com;
+0001012;Oðuz;Çetin;05.03.1990;35;980,40;A;oguz.cetin@example.com;
+0001013;Ilgaz;Koç;29.02.1992;34;5.500,00;A;ilgaz.koc@example.com;
+0001014;Fatma;Kurt;12.10.1980;06;610,00;P;fatma.kurt@example.com;
+0001015;Hüseyin;Özdemir;27.12.1966;35;18.750,35;A;huseyin.ozdemir@example.com;
+0001016;Derya;Þimþek;15.08.1988;34;2.345,60;A;  derya.simsek@example.com ;
+0001017;Serkan;Polat;02.02.1976;06;9.100,00;A;serkan.polat@example.com;
+0001018;Tuðba;Erdoðan;21.09.1993;35;310,90;A;tugba.erdogan@example.com;
+0001019;Ebru;Güneþ;07.07.1987;34;12.000,00;P;ebru.gunes@example.com;
+0001020;Kývanç;Iþýk;16.01.1979;06;44.444,44;A;kivanc.isik@example.com;
+0001021;Irmak;Uçar;04.05.2001;35;75,00;A;irmak.ucar@example.com;
+0001022;Gülþen;Iþýk;23.11.1958;34;6.780,00;A;gulsen.isik@example.com;
+0001023;Barýþ;Kaplan;10.06.1984;06;1.050,05;A;baris.kaplan@example.com;
+0001024;Sýla;Tekin;28.04.1997;35;560,00;P;sila.tekin@example.com;
+0001025;Ýpek;Ünal;13.12.1991;34;3.333,33;A;ipek.unal@example.com;
+0001026;Burak;Bulut;31.10.1982;06;27.500,00;A;burak.bulut@example.com;
+0001027;Elif;Keskin;06.03.1975;35;0,00;K;elif.keskin@example.com;
+0001028;Deniz;Sarý;18.07.1989;34;8.200,80;A;deniz.sari@example.com;
+0001029;Cem;Akýn;24.02.1970;06;990,99;A;cem.akin@example.com;
+0001030;Hülya;Güler;09.12.1963;35;14.600,00;A;hulya.guler@example.com;
+0001031;Yiðit;Ateþ;20.05.1999;34;3.456,78;A;yigit.ates@example.com;
+0001032;Pýnar;Bozkurt;03.08.1986;06;720,00;A;pinar.bozkurt@example.com;
+0001033;Þebnem;Ýnce;14.11.1977;35;5.025,50;P;sebnem.ince@example.com;
+0001034;Tolga;Karaca;26.09.1981;34;11.111,11;A;tolga.karaca@example.com;
+0001035;Ömer;Türkmen;01.01.1960;06;2.000,00;A;omer.turkmen@example.com;
+0001036;Aslý ;Özkan;12.12.1994;35;395,75;A;asli.ozkan@example.com;
+0001037;Berk;Aksoy;08.03.2000;34;1.500,00;A;berk.aksoy@example.com;
+0001038;Neþe;Duman;19.06.1968;06;66.000,00;K;nese.duman@example.com;
+0001039;Özge;Erdem;30.09.1990;35;4.100,40;A;ozge.erdem@example.com;
+0001040;Mehmet  Ali;Tuncer;11.11.1974;34;2.750,00;A;mehmetali.tuncer@example.com;

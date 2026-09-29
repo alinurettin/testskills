@@ -1,0 +1,77 @@
+{
+  "openapi": "3.0.3",
+  "info": { "title": "Demo Bank API", "version": "1.2.0", "description": "Accounts and transfers for retail customers (test environment)." },
+  "servers": [{ "url": "http://localhost:4180" }],
+  "security": [{ "bearerAuth": [] }],
+  "tags": [{ "name": "Accounts" }, { "name": "Transfers" }],
+  "paths": {
+    "/accounts": {
+      "get": {
+        "tags": ["Accounts"], "operationId": "listAccounts", "summary": "List the caller's accounts",
+        "responses": {
+          "200": { "description": "Accounts of the authenticated customer",
+                   "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/Account" } } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" }
+        }
+      }
+    },
+    "/accounts/{accountId}": {
+      "get": {
+        "tags": ["Accounts"], "operationId": "getAccount", "summary": "Get one of the caller's accounts",
+        "parameters": [{ "name": "accountId", "in": "path", "required": true, "schema": { "type": "string" }, "example": "A-100" }],
+        "responses": {
+          "200": { "description": "The account", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Account" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "description": "The account belongs to another customer" },
+          "404": { "description": "No such account" }
+        }
+      }
+    },
+    "/transfers": {
+      "post": {
+        "tags": ["Transfers"], "operationId": "createTransfer", "summary": "Create a transfer from one of the caller's accounts",
+        "requestBody": { "required": true, "content": { "application/json": {
+          "schema": { "$ref": "#/components/schemas/TransferRequest" },
+          "example": { "fromAccountId": "A-100", "toIban": "TR330006100519786457841326", "amount": 100.0, "currency": "TRY", "description": "Kira" } } } },
+        "responses": {
+          "201": { "description": "Transfer created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Transfer" } } } },
+          "400": { "description": "Validation error", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "description": "Source account belongs to another customer" }
+        }
+      }
+    },
+    "/transfers/{transferId}": {
+      "get": {
+        "tags": ["Transfers"], "operationId": "getTransfer", "summary": "Get a transfer of the caller",
+        "parameters": [{ "name": "transferId", "in": "path", "required": true, "schema": { "type": "string" }, "example": "T-1" }],
+        "responses": {
+          "200": { "description": "The transfer", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Transfer" } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "404": { "description": "No such transfer" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer" } },
+    "responses": { "Unauthorized": { "description": "Missing or invalid token" } },
+    "schemas": {
+      "Account": { "type": "object", "required": ["id", "iban", "currency", "balance"],
+        "properties": { "id": { "type": "string" }, "iban": { "type": "string" }, "currency": { "type": "string", "enum": ["TRY", "EUR"] },
+                        "balance": { "type": "number" } } },
+      "TransferRequest": { "type": "object", "required": ["fromAccountId", "toIban", "amount", "currency"],
+        "properties": {
+          "fromAccountId": { "type": "string", "example": "A-100" },
+          "toIban": { "type": "string", "pattern": "^TR[0-9]{24}$", "example": "TR330006100519786457841326" },
+          "amount": { "type": "number", "minimum": 1, "maximum": 50000 },
+          "currency": { "type": "string", "enum": ["TRY", "EUR"] },
+          "description": { "type": "string", "maxLength": 140 } } },
+      "Transfer": { "type": "object", "required": ["id", "status", "amount", "currency"],
+        "properties": { "id": { "type": "string" }, "status": { "type": "string", "enum": ["COMPLETED", "PENDING", "REJECTED"] },
+                        "amount": { "type": "number" }, "currency": { "type": "string" }, "fromAccountId": { "type": "string" },
+                        "toIban": { "type": "string" }, "description": { "type": "string" } } },
+      "Error": { "type": "object", "required": ["code", "message"], "properties": { "code": { "type": "string" }, "message": { "type": "string" } } }
+    }
+  }
+}

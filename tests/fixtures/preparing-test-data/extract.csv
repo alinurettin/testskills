@@ -1,0 +1,5 @@
+musteri_no;ad;soyad;email;cep_tel;tckn;iban;dogum_tarihi;posta_kodu;gelir;adres;musteri_notu;segment;il;iletisim_bilgisi;Referans
+100001;Ayşe;Yılmaz;Ayse.Yilmaz@example.com;+90 532 111 22 33;10000000078;TR330006100519786457841326;14.03.1985;34710;45.250,75;Örnek Sok. No:1 Kadıköy;VIP müşteri, aramadan önce SMS;premium;İstanbul;fatma.demo@example.com;R-1
+100002;Mehmet;Kaya;mehmet.kaya@example.com;05321112234;99999999990;;1990-07-01;06100;12000;Deneme Cad. 5;;bireysel;Ankara;ali.demo@example.test;R-2
+100003;Işıl;Öztürk;isil.ozturk@example.com;+905441234567;;TR320001000000000000000001;29.02.2000;35000;abc;;;kobi;İzmir;veli.demo@example.com;R-3
+100001;Ayşe;Yılmaz; ayse.yilmaz@example.com ;0532 111 22 33;10000000078;TR330006100519786457841326;14.03.1985;34710;45250,75;Örnek Sok. No:1 Kadıköy;;premium;İstanbul;;R-4

@@ -4,14 +4,14 @@
     "name": "QA Suite contributors"
   },
   "metadata": {
-    "description": "QA Suite: professional software testing skills (TR/EN) - requirements analysis, ISTQB test design, traceability, Xray/Zephyr export, Playwright/BDD automation, NFR (k6, WCAG, ASVS), reporting and review.",
-    "version": "0.5.1"
+    "description": "QA Suite: professional software testing skills (TR/EN) - requirements analysis, ISTQB test design, API/mobile/AI/migration/exploratory testing, test data, traceability, Xray/Zephyr/TestRail/Azure DevOps/Qase export, Playwright/BDD automation, NFR (k6, WCAG, ASVS), reporting and review.",
+    "version": "0.6.0"
   },
   "plugins": [
     {
       "name": "qa-suite",
       "source": "./",
-      "description": "End-to-end QA skills (TR/EN): planning, analysis, test design, NFR (k6/WCAG/ASVS), traceability, export, Playwright/BDD automation, reporting and review."
+      "description": "End-to-end QA skills (TR/EN): planning, analysis, test design, API, exploratory, mobile, AI/LLM, data migration, test data, NFR (k6/WCAG/ASVS), traceability, export, Playwright/BDD automation, reporting and review."
     }
   ]
 }

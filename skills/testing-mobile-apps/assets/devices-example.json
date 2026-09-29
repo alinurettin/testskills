@@ -1,0 +1,30 @@
+{
+  "_note": "ILLUSTRATIVE EXAMPLE ONLY. The share numbers are invented to demonstrate the format and the selection algorithm; they are NOT market data. Replace every row with your own analytics (e.g. active users per device model and OS version over the last 90 days). 'share' is the percentage of that platform's users. List only devices and OS versions you support.",
+  "devices": [
+    {"name": "Samsung Galaxy A55", "os": "android", "version": "15", "share": 16.0, "form_factor": "phone", "width_dp": 384},
+    {"name": "Samsung Galaxy A15", "os": "android", "version": "14", "share": 13.0, "form_factor": "phone", "width_dp": 384},
+    {"name": "Xiaomi Redmi Note 13", "os": "android", "version": "14", "share": 12.0, "form_factor": "phone", "width_dp": 393},
+    {"name": "Samsung Galaxy S24", "os": "android", "version": "16", "share": 9.0, "form_factor": "phone", "width_dp": 360},
+    {"name": "Samsung Galaxy A34", "os": "android", "version": "14", "share": 8.0, "form_factor": "phone", "width_dp": 411},
+    {"name": "Samsung Galaxy S23", "os": "android", "version": "15", "share": 7.0, "form_factor": "phone", "width_dp": 360},
+    {"name": "Google Pixel 8", "os": "android", "version": "16", "share": 5.0, "form_factor": "phone", "width_dp": 412},
+    {"name": "OPPO A78", "os": "android", "version": "13", "share": 5.0, "form_factor": "phone", "width_dp": 360},
+    {"name": "Xiaomi Redmi 12", "os": "android", "version": "13", "share": 5.0, "form_factor": "phone", "width_dp": 393},
+    {"name": "Samsung Galaxy A12", "os": "android", "version": "11", "share": 4.0, "form_factor": "phone", "width_dp": 360},
+    {"name": "Samsung Galaxy A05s", "os": "android", "version": "14", "share": 3.0, "form_factor": "phone", "width_dp": 360},
+    {"name": "Xiaomi Redmi 9A", "os": "android", "version": "10", "share": 3.0, "form_factor": "phone", "width_dp": 360},
+    {"name": "Samsung Galaxy Tab A9", "os": "android", "version": "14", "share": 3.0, "form_factor": "tablet", "width_dp": 800},
+    {"name": "Samsung Galaxy Z Flip6", "os": "android", "version": "15", "share": 2.0, "form_factor": "foldable", "width_dp": 360},
+    {"name": "iPhone 16", "os": "ios", "version": "26", "share": 18.0, "form_factor": "phone", "width_dp": 393},
+    {"name": "iPhone 15", "os": "ios", "version": "26", "share": 15.0, "form_factor": "phone", "width_dp": 393},
+    {"name": "iPhone 13", "os": "ios", "version": "18", "share": 14.0, "form_factor": "phone", "width_dp": 390},
+    {"name": "iPhone 14", "os": "ios", "version": "18", "share": 12.0, "form_factor": "phone", "width_dp": 390},
+    {"name": "iPhone 11", "os": "ios", "version": "17", "share": 8.0, "form_factor": "phone", "width_dp": 414},
+    {"name": "iPhone 16 Pro Max", "os": "ios", "version": "26", "share": 7.0, "form_factor": "phone", "width_dp": 440},
+    {"name": "iPhone 12", "os": "ios", "version": "18", "share": 6.0, "form_factor": "phone", "width_dp": 390},
+    {"name": "iPhone SE (3rd generation)", "os": "ios", "version": "18", "share": 5.0, "form_factor": "phone", "width_dp": 375},
+    {"name": "iPad (10th generation)", "os": "ios", "version": "18", "share": 3.0, "form_factor": "tablet", "width_dp": 820},
+    {"name": "iPhone XR", "os": "ios", "version": "18", "share": 3.0, "form_factor": "phone", "width_dp": 414},
+    {"name": "iPhone 8", "os": "ios", "version": "16", "share": 2.0, "form_factor": "phone", "width_dp": 375}
+  ]
+}

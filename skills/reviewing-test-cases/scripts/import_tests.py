@@ -88,8 +88,8 @@ def main() -> int:
     ap.add_argument("--lang", choices=["tr", "en"], default="tr")
     ap.add_argument("--project", default="")
     ap.add_argument("--map", default="", help="explicit column mapping, e.g. title=Summary,steps=Action,expected=Result")
-    a = ap.parse_args()
     sys.stdout.reconfigure(encoding="utf-8")
+    a = ap.parse_args()
     raw = Path(a.csv).read_bytes().decode("utf-8-sig", errors="replace")
     delim = a.delimiter or csv.Sniffer().sniff(raw.splitlines()[0], delimiters=",;\t").delimiter
     rows = list(csv.reader(io.StringIO(raw), delimiter=delim))

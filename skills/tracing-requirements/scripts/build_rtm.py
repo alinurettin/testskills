@@ -182,15 +182,20 @@ def calibration(active: list) -> list[dict]:
             out.append({"code": "PRIORITY_SKEW", "tests": [], "detail": {
                 "critical_pct": round(100 * crit / n), "critical_high_pct": round(100 * top / n)}})
     groups = defaultdict(list)
+    generated_keys = set()
     for t in active:
         steps = t.get("steps") or [{}]
         last = re.sub(r"\d[\d.,]*", "#", str(steps[-1].get("expected", "")).lower())
         last = re.sub(r"\s+", " ", last).strip()
         key = (tuple(sorted(t.get("requirement_ids", []))), t.get("polarity"), t.get("technique"), last)
         groups[key].append(t["id"])
+        if "generated" in (t.get("tags") or []):
+            generated_keys.add(key)
     for key, ids in groups.items():
         if key[2] == "pairwise":
             continue  # pairwise rows repeat one scenario across configurations by design
+        if key in generated_keys:
+            continue  # generator output (e.g. openapi_tests.py): one test per schema constraint by design
         limit = 5 if key[2] == "boundary-value-analysis" else 3
         if len(ids) >= limit:
             out.append({"code": "REDUNDANT", "tests": ids, "detail": {"technique": key[2]}})

@@ -99,6 +99,8 @@ def parse(text: str, kind: str):
         line = raw.rstrip()
         if not line.strip() or line.lstrip().startswith("<!--"):
             continue
+        if line.lstrip().startswith("#") and not HEAD.match(line) and cur is not None:
+            continue  # comment lines (e.g. "# QUESTION: ...") may appear anywhere
         h = HEAD.match(line)
         if h:
             prefix = "TC" if kind == "tc" else "REQ"

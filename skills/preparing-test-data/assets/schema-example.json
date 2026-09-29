@@ -1,0 +1,39 @@
+{
+  "description": "Example: banking customers and their accounts. Synthetic only. accounts.customer_id references customers.id (referential integrity). Generate with: python scripts/gen_data.py --schema assets/schema-example.json --seed 42 --lang tr --out data/",
+  "edge_fraction": 0.1,
+  "tables": [
+    {
+      "name": "customers",
+      "rows": 50,
+      "fields": [
+        {"name": "id", "type": "seq", "prefix": "CUST-{run}", "width": 5},
+        {"name": "ad", "type": "first_name", "edge": true, "max_len": 30},
+        {"name": "soyad", "type": "last_name", "edge": true, "max_len": 30},
+        {"name": "email", "type": "email", "from": ["ad", "soyad"], "domain": "example.com"},
+        {"name": "tckn", "type": "tckn"},
+        {"name": "cep_tel", "type": "phone_tr", "format": "e164", "edge": true},
+        {"name": "dogum_tarihi", "type": "date", "min": "1940-01-01", "max": "2008-09-30", "format": "%d.%m.%Y", "edge": true},
+        {"name": "il", "type": "city_tr", "edge": true},
+        {"name": "posta_kodu", "type": "postcode_tr", "city_field": "il"},
+        {"name": "segment", "type": "enum", "values": ["bireysel", "premium", "kobi"], "weights": [80, 15, 5]},
+        {"name": "kvkk_onay", "type": "bool", "p": 0.9},
+        {"name": "not", "type": "text", "charset": "words", "min_len": 0, "max_len": 40, "null_p": 0.3, "edge": true}
+      ],
+      "unique": ["id", "email", "tckn"]
+    },
+    {
+      "name": "accounts",
+      "rows": 80,
+      "fields": [
+        {"name": "account_id", "type": "uuid"},
+        {"name": "customer_id", "type": "ref", "source": "customers:id"},
+        {"name": "iban", "type": "iban_tr", "edge": true},
+        {"name": "currency", "type": "enum", "values": ["TRY", "USD", "EUR"], "weights": [85, 10, 5]},
+        {"name": "balance", "type": "decimal", "min": 0, "max": 250000, "scale": 2, "edge": true},
+        {"name": "opened_at", "type": "datetime", "min": "2015-01-01T09:00:00", "max": "2026-06-30T18:00:00"},
+        {"name": "status", "type": "enum", "values": ["active", "frozen", "closed"], "weights": [90, 5, 5], "edge": true}
+      ],
+      "unique": ["account_id", "iban"]
+    }
+  ]
+}

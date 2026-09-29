@@ -12,6 +12,13 @@ Formats
   csv       Generic spreadsheet CSV - one row per test, steps numbered in cells.
   xlsx      Excel workbook (no third-party library needed) - Test Cases sheet
             (one row per step) + Summary sheet.
+  testrail  TestRail CSV, template "Test Case (Steps)", row layout "multiple rows": Title marks a new
+            case, continuation rows leave Title empty; Section "A > B"; References = REQ IDs + Jira keys.
+  azure-devops  Azure DevOps Test Plans bulk import: one row per step, test fields repeated, Test Step 1..n,
+            Priority 1-4, State Design (--area-path, --assigned-to). Requirement links cannot be imported:
+            import into a requirement-based suite instead.
+  qase      Qase CSV (V2 headers), steps numbered inside one cell. The step encoding is only partly
+            documented: compare with an export from your own workspace before a bulk import.
   markdown  Readable document for reviews / Confluence.
 
 Requirement links use requirements.json "external_id" (Jira keys such as
@@ -203,6 +210,85 @@ def export_zephyr(tests, ext_map, pmap, a, h):
     return csv_text(rows, a.delimiter), missing_keys
 
 
+TESTRAIL_PRIORITY = {"critical": "Critical", "high": "High", "medium": "Medium", "low": "Low"}
+ADO_PRIORITY = {"critical": "1", "high": "2", "medium": "3", "low": "4"}
+QASE_PRIORITY = {"critical": "high", "high": "high", "medium": "medium", "low": "low"}
+QASE_SEVERITY = {"critical": "critical", "high": "major", "medium": "normal", "low": "minor"}
+QASE_TYPE = {"functional": "functional", "security": "security", "performance": "performance", "usability": "usability",
+             "compatibility": "compatibility", "integration": "integration", "api": "functional", "accessibility": "usability"}
+
+
+def step_text(s: dict) -> str:
+    return s.get("action", "") + (f" [{s['data']}]" if s.get("data") else "")
+
+
+def export_testrail(tests, ext_map, a, h):
+    """TestRail CSV import, template "Test Case (Steps)", row layout "Test cases use multiple rows":
+    map Title as the new-case detection column; continuation rows leave Title empty."""
+    rows = [["Title", "Section", "Priority", "Type", "Preconditions", "Step", "Expected Result", "References"]]
+    for t in tests:
+        refs = ", ".join(dict.fromkeys(list(t.get("requirement_ids", [])) + ext_keys(t, ext_map)))
+        pre = as_lines(t.get("preconditions"))
+        if t.get("test_data"):
+            pre += ("\n\n" if pre else "") + f"{h['data']}:\n{as_lines(t['test_data'])}"
+        for i, s in enumerate(t["steps"]):
+            if i == 0:
+                rows.append([f"{t['id']} {t['title']}", a.folder or "", TESTRAIL_PRIORITY.get(t.get("priority"), "Medium"),
+                             "Regression" if "regression" in t.get("tags", []) else "Functional", pre, step_text(s),
+                             s.get("expected", ""), refs])
+            else:
+                rows.append(["", "", "", "", "", step_text(s), s.get("expected", ""), ""])
+    return rows
+
+
+def export_ado(tests, ext_map, a, h):
+    """Azure DevOps Test Plans bulk import: one row per step, test fields repeated on every row,
+    Test Step numbered 1..n. Requirement links are not importable (import into a requirement-based suite)."""
+    rows = [["ID", "Work Item Type", "Title", "Test Step", "Step Action", "Step Expected", "Area Path", "Assigned To",
+             "State", "Priority"]]
+    for t in tests:
+        title = f"{t['id']} {t['title']}"[:128]
+        pre = t.get("preconditions") or []
+        pre = pre if isinstance(pre, list) else [pre]
+        for i, s in enumerate(t["steps"], 1):
+            action = step_text(s)
+            if i == 1 and pre:
+                action = f"{h['pre']}: {'; '.join(map(str, pre))}\n{action}"
+            rows.append(["", "Test Case", title, str(i), action, s.get("expected", ""), a.area_path or "",
+                         a.assigned_to or "", "Design", ADO_PRIORITY.get(t.get("priority"), "3")])
+    return rows
+
+
+def export_qase(tests, ext_map, a, h):
+    """Qase CSV (V2 header set): one row per case, steps numbered inside steps_actions/steps_result/steps_data.
+    The exact V2 step-cell encoding is only partly documented - export a sample from your workspace and compare."""
+    header = ["v2.id", "title", "description", "preconditions", "postconditions", "tags", "priority", "severity",
+              "type", "behavior", "automation", "status", "is_flaky", "layer", "steps_type", "steps_actions",
+              "steps_result", "steps_data", "milestone_id", "milestone", "suite_id", "suite_parent_id", "suite",
+              "suite_without_cases", "parameters"]
+    suite = a.folder or "QA Suite"
+    rows = [header, [""] * 20 + ["1", "", suite, "1", ""]]
+
+    def numbered(xs):
+        return "\n".join(f'{i}. "{str(x).replace(chr(34), chr(39))}"' for i, x in enumerate(xs, 1))
+
+    for t in tests:
+        refs = ", ".join(dict.fromkeys(list(t.get("requirement_ids", [])) + ext_keys(t, ext_map)))
+        auto = (t.get("automation") or {}).get("candidate")
+        tags = ",".join(dict.fromkeys([label(x) for x in t.get("tags", [])] + [label(r) for r in t.get("requirement_ids", [])]))
+        rows.append(["", f"{t['id']} {t['title']}", (t.get("objective") or "") + (f"\n{h['reqs']}: {refs}" if refs else ""),
+                     as_lines(t.get("preconditions")), as_lines(t.get("postconditions")), tags,
+                     QASE_PRIORITY.get(t.get("priority"), "medium"), QASE_SEVERITY.get(t.get("priority"), "normal"),
+                     QASE_TYPE.get(t.get("category", "functional"), "other"),
+                     "negative" if t.get("polarity") == "negative" else "positive",
+                     "to-be-automated" if auto else "is-not-automated",
+                     "actual" if t.get("status") == "ready" else "draft", "no",
+                     "api" if t.get("category") == "api" else "e2e", "classic",
+                     numbered([s.get("action", "") for s in t["steps"]]), numbered([s.get("expected", "") for s in t["steps"]]),
+                     numbered([s.get("data", "") for s in t["steps"]]), "", "", "1", "", suite, "", ""])
+    return rows
+
+
 def export_generic(tests, ext_map, a, h):
     header = [h["id"], h["title"], h["objective"], h["reqs"], h["ext"], h["priority"], h["polarity"], h["category"],
               h["technique"], h["pre"], h["data"], h["steps"], h["expected"], h["post"], h["tags"], h["auto"],
@@ -377,7 +463,7 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--tests", required=True)
     ap.add_argument("--requirements")
-    ap.add_argument("--format", required=True, choices=["xray", "zephyr", "csv", "xlsx", "markdown"])
+    ap.add_argument("--format", required=True, choices=["xray", "zephyr", "testrail", "azure-devops", "qase", "csv", "xlsx", "markdown"])
     ap.add_argument("--out", required=True)
     ap.add_argument("--delimiter", default=",")
     ap.add_argument("--list-delimiter", default=";", help="separator for multi-value cells (labels, keys)")
@@ -387,6 +473,8 @@ def main() -> int:
     ap.add_argument("--component", help="Xray component value")
     ap.add_argument("--folder", help="Zephyr Scale folder, e.g. 'Checkout/Coupon'")
     ap.add_argument("--zephyr-steps", choices=["rows", "single"], default="rows")
+    ap.add_argument("--area-path", help="Azure DevOps Area Path (must already exist)")
+    ap.add_argument("--assigned-to", help="Azure DevOps Assigned To (a valid user)")
     ap.add_argument("--include-deprecated", action="store_true")
     ap.add_argument("--only", help="comma-separated test IDs")
     ap.add_argument("--tag", help="export only tests with this tag")
@@ -431,6 +519,12 @@ def main() -> int:
         text, missing = export_xray(tests, ext_map, pmap, a, h)
     elif a.format == "zephyr":
         text, missing = export_zephyr(tests, ext_map, pmap, a, h)
+    elif a.format == "testrail":
+        text = csv_text(export_testrail(tests, ext_map, a, h), a.delimiter)
+    elif a.format == "azure-devops":
+        text = csv_text(export_ado(tests, ext_map, a, h), a.delimiter)
+    elif a.format == "qase":
+        text = csv_text(export_qase(tests, ext_map, a, h), a.delimiter)
     elif a.format == "csv":
         text = csv_text(export_generic(tests, ext_map, a, h), a.delimiter)
         a.bom = True

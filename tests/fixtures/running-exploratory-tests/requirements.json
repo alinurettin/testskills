@@ -1,0 +1,13 @@
+{
+ "project": "Demo Wallet – Transfers",
+ "language": "en",
+ "version": 1,
+ "requirements": [
+  {"id": "REQ-001", "title": "Daily transfer limit", "text": "A customer can transfer at most 5,000.00 EUR per calendar day; a transfer that would exceed the limit is rejected with a message.", "type": "business-rule", "source": "US-7 AC-1", "priority": "high", "risk": {"likelihood": 4, "impact": 5, "rationale": "Money loss, regulatory"}, "acceptance_criteria": ["Given 4,999.99 EUR sent today, when 0.01 EUR is sent, then it succeeds"], "status": "ready", "derived": false},
+  {"id": "REQ-002", "title": "Transfer status lifecycle", "text": "A transfer moves from pending to completed or failed; a cancelled transfer cannot be completed.", "type": "functional", "source": "US-7 AC-2", "priority": "medium", "risk": {"likelihood": 3, "impact": 3}, "status": "ready", "derived": false},
+  {"id": "REQ-003", "title": "Only own accounts visible", "text": "A customer sees only their own accounts and transfers; another user's transfer ID returns not found.", "type": "functional", "quality_characteristic": "security", "source": "Security baseline", "priority": "critical", "risk": {"likelihood": 3, "impact": 5}, "status": "clarification-needed", "derived": true, "questions": ["Q-002"]},
+  {"id": "REQ-004", "title": "Payee name field", "text": "The payee name field accepts 2 to 70 characters including Unicode letters.", "type": "data", "source": "US-9", "priority": "low", "risk": {"likelihood": 2, "impact": 2}, "status": "ready", "derived": false},
+  {"id": "REQ-005", "title": "Legacy statement page", "text": "The legacy statement page remains reachable from the footer.", "type": "functional", "source": "US-2", "priority": "low", "status": "ready", "derived": false},
+  {"id": "REQ-006", "title": "Old export", "text": "CSV export of 2019 format.", "type": "functional", "source": "US-1", "priority": "low", "risk": {"likelihood": 5, "impact": 5}, "status": "deprecated", "derived": false}
+ ]
+}

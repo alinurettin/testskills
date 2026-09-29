@@ -1,0 +1,15 @@
+{
+  "_comment": "Executable version of mapping-spec.md v1.2 (customers: legacy MUSTERI -> new core customers). Rule IDs M1-M8 refer to spec section 3. Source: cp1254, ';', Turkish decimals, dd.MM.yyyy. Target: UTF-8, ',', ISO dates.",
+  "columns": {
+    "customer_id": {"_rule": "M1", "source": "MUSTERI_NO", "transform": ["trim", "strip_leading_zeros"]},
+    "full_name":   {"_rule": "M2", "transform": [{"concat": ["AD", "SOYAD", " "]}, "collapse_spaces", "upper_tr"]},
+    "birth_date":  {"_rule": "M3", "source": "DOGUM_TARIHI", "transform": ["trim", "date:%d.%m.%Y>%Y-%m-%d"]},
+    "branch":      {"_rule": "M4", "source": "SUBE_KODU", "transform": ["trim", {"map": {"34": "IST", "06": "ANK", "35": "IZM"}}]},
+    "balance":     {"_rule": "M5", "source": "BAKIYE", "transform": ["trim", "decimal:2:,"]},
+    "status":      {"_rule": "M6", "source": "DURUM", "transform": ["trim", {"map": {"A": "ACTIVE", "P": "PASSIVE", "K": "CLOSED"}}]},
+    "email":       {"_rule": "M7", "source": "EPOSTA", "transform": ["trim", "lower"]}
+  },
+  "ignore": [],
+  "not_migrated": ["FAKS"],
+  "accepted_exceptions": []
+}

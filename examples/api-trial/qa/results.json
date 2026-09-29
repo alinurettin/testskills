@@ -1,0 +1,443 @@
+{
+  "run": "Demo Bank API 1.2.0 – run 2 (2026-09-30)",
+  "results": {
+    "TC-001": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 20,
+      "spec": "api-contract.spec.ts:7"
+    },
+    "TC-002": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 8,
+      "spec": "api-contract.spec.ts:12"
+    },
+    "TC-003": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 12,
+      "spec": "api-contract.spec.ts:16",
+      "errors": [
+        "Error: expect(received).toBe(expected) // Object.is equality"
+      ],
+      "defects": [
+        "DEF-002"
+      ]
+    },
+    "TC-004": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 64,
+      "spec": "api-contract.spec.ts:23",
+      "errors": [
+        "Error: expect(received).toEqual(expected) // deep equality"
+      ],
+      "defects": [
+        "DEF-006"
+      ]
+    },
+    "TC-005": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 52,
+      "spec": "api-contract.spec.ts:28"
+    },
+    "TC-006": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 13,
+      "spec": "api-contract.spec.ts:32"
+    },
+    "TC-007": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 15,
+      "spec": "api-contract.spec.ts:36",
+      "errors": [
+        "Error: {\"id\":\"A-100\",\"iban\":\"TR120006200000000000000100\",\"currency\":\"TRY\",\"balance\":\"49774.79\"}"
+      ],
+      "defects": [
+        "DEF-001"
+      ]
+    },
+    "TC-008": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 52,
+      "spec": "api-contract.spec.ts:46",
+      "errors": [
+        "Error: expect(received).toBe(expected) // Object.is equality"
+      ],
+      "defects": [
+        "DEF-004"
+      ]
+    },
+    "TC-009": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 51,
+      "spec": "api-contract.spec.ts:51"
+    },
+    "TC-010": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 11,
+      "spec": "api-contract.spec.ts:55"
+    },
+    "TC-011": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 14,
+      "spec": "api-contract.spec.ts:59",
+      "errors": [
+        "Error: expect(received).toBe(expected) // Object.is equality"
+      ],
+      "defects": [
+        "DEF-005"
+      ]
+    },
+    "TC-012": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 52,
+      "spec": "api-contract.spec.ts:63"
+    },
+    "TC-013": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 10,
+      "spec": "api-contract.spec.ts:67"
+    },
+    "TC-014": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 10,
+      "spec": "api-contract.spec.ts:71"
+    },
+    "TC-015": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 25,
+      "spec": "api-contract.spec.ts:75",
+      "errors": [
+        "Error: expect(received).toBe(expected) // Object.is equality"
+      ],
+      "defects": [
+        "DEF-005"
+      ]
+    },
+    "TC-016": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 55,
+      "spec": "api-contract.spec.ts:79",
+      "errors": [
+        "Error: expect(received).toBe(expected) // Object.is equality"
+      ],
+      "defects": [
+        "DEF-004"
+      ]
+    },
+    "TC-017": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 53,
+      "spec": "api-contract.spec.ts:83"
+    },
+    "TC-018": {
+      "status": "failed",
+      "source": "playwright",
+      "spec": "api-contract.spec.ts:87",
+      "errors": [
+        "Expected: 201 Received: 200 (transfer 50000 TRY kabul edildi)"
+      ],
+      "note": "Run 1 (00:53) sonucu, line reporter çıktısından aktarıldı. Run 2'de bilinçli olarak tekrar koşulmadı: A-100 bakiyesi (~49.786 TRY) 50000'in altına düştü; tekrar koşu yanlış sonuç (test verisi sorunu) üretirdi.",
+      "defects": [
+        "DEF-004"
+      ]
+    },
+    "TC-019": {
+      "status": "failed",
+      "source": "playwright",
+      "spec": "api-contract.spec.ts:91",
+      "errors": [
+        "Expected: 400 Received: 200 (50000.01 TRY transfer kabul edildi)"
+      ],
+      "note": "Run 1 (00:53) sonucu, line reporter çıktısından aktarıldı. Run 2'de koşulmadı: düşük bakiyede 400 INSUFFICIENT_FUNDS dönerdi ve test YANLIŞ GEÇERDİ. Ek kanıt (curl, 00:55): amount=1000000000 -> 400 INSUFFICIENT_FUNDS (VALIDATION değil) → üst sınır hiç denetlenmiyor.",
+      "defects": [
+        "DEF-003"
+      ]
+    },
+    "TC-020": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 9,
+      "spec": "api-contract.spec.ts:149"
+    },
+    "TC-021": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 13,
+      "spec": "api-contract.spec.ts:95"
+    },
+    "TC-022": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 9,
+      "spec": "api-contract.spec.ts:99"
+    },
+    "TC-023": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 19,
+      "spec": "api-contract.spec.ts:103",
+      "errors": [
+        "Error: expect(received).toBe(expected) // Object.is equality"
+      ],
+      "defects": [
+        "DEF-004"
+      ]
+    },
+    "TC-024": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 50,
+      "spec": "api-contract.spec.ts:107"
+    },
+    "TC-025": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 11,
+      "spec": "api-contract.spec.ts:111"
+    },
+    "TC-026": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 29,
+      "spec": "api-contract.spec.ts:118"
+    },
+    "TC-027": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 24,
+      "spec": "api-contract.spec.ts:127"
+    },
+    "TC-028": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 11,
+      "spec": "api-contract.spec.ts:131"
+    },
+    "TC-029": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 25,
+      "spec": "api-contract.spec.ts:135"
+    },
+    "TC-030": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 69,
+      "spec": "api-authz-rules.spec.ts:23"
+    },
+    "TC-031": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 22,
+      "spec": "api-authz-rules.spec.ts:30"
+    },
+    "TC-032": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 12,
+      "spec": "api-authz-rules.spec.ts:36"
+    },
+    "TC-033": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 38,
+      "spec": "api-authz-rules.spec.ts:43"
+    },
+    "TC-034": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 34,
+      "spec": "api-authz-rules.spec.ts:51"
+    },
+    "TC-035": {
+      "status": "failed",
+      "source": "playwright",
+      "projects": {
+        "default": "failed"
+      },
+      "duration_ms": 36,
+      "spec": "api-authz-rules.spec.ts:58",
+      "errors": [
+        "Error: {\"id\":\"T-12\",\"status\":\"COMPLETED\",\"amount\":1,\"currency\":\"TRY\",\"fromAccountId\":\"A-101\",\"toIban\":\"TR330006100519786457841326\",\"description\":\"TC-035\"}"
+      ],
+      "defects": [
+        "DEF-007"
+      ]
+    },
+    "TC-036": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 65,
+      "spec": "api-authz-rules.spec.ts:65"
+    },
+    "TC-037": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 12,
+      "spec": "api-authz-rules.spec.ts:71"
+    },
+    "TC-038": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 15,
+      "spec": "api-authz-rules.spec.ts:75"
+    },
+    "TC-039": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 22,
+      "spec": "api-authz-rules.spec.ts:79"
+    },
+    "TC-040": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 13,
+      "spec": "api-authz-rules.spec.ts:89"
+    },
+    "TC-041": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 21,
+      "spec": "api-authz-rules.spec.ts:96"
+    },
+    "TC-042": {
+      "status": "passed",
+      "source": "playwright",
+      "projects": {
+        "default": "passed"
+      },
+      "duration_ms": 10,
+      "spec": "api-authz-rules.spec.ts:101"
+    }
+  }
+}

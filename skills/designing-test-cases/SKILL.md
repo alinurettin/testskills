@@ -4,7 +4,7 @@ description: Designs professional manual test cases from requirements using ISTQ
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Designing test cases
@@ -27,7 +27,7 @@ Write test cases in the user's language: Turkish if the user writes Turkish, oth
   - the sections of `references/techniques.md` for the techniques you actually apply (find them via its Contents list);
   - the relevant categories of `references/error-guessing-checklist.md`.
 - **Read `references/test-case-standard.md` sections 2 and 4** (writing rules and priority) before your first test. Use section 6 as the final checklist.
-- **Domain packs:** for banking/payments, e-commerce, health or the public sector, read sections 3–4 of the matching pack in `references/domains/` (high-risk rules → techniques, and test data such as TCKN/IBAN validation partitions).
+- **Domain packs:** for banking/payments, e-commerce, health, the public sector, insurance/pensions or telecommunications, read sections 3–4 of the matching pack in `references/domains/` (high-risk rules → techniques, and test data such as TCKN/IBAN validation partitions).
 - **Compact format syntax:** run `python scripts/qa_compact.py --help`. You do not need `references/data-model.md` unless you read the JSON directly.
 
 ## Inputs
@@ -173,4 +173,4 @@ Tell the user:
 - `references/test-case-standard.md`: fields, writing rules, priority calibration, review checklist, dedupe.
 - `references/error-guessing-checklist.md`: fault taxonomy with a Turkish-locale focus.
 - `references/data-model.md`: generated JSON schema; only needed for reading the JSON directly.
-- `references/domains/fintech.md`, `references/domains/ecommerce.md`, `references/domains/health.md`, `references/domains/public-sector.md`: domain packs.
+- `references/domains/fintech.md`, `references/domains/ecommerce.md`, `references/domains/health.md`, `references/domains/public-sector.md`, `references/domains/insurance.md`, `references/domains/telecom.md`: domain packs.

@@ -1,10 +1,10 @@
 ---
 name: tracing-requirements
-description: Builds and maintains a bidirectional Requirements Traceability Matrix (RTM) linking requirements to test cases, execution results and defects. It validates the QA artifacts (IDs, required fields, broken links), measures coverage, and produces a risk-ordered gap report covering uncovered requirements, missing negative tests, thinly covered high-risk items, orphan and duplicate tests, unconfirmed derived requirements and failed tests. It also answers change-impact questions. Use this whenever the user asks about test coverage, traceability, an RTM or "izlenebilirlik matrisi", which requirements are untested, what to re-test after a requirement changed, release readiness from a coverage view, or wants to check a test suite for gaps, duplicates or orphans. Use it after designing test cases, before exporting them, and whenever execution results arrive.
+description: Builds and maintains a bidirectional Requirements Traceability Matrix (RTM) linking requirements to test cases, execution results and defects. It validates the QA artifacts (IDs, required fields, broken links), measures coverage, and produces a risk-ordered gap report covering uncovered requirements, missing negative tests, thinly covered high-risk items, orphan and duplicate tests, unconfirmed derived requirements and failed tests. It also answers change-impact questions. Use this whenever the user asks about test coverage, traceability, an RTM or "izlenebilirlik matrisi", which requirements are untested, what to re-test after a requirement changed, which regression tests to run for a release or a change (risk-based regression selection within a time budget), release readiness from a coverage view, or wants to check a test suite for gaps, duplicates or orphans. Use it after designing test cases, before exporting them, and whenever execution results arrive.
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Tracing requirements
@@ -58,11 +58,22 @@ If the user only has a spreadsheet or a list, convert it into these files first.
    | Item | Meaning | Usual action |
    |---|---|---|
    | PRIORITY_SKEW | More than 20% of tests are critical, or more than 60% are critical+high | Re-rate each test by its own impact. Only go/no-go checks are critical; variants go one level lower. |
-   | REDUNDANT | Three or more tests (five or more for BVA) share requirement, polarity, technique and outcome pattern | Keep one representative per partition plus the boundary values, or state the distinct risk each extra test targets |
+   | REDUNDANT | Three or more tests (five or more for BVA) share requirement, polarity, technique and outcome pattern | Keep one representative per partition plus the boundary values, or state the distinct risk each extra test targets. Tests tagged `generated` (one per schema constraint) and pairwise rows are exempt. |
 
 4. **Change impact.** When a requirement changes, run with `--changed REQ-xxx`. List the affected tests, update them (never renumber), and mark obsolete ones `deprecated`.
 
-5. **Report to the user:**
+5. **Regression selection.** For a release, a hotfix or a change, select what to run instead of "everything" or "whatever fits":
+   ```bash
+   python scripts/select_regression.py --requirements qa/requirements.json --tests qa/test-cases.json        --results qa/results.json --changed REQ-003,REQ-007 [--areas coupon] [--budget 40 | --budget-minutes 120]        [--level must|should|could] --lang tr --out qa/regression.md [--json qa/regression.json]
+   ```
+   The tiers follow impact analysis first and risk second:
+   - **must:** tests linked to changed requirements or their parent/child requirements, tests that failed or were blocked last time (confirmation testing), and critical/high smoke tests.
+   - **should:** the same functional area (shared tags), high risk (L × I ≥ 12), and flaky tests.
+   - **could:** everything else, ordered by risk.
+
+   With a budget, the set is filled tier by tier. The tests that are left out are listed as **residual risk**, so the cut is a decision someone can sign off, not an accident. The report ends with a `npx playwright test --grep "@TC-…"` command for the automated tests and a list of the manual ones. Ask for the changed requirements if the user describes the change only in words. Map the description to REQ IDs and confirm the mapping.
+
+6. **Report to the user:**
    - Coverage % (covered in-scope requirements divided by all in-scope requirements).
    - The number of functional requirements with negative tests.
    - The top gaps by risk.
@@ -83,4 +94,5 @@ If the user only has a spreadsheet or a list, convert it into these files first.
 ## Files
 
 - `scripts/build_rtm.py`: validation, RTM, gap report, change impact. Outputs md, csv and optionally json. Standard library only.
+- `scripts/select_regression.py`: risk-based regression selection (must/should/could tiers with reasons), time or count budget with residual risk, Playwright `--grep` command.
 - `references/data-model.md`: shared JSON schema.

@@ -1,10 +1,10 @@
 ---
 name: exporting-test-cases
-description: Exports QA Suite test cases (test-cases.json) into import-ready files for test management tools. Supports Xray Test Case Importer CSV (one row per step, grouped by Test ID, requirement links via Jira keys), Zephyr Scale CSV (step rows or plain-text script), Excel .xlsx, generic CSV and a Markdown review document, with validation, priority mapping and Turkish-safe encoding. Use this whenever the user wants to move test cases into Jira, Xray, Zephyr, Excel or Confluence, or asks for an import file, a CSV/XLSX of tests, or a printable or reviewable test case document. Also use it for Turkish requests such as "Xray'e aktar", "Zephyr'e yükle", "Jira'ya import", "Excel'e dök", "test case'leri dışa aktar", "import dosyası hazırla".
+description: Exports QA Suite test cases (test-cases.json) into import-ready files for test management tools. Supports Xray Test Case Importer CSV (one row per step, grouped by Test ID, requirement links via Jira keys), Zephyr Scale CSV (step rows or plain-text script), TestRail CSV, Azure DevOps Test Plans CSV, Qase CSV, Excel .xlsx, generic CSV and a Markdown review document, with validation, priority mapping and Turkish-safe encoding. Use this whenever the user wants to move test cases into Jira, Xray, Zephyr, TestRail, Azure DevOps, Qase, Excel or Confluence, or asks for an import file, a CSV/XLSX of tests, or a printable or reviewable test case document. Also use it for Turkish requests such as "Xray'e aktar", "Zephyr'e yükle", "Jira'ya import", "Excel'e dök", "test case'leri dışa aktar", "import dosyası hazırla".
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Exporting test cases
@@ -28,7 +28,7 @@ When all requirements come from one Jira story or epic, derived and split requir
 ## Workflow
 
 1. **Pick the target and the options.** Ask only for what you cannot infer:
-   - The tool: Xray, Zephyr Scale, Excel, CSV or Markdown.
+   - The tool: Xray, Zephyr Scale, TestRail, Azure DevOps Test Plans, Qase, Excel, CSV or Markdown.
    - Whether the requirements have Jira keys. If they do not, offer to add them to `external_id` first.
    - The Zephyr folder, the Xray component, and whether the project uses non-default priority names.
    - The delimiter for Excel users in a Turkish locale: `;`.
@@ -46,6 +46,10 @@ When all requirements come from one Jira story or epic, derived and split requir
    # Zephyr Scale
    python scripts/export_tests.py --tests qa/test-cases.json --requirements qa/requirements.json \
        --format zephyr --folder "Checkout/Coupon" --out qa/exports/zephyr.csv
+   # TestRail ("Test Case (Steps)" template), Azure DevOps Test Plans, Qase
+   python scripts/export_tests.py --tests qa/test-cases.json --requirements qa/requirements.json --format testrail --folder "Checkout > Coupon" --out qa/exports/testrail.csv
+   python scripts/export_tests.py --tests qa/test-cases.json --format azure-devops --area-path "Shop\Web" --out qa/exports/ado.csv
+   python scripts/export_tests.py --tests qa/test-cases.json --requirements qa/requirements.json --format qase --folder "Coupon" --out qa/exports/qase.csv
    # Excel workbook (steps sheet + summary sheet), generic CSV, Markdown document
    python scripts/export_tests.py --tests qa/test-cases.json --requirements qa/requirements.json --format xlsx --out qa/exports/test-cases.xlsx
    python scripts/export_tests.py --tests qa/test-cases.json --format csv --delimiter ";" --out qa/exports/test-cases.csv
@@ -58,13 +62,14 @@ When all requirements come from one Jira story or epic, derived and split requir
    - `--priority-map '{"medium":"Normal"}'`
    - `--test-type Manual`, `--component`
    - `--zephyr-steps rows|single`
+   - `--area-path`, `--assigned-to` (Azure DevOps)
    - `--list-delimiter`
    - `--bom`
    - `--lang tr|en` (column headers of csv, xlsx and markdown)
 
    The script validates before writing and exits 1 without writing anything if a test has no ID, no title or no steps. It warns about missing Jira keys, unknown requirement IDs and tests with no requirement.
 
-4. **Give import instructions** tailored to the target: read `references/xray.md` or `references/zephyr-scale.md`. Always recommend a **trial import of 2–3 tests** in a sandbox project first. Importers differ between versions, and a bulk import with the wrong mapping is painful to undo.
+4. **Give import instructions** tailored to the target: read `references/xray.md`, `references/zephyr-scale.md` or `references/other-tools.md` (TestRail, Azure DevOps, Qase). Always recommend a **trial import of 2–3 tests** in a sandbox project first. Importers differ between versions, and a bulk import with the wrong mapping is painful to undo.
 
 5. **Report to the user:**
    - The file paths.
@@ -75,13 +80,14 @@ When all requirements come from one Jira story or epic, derived and split requir
 
 ## Encoding and locale
 
-- Xray and Zephyr: plain UTF-8, delimiter `,` by default. Choose UTF-8 in the importer.
+- Xray, Zephyr, TestRail, Azure DevOps and Qase: plain UTF-8, delimiter `,` by default. Choose UTF-8 in the importer.
 - Generic CSV for Excel: written **with a BOM** automatically, so Excel shows `ç ğ ı İ ö ş ü` correctly. Excel in a Turkish locale expects `;` as the delimiter, so use `--delimiter ";"`.
 - `.xlsx` avoids delimiter and encoding problems completely. Prefer it for humans, and CSV for importers.
 
 ## Files
 
-- `scripts/export_tests.py`: exporter for xray, zephyr, csv, xlsx and markdown. Standard library only; it includes a minimal xlsx writer.
+- `scripts/export_tests.py`: exporter for xray, zephyr, testrail, azure-devops, qase, csv, xlsx and markdown. Standard library only; it includes a minimal xlsx writer.
 - `references/xray.md`: Xray Test Case Importer mapping, steps and pitfalls.
 - `references/zephyr-scale.md`: Zephyr Scale import mapping, the two step layouts and pitfalls.
+- `references/other-tools.md`: TestRail, Azure DevOps Test Plans and Qase import mapping, what is certain and what to verify.
 - `references/data-model.md`: shared JSON schema.

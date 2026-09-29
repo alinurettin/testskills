@@ -4,7 +4,7 @@ description: Reviews an existing test-case suite, whether written by the team, b
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # Reviewing test cases

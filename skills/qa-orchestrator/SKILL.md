@@ -1,10 +1,10 @@
 ---
 name: qa-orchestrator
-description: Entry point of the QA Suite. Runs the end-to-end testing workflow from raw requirements to import-ready and executable test artifacts - requirements analysis with clarification questions, risk-based ISTQB test design, traceability matrix, Xray/Zephyr/Excel export, and Playwright/BDD automation feeding results back - with one set of stable IDs. Use this whenever someone hands over a feature, user story, PRD/SRS, ticket or spec and wants it "tested", wants "all test cases", a test analysis or a QA package, or asks how to test something end to end, for manual testing or as groundwork for automation. Also use it for Turkish requests such as "bu gereksinimleri test et", "baştan sona test analizi", "tüm test senaryolarını çıkar", "QA paketi hazırla", "test sürecini yürüt". Prefer the specialised QA Suite skills when only one stage is requested (plan, analysis, design, NFR, traceability, export, automation, BDD, reporting, review).
+description: Entry point of the QA Suite. Runs the end-to-end testing workflow from raw requirements to import-ready and executable test artifacts - requirements analysis with clarification questions, risk-based ISTQB test design, traceability matrix, Xray/Zephyr/Excel export, and Playwright/BDD automation feeding results back - with one set of stable IDs, plus API, exploratory, mobile, AI-feature, test-data and data-migration testing. Use this whenever someone hands over a feature, user story, PRD/SRS, ticket or spec and wants it "tested", wants "all test cases", a test analysis or a QA package, or asks how to test something end to end, for manual testing or as groundwork for automation. Also use it for Turkish requests such as "bu gereksinimleri test et", "baştan sona test analizi", "tüm test senaryolarını çıkar", "QA paketi hazırla", "test sürecini yürüt". Prefer the specialised QA Suite skills when only one stage or one kind of testing is requested.
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.5.0"
+  version: "0.6.0"
 ---
 
 # QA Suite orchestrator
@@ -49,10 +49,13 @@ A QA package is only useful if people read it. Its cost also scales with every f
 | 1 | Requirements analysis | `analyzing-requirements` | `qa/requirements.src.md` → `.json`, `qa/clarifications.md`, in full mode also `qa/analysis-report.md` | Blocking questions surfaced. The user chooses: wait for answers, or proceed on the documented defaults. |
 | 2 | Test design | `designing-test-cases` | `qa/design/DS-*.json/.md`, `qa/test-cases.src.md` → `.json` | Calibration passed: no PRIORITY_SKEW; REDUNDANT items resolved or justified |
 | 2b | Non-functional (when NFRs exist) | `testing-nonfunctional` | k6 scripts, WCAG 2.2 / ASVS 5.0 test drafts merged into `qa/test-cases.src.md` | Every NFR has a measurable target or an open question |
+| 2c | Specialised design (when the product needs it) | `testing-apis`, `testing-mobile-apps`, `testing-ai-features`, `testing-data-migrations` | Contract tests and API spec; mobile checklist and device matrix; AI eval dataset and score gate; reconciliation report | Tests trace to REQs like every other test; thresholds are explicit numbers |
+| 2d | Test data (when tests need it) | `preparing-test-data` | Synthetic data files, masking rules and report | No real personal data in test environments without an approved decision |
 | 3 | Traceability | `tracing-requirements` | `qa/rtm.md`, `qa/rtm.csv` | No validation errors. Every gap is fixed or justified. |
 | 4 | Export | `exporting-test-cases` | `qa/exports/*` | The user has picked the target tool |
 | 5 | Automation (Playwright) | `automating-with-playwright` | `automation/` project, `tests/*.spec.ts` with `@TC-###` tags, `qa/results.json`, `qa/automation-coverage.md` | Tests implemented without `test.fixme`; failures classified as product vs test bugs |
 | 5b | BDD (optional) | `writing-bdd-scenarios` | `features/*.feature` (TR/EN) with `@TC-###` tags, step definitions | Scenarios reviewed by the business if they are the audience |
+| 5c | Exploratory sessions (recommended for high risk) | `running-exploratory-tests` | Charters, session sheets, session summary, defects, candidate regression tests | Findings turned into defects and scripted tests; debrief held |
 | 6 | Reporting | `reporting-test-results` | defect reports, `qa/status-report.md` / `qa/completion-report.md` | Exit criteria evaluated; residual risks stated for the release decision |
 
 If the skills cannot be invoked by name in your environment, read `../<skill-name>/SKILL.md` and follow it. The scripts sit in each skill's `scripts/` folder.
@@ -66,12 +69,18 @@ If the skills cannot be invoked by name in your environment, read `../<skill-nam
 - **"We need this in Xray/Zephyr/Excel"**:
   - Test cases already exist: stage 3 → stage 4.
   - No test cases yet: the full chain.
-- **"What's our coverage / what do we re-test"** → stage 3.
+- **"What's our coverage / what do we re-test"** → stage 3. For a regression set within a time budget, use `select_regression.py` in stage 3.
 - **"Automate this" / "Playwright testleri yaz"**:
   - If `qa/test-cases.json` exists: stage 5, then the results loop into stage 3.
   - If it does not exist: stages 1–3 first. Automating tests that were never designed produces click-scripts with no oracle.
 - **"Test planı / strateji / çıkış kriterleri"** → stage 0. The plan's numbers come from `qa/`, so analyse and design first when those files do not exist yet.
 - **Performance, accessibility or security** → stage 2b, after stage 1 has identified the NFRs.
+- **"API'yi test et" / an OpenAPI document** → `testing-apis` (stage 2c), then stages 3 and 6.
+- **A mobile app** → `testing-mobile-apps` (stage 2c) next to stage 2; automation there uses Appium or Maestro, not Playwright.
+- **A chatbot, LLM or RAG feature** → `testing-ai-features` (stage 2c). Get explicit acceptance thresholds in stage 1.
+- **A migration, ETL or system replacement** → `testing-data-migrations` (stage 2c); the mapping specification is the requirement.
+- **"Test verisi hazırla" / masking** → `preparing-test-data` (stage 2d).
+- **"Keşif testi" / "exploratory"** → `running-exploratory-tests` (stage 5c). Charters come from the risk scores of stage 1.
 - **"Hata raporu yaz" / "yayına hazır mıyız" / "test özet raporu"** → stage 6.
 - **"Mevcut test case'lerimizi incele" (Excel, TestRail…)** → `reviewing-test-cases`, then stage 2 for the missing tests it finds.
 - **"Gherkin/BDD senaryoları"** → stage 5b. It uses stage 2's test cases when they exist; otherwise the acceptance criteria.

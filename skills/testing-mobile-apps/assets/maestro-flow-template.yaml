@@ -1,0 +1,83 @@
+# QA Suite - Maestro flow template (one flow = one test case).
+#
+# Traceability: the flow `name` STARTS WITH the TC ID and the TC ID is also a tag.
+# Maestro's JUnit report uses the flow name as the testcase name, so
+# scripts/junit_results.py can map the result back to qa/results.json.
+# Name the file after the TC too (tc-101-process-death.yaml) so a missing `name` still maps.
+#
+# Run (one device at a time; label the device when converting):
+#   maestro test --format junit --output reports/pixel8.xml -e TEST_PASSWORD=... flows/
+#   maestro test --include-tags smoke --format junit --output reports/smoke.xml flows/
+#   python scripts/junit_results.py reports/pixel8.xml --device "Pixel 8 / Android 16" --source maestro --out qa/results.json
+#
+# Test data: test accounts only (example.com). Pass secrets with -e or CI secrets; never commit them.
+# Selectors: prefer stable ids (Android resource-id / testTag, iOS accessibilityIdentifier) over
+# visible text, because text changes with the language (tr/en) and with copy edits.
+# Commands and options change between Maestro versions: check the docs of the version you pin.
+
+appId: com.example.shop            # Android applicationId / iOS bundle identifier of the build under test
+name: "TC-101 Checkout draft survives process death"
+tags:
+  - TC-101                         # the TC ID again, for --include-tags and for readers
+  - mobile
+  - android                        # platforms this flow is valid for
+  - ios
+  - regression
+env:
+  TEST_USER: qa.user@example.com   # synthetic test account
+---
+# 1. Start from a clean state (permissions answered up front so dialogs do not block the flow)
+- launchApp:
+    clearState: true
+    permissions:
+      all: deny                    # permission tests: deny; feature tests: allow the ones you need
+
+# 2. Sign in (ids are placeholders; replace with the app's real ids)
+- tapOn:
+    id: "login_email"
+- inputText: ${TEST_USER}
+- tapOn:
+    id: "login_password"
+- inputText: ${TEST_PASSWORD}      # maestro test -e TEST_PASSWORD=...
+- tapOn:
+    id: "login_submit"
+- assertVisible:
+    id: "home_screen"
+
+# 3. Reach the state under test
+- tapOn:
+    id: "cart_checkout"
+- tapOn:
+    id: "address_line1"
+- inputText: "Test Sokak No 1"
+- takeScreenshot: TC-101-before
+
+# 4. The mobile-specific action of this TC.
+#    killApp: on Android it simulates a system-initiated process death (saved state should be restored);
+#    on iOS it terminates the app. For a plain cold start use stopApp + launchApp instead.
+- killApp
+- launchApp:
+    clearState: false              # keep data: this is a relaunch, not a fresh install
+
+# 5. Expected result of the TC (one assertion per expected-result clause)
+- assertVisible:
+    id: "checkout_screen"
+- assertVisible: "Test Sokak No 1"
+- takeScreenshot: TC-101-after
+
+# Other building blocks for mobile TCs (uncomment as needed):
+# - openLink: https://example.com/products/42          # deep link / App Link / universal link
+# - setLocation:
+#     latitude: 41.0082
+#     longitude: 28.9784
+# - setAirplaneMode: enabled                            # Android only; check your Maestro version
+# - pressKey: Home                                      # background the app
+# - back                                                # Android back
+# - scrollUntilVisible:
+#     element:
+#       id: "order_total"
+# - extendedWaitUntil:
+#     visible:
+#       id: "sync_done"
+#     timeout: 15000
+# - runFlow: subflows/login.yaml                        # reuse shared steps

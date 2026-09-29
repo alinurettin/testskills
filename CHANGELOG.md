@@ -1,5 +1,27 @@
 # Değişiklik günlüğü
 
+**0.6.0**: Faz 5, kapsam genişletme ve kör denemeler
+- **6 yeni skill, toplam 17:**
+  - `testing-apis`: OpenAPI 3'ten sözleşme testleri ve aynı TC ID'leriyle koşturulabilir Playwright API paketi üretir. Kapsamı: şema kontrolü, sınır/enum/tip/pattern testleri, 401 ve `Bearer`'sız başlık, yol ve gövde düzeyinde BOLA, önce oluşturup sonra okuma, hata gövdesi şeması, sözleşme boşluğu soruları, istek/yanıt kanıtı.
+  - `running-exploratory-tests`: SBTM ile keşif testi. Riske göre sıralı görev kartları, sezgisel yöntem kataloğu, oturum notu şablonu; notlardan özet, hata taslakları ve regresyon testleri üretilir.
+  - `testing-ai-features`: LLM, chatbot ve RAG testi. OWASP LLM Top 10 2025'e eşlenmiş TR/EN saldırgan eval seti, tekrarlı koşularda deterministik puanlama, kararsızlık tespiti ve yayın kapısı, rubrik şablonu.
+  - `preparing-test-data`: geçerli TCKN/VKN/IBAN'lı, ilişkisel bütünlüklü, seed'li sentetik veri; HMAC ile deterministik maskeleme (KVKK/GDPR); test case'lerin veri ihtiyacı analizi.
+  - `testing-mobile-apps`: iOS/Android kontrol listesi (82 kontrol), MASVS ve WCAG eşlemesi, kullanım payından cihaz matrisi, Maestro şablonu, JUnit → `results.json` dönüştürücü.
+  - `testing-data-migrations`: kaynak–hedef mutabakatı (anahtar kümeleri, alan dönüşümleri, Decimal kontrol toplamları, Türkçe kodlama bozulması teşhisi), SQL şablonları, imza kriterleri.
+- **Export:** TestRail, Azure DevOps Test Plans ve Qase formatları eklendi.
+- **Regresyon seçimi:** `select_regression.py` eklendi. Seçim must/should/could katmanlarında gerekçeleriyle yapılır; test sayısı veya süre bütçesi aşılırsa dışarıda kalanlar kalan risk olarak raporlanır. Otomatik testler için Playwright `--grep` komutu üretilir.
+- **Sektör paketleri:** sigorta/emeklilik ve telekom eklendi (toplam 6).
+- **Kör denemeler:**
+  - API denemesinde yerleştirilen 5 hatanın 5'i ve yerleştirilmemiş 2 gerçek hata bulundu. Bağımsız yeniden koşum aynı sonucu verdi.
+  - Veri taşıma denemesinde yerleştirilen 9 hatanın 9'u bulundu, yanlış alarm çıkmadı.
+  - Denemelerden gelen 12 bulgunun 11'i düzeltildi, 1'i README'de belgelendi. Ayrıntılar: `docs/EVALUATION.md`, gerçek çıktılar: `examples/`.
+- **Yönlendirme:** `tools/routing_proxy.py` eklendi. Vekil ölçüm 17 skill ve 84 istekte 84/84 verdi.
+- **Düzeltmeler:**
+  - `qa_compact.py` artık `# QUESTION` gibi yorum satırlarını her yerde kabul ediyor.
+  - İki script'in `--help` çıktısı Windows cp1254 konsolunda çöküyordu; düzeltildi.
+  - RTM'nin REDUNDANT kontrolü `generated` etiketli üretici çıktısını atlıyor.
+- **Testler:** 70'ten 150 birim testine çıktı.
+
 **0.5.1**: Herkese açık paylaşıma hazırlık
 - **Lisans ve dokümantasyon:** MIT lisansı eklendi. README Türkçe ve İngilizce olarak yeniden yazıldı; kanıt tablosu, kurulum adımları, Mermaid akış şeması ve bilinen sınırlar bölümleri eklendi.
 - **Örnek çıktılar:** `examples/fast-transfer` klasörüne kör uçtan uca denemenin gerçek çıktıları kondu.

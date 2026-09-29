@@ -1,0 +1,20 @@
+{
+  "description": "Example masking rules for a customer extract (customers.csv) and its accounts extract. Use the SAME secret for both files so musteri_no joins keep working. Columns not listed are dropped (default).",
+  "default": "drop",
+  "columns": {
+    "musteri_no":   {"rule": "hash", "length": 16, "prefix": "C-"},
+    "ad":           {"rule": "fake", "type": "first_name"},
+    "soyad":        {"rule": "fake", "type": "last_name"},
+    "email":        {"rule": "fake", "type": "email", "normalize": "lower"},
+    "cep_tel":      {"rule": "fake", "type": "phone_tr", "normalize": "phone"},
+    "tckn":         {"rule": "fake", "type": "tckn"},
+    "iban":         {"rule": "fake", "type": "iban_tr", "normalize": "digits"},
+    "dogum_tarihi": {"rule": "generalize", "to": "year"},
+    "posta_kodu":   {"rule": "generalize", "to": "postcode"},
+    "gelir":        {"rule": "generalize", "bucket": 10000},
+    "adres":        "drop",
+    "musteri_notu": {"rule": "redact", "with": "***"},
+    "segment":      "keep",
+    "il":           "keep"
+  }
+}

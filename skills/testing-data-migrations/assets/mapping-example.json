@@ -1,0 +1,24 @@
+{
+  "_comment": "Example mapping for reconcile.py: legacy deposit accounts (cp1254, ';') -> new core banking accounts (UTF-8). Keys starting with '_' are ignored. Every target column is either mapped here, listed in 'ignore', or compared by same name; every source column is either used here or listed in 'not_migrated'.",
+  "columns": {
+    "account_no": {"source": "HESAP_NO", "transform": ["trim", "strip_leading_zeros"]},
+    "iban": {"source": "IBAN", "transform": ["trim", "upper", "collapse_spaces"]},
+    "holder_name": {"transform": [{"concat": ["AD", "SOYAD", " "]}, "collapse_spaces", "upper_tr"]},
+    "city": {"source": "IL", "transform": ["trim", "upper_tr"]},
+    "open_date": {"source": "ACILIS_TARIHI", "transform": ["trim", "date:%d.%m.%Y>%Y-%m-%d"]},
+    "currency": {"source": "DOVIZ", "transform": ["trim", "upper", {"map": {"TL": "TRY", "YTL": "TRY", "USD": "USD", "EUR": "EUR"}}]},
+    "balance": {"source": "BAKIYE", "transform": ["decimal:2:,"]},
+    "interest_rate": {"source": "FAIZ_ORANI", "transform": ["decimal:4:,"]},
+    "status": {"source": "DURUM", "transform": ["trim", "upper", {"map": {"A": "ACTIVE", "P": "DORMANT", "K": "CLOSED"}}]},
+    "branch_code": {"source": "SUBE", "transform": ["trim", "zfill:4"]},
+    "segment": {"source": "SEGMENT", "transform": ["trim", "default:RETAIL"]},
+    "email": {"source": "EPOSTA", "transform": ["trim", "lower"]},
+    "country": {"source": null, "transform": ["default:TR"]}
+  },
+  "ignore": ["created_at", "migration_batch_id"],
+  "not_migrated": ["FAKS", "TELEKS", "ESKI_MUSTERI_TIPI"],
+  "accepted_exceptions": [
+    {"check": "column", "key": "40012", "column": "email", "reason": "Invalid legacy e-mail cleared on purpose (DEF-118, accepted by data owner 2026-09-12)"},
+    {"check": "missing", "key": "40999", "reason": "Test account excluded from scope (mapping spec §2.3)"}
+  ]
+}

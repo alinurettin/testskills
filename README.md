@@ -1,20 +1,23 @@
 # QA Suite: Yapay zekâ için profesyonel yazılım test skill'leri
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.5.1-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-11%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.6.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[English README →](README.en.md)**
 
 ![QA Suite](docs/assets/qa-suite-card.png)
 
-Yapay zekâ asistanınıza (Claude Code, claude.ai, Claude API ve Agent Skills standardını destekleyen diğer araçlar) **kıdemli bir test analisti gibi çalışmayı** öğreten 11 skill'lik bir paket. Kapsadığı akış:
+Yapay zekâ asistanınıza (Claude Code, claude.ai, Claude API ve Agent Skills standardını destekleyen diğer araçlar) **kıdemli bir test analisti gibi çalışmayı** öğreten 17 skill'lik bir paket. Kapsadığı akış:
 
 1. gereksinim analizi
 2. ISTQB tekniklerine dayalı test tasarımı
 3. izlenebilirlik
-4. Xray/Zephyr/Excel'e aktarım
+4. Xray, Zephyr, TestRail, Azure DevOps, Qase ve Excel'e aktarım
 5. Playwright ve BDD otomasyonu
-6. performans, erişilebilirlik ve güvenlik testleri
-7. hata ve tamamlama raporları
+6. OpenAPI'den API sözleşme ve yetkilendirme testleri
+7. keşif testi oturumları (SBTM), mobil uygulamalar, yapay zekâ/LLM özellikleri ve veri taşıma
+8. sentetik test verisi ve maskeleme
+9. performans, erişilebilirlik ve güvenlik testleri
+10. risk bazlı regresyon seçimi, hata ve tamamlama raporları
 
 Türkçe ve İngilizce çıktı üretir.
 
@@ -24,18 +27,18 @@ Türkçe ve İngilizce çıktı üretir.
   `REQ-001` → tasarım kanıtı → `TC-001` → `@TC-001` etiketli Playwright testi → koşum sonucu → izlenebilirlik matrisi → Jira/Xray.
 - **Dürüst raporlama.** Uygulanmamış bir test asla "geçti" sayılmaz. Eksik veri "0" değil "bilinmiyor" olarak raporlanır. Beklenen sonuç, testi geçirmek için asla hatalı davranışa uydurulmaz.
 
-## Kanıt: kör uçtan uca deneme
-Yeni bir bankacılık senaryosu hazırlandı: FAST para transferi. Kullanılan demo uygulamaya, ajana söylenmeden **5 hata** yerleştirildi.
+## Kanıt: hata yerleştirilmiş kör denemeler
+Her denemede ajana yalnızca bir test uzmanına verilecek girdiler verildi: bir story, bir OpenAPI dokümanı ya da veri extract'ları. Uygulama kodu ve cevap anahtarı hiçbir zaman gösterilmedi.
 
-| | Sonuç |
-|---|---|
-| Yerleştirilen hatalar | **5/5 bulundu**, artı yerleştirilmemiş gerçek bir hata |
-| Story'deki belirsizlikler ("hızlı", "uygun mesaj", "belirlenecek") | Hepsi soru olarak raporlandı |
-| Test tasarımı | 47 test; öncelik dağılımı %2 kritik, %34 yüksek |
-| Playwright | 46/46 aday otomatize edildi, sonuç 37 geçti / 9 kaldı. Bağımsız yeniden koşum aynı sonucu verdi. |
-| Yayın kararı | "Hazır değil" (9 çıkış kriterinden 4'ü karşılandı), doğru karar |
+| Deneme | Yerleştirilen hatalar | Ayrıca bulunan | Karar |
+|---|---|---|---|
+| FAST para transferi, web uygulaması, uçtan uca | **5/5** | Yerleştirilmemiş 1 gerçek hata; tüm belirsizlikler soru olarak raporlandı | "Hazır değil": doğru |
+| Demo Bank API (OpenAPI) | BOLA dahil **5/5** | Yerleştirilmemiş 2 gerçek hata; 17 sözleşme sorusu | Bağımsız yeniden koşum aynı sonucu verdi: 31 geçti / 11 kaldı |
+| Müşteri verisi taşıma (cp1254 → UTF-8) | **9/9** | Türkçe büyük harf ve format tuzaklarında yanlış alarm yok | "Go değil": doğru |
 
-Tüm gerçek çıktılar: **[examples/fast-transfer](examples/fast-transfer/README.md)**
+17 skill'in tamamında vekil yönlendirme ölçümü: **84/84** istek doğru skill'e gitti. Bunlara skill gerektirmeyen 5 yakın istek de dahil. Ayrıca 150 birim testi var.
+
+Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVALUATION.md)**. Her denemenin gerçek çıktıları: [examples/](examples/).
 
 ## Skill'ler
 | Skill | Ne yapar |
@@ -45,14 +48,20 @@ Tüm gerçek çıktılar: **[examples/fast-transfer](examples/fast-transfer/READ
 | `analyzing-requirements` | ISO 29148 kalite incelemesi, TR/EN belirsizlik taraması, eksik gereksinim ve NFR keşfi (ISO 25010), risk puanlama ve soru listesi |
 | `designing-test-cases` | EP/BVA, karar tablosu, durum geçişi ve pairwise script'leri; risk bazlı test case'ler; TCKN/IBAN test verisi kontrolü |
 | `testing-nonfunctional` | Eşikleri gereksinimden gelen k6 yük testi; WCAG 2.2 A/AA (55 kriter); OWASP ASVS 5.0 |
-| `tracing-requirements` | İzlenebilirlik matrisi, kapsam boşlukları, öncelik şişmesi ve gereksiz tekrar kontrolleri, değişiklik etkisi |
-| `exporting-test-cases` | Xray, Zephyr Scale, Excel, CSV ve Markdown'a aktarım |
+| `tracing-requirements` | İzlenebilirlik matrisi, kapsam boşlukları, öncelik şişmesi ve gereksiz tekrar kontrolleri, değişiklik etkisi, zaman bütçeli **risk bazlı regresyon seçimi** |
+| `exporting-test-cases` | Xray, Zephyr Scale, TestRail, Azure DevOps Test Plans, Qase, Excel, CSV ve Markdown'a aktarım |
 | `automating-with-playwright` | Proje iskeleti, `@TC` etiketli spec'ler; sonuçları izlenebilirlik matrisine geri besler |
 | `writing-bdd-scenarios` | TR/EN Gherkin; playwright-bdd ile koşum |
 | `reporting-test-results` | Hata raporları; çıkış kriterlerini otomatik değerlendiren tamamlama raporu |
 | `reviewing-test-cases` | Excel/TestRail CSV içe aktarımı ve test kalitesi denetimi |
+| `testing-apis` | OpenAPI 3'ten sözleşme testleri ve aynı TC ID'leriyle koşturulabilir Playwright API paketi: şema kontrolü, sınırlar, BOLA, sözleşme boşluğu soruları, istek/yanıt kanıtı |
+| `running-exploratory-tests` | Oturum bazlı keşif testi: riske göre sıralı görev kartları (charter), sezgisel yöntemler (SFDIPOT, FEW HICCUPPS, turlar), oturum notlarından özet, hata ve regresyon testi |
+| `testing-ai-features` | LLM, chatbot ve RAG testi: saldırgan eval seti (OWASP LLM Top 10 2025, TR/EN), tekrarlı koşularda deterministik puanlama, kararsızlık ve yayın kapısı |
+| `preparing-test-data` | Geçerli TCKN/VKN/IBAN'lı, ilişkisel bütünlüklü sentetik veri; üretim extract'larının deterministik maskelenmesi (KVKK/GDPR) |
+| `testing-mobile-apps` | iOS/Android kontrol listeleri (yaşam döngüsü, kesintiler, izinler, çevrimdışı, MASVS, erişilebilirlik), kullanım payından cihaz matrisi, JUnit → sonuçlar |
+| `testing-data-migrations` | Kaynak–hedef mutabakatı (anahtarlar, alanlar, kontrol toplamları, Türkçe karakter kodlama tuzakları), SQL şablonları, imza kriterleri |
 
-Ek olarak **sektör paketleri** var: fintech/bankacılık, e-ticaret, sağlık ve kamu. Her birinde mevzuat kontrol listesi, sık unutulan gereksinimler, yüksek riskli kurallar ve sentetik test verisi bulunur.
+Ek olarak **sektör paketleri** var: fintech/bankacılık, e-ticaret, sağlık, kamu, sigorta/emeklilik ve telekom. Her birinde mevzuat kontrol listesi, sık unutulan gereksinimler, yüksek riskli kurallar ve sentetik test verisi bulunur.
 
 ## Kurulum
 **Claude Code (önerilen):**
@@ -61,7 +70,7 @@ claude plugin marketplace add alinurettin/testskills
 claude plugin install qa-suite@qa-suite-marketplace
 ```
 
-**claude.ai / Claude API:** [Releases](https://github.com/alinurettin/testskills/releases) sayfasından skill zip'lerini indirip **Settings → Skills** bölümünden yükleyin. Skill'ler birbirine görev devrettiği için 11'ini birlikte yüklemeniz önerilir.
+**claude.ai / Claude API:** [Releases](https://github.com/alinurettin/testskills/releases) sayfasından skill zip'lerini indirip **Settings → Skills** bölümünden yükleyin. Skill'ler birbirine görev devrettiği için 17'sini birlikte yüklemeniz önerilir.
 
 **Diğer araçlar (Codex, Copilot, Cursor, Gemini CLI…):** Paket açık Agent Skills standardına uyar. `skills/` altındaki klasörleri aracın skills klasörüne kopyalayın.
 
@@ -76,6 +85,10 @@ Kredi başvuru formu için sınır değer ve karar tablosu testlerini tasarla.
 qa/test-cases.json'daki smoke testleri Playwright ile otomatize et, sonuçları RTM'ye bağla.
 Ekibin Excel'deki test case'lerini incele, eksik ve hatalı olanları bul.
 Sprint sonu test tamamlama raporu hazırla: çıkış kriterleri sağlandı mı?
+Bu API'yi OpenAPI dokümanından test et; kullanıcılar birbirinin verisine erişebiliyor mu?
+REQ-004 değişti, 2 saatimiz var: hangi regresyon testlerini koşalım?
+Eski ve yeni sistemin müşteri extract'larını karşılaştır, taşımayı imzalayabilir miyiz?
+Destek chatbot'umuz için eval seti hazırla: prompt injection, halüsinasyon, kişisel veri sızıntısı.
 ```
 Çıktılar projenizde `qa/` klasörüne yazılır: gereksinimler, sorular, tasarım kanıtları, test case'ler, izlenebilirlik matrisi, export dosyaları ve raporlar. Otomasyon `automation/` klasörüne yazılır.
 
@@ -99,15 +112,18 @@ flowchart LR
 Standart metinleri kopyalanmadı; içerikler uygulanabilir kontrol listelerine dönüştürüldü.
 
 ## Bilinen sınırlar
-- **Gerçek araçlarda denenmedi:** Xray/Zephyr içe aktarımı ve Xray sonuç reporter'ı gerçek bir Jira ortamında denenmedi. Resmi dokümantasyona göre hazırlandı; önce 2–3 testlik deneme importu yapın.
+- **Gerçek araçlarda denenmedi:** Xray, Zephyr, TestRail, Azure DevOps ve Qase içe aktarımları ile Xray sonuç reporter'ı gerçek bir sunucuda denenmedi. Resmi dokümantasyona göre hazırlandı; önce 2–3 testlik deneme importu yapın.
 - **k6:** Script'ler üretilip sözdizimi kontrolünden geçirildi, ama gerçek bir yük testi koşturulmadı.
-- **Otomatik devreye girme:** Skill'lerin otomatik devreye girmesi yalnızca vekil bir yöntemle ölçüldü (62/62).
+- **Otomatik devreye girme:** Skill yönlendirmesi yalnızca vekil bir yöntemle ölçüldü (84/84). Claude Code'un gerçek tetiklenme mekanizmasıyla ölçülmedi.
+- **Kör denemesi olmayanlar:** Keşif testi, yapay zekâ, mobil ve test verisi skill'leri için henüz kör deneme yapılmadı. Bunlar birim testleri ve script demolarıyla doğrulandı.
+- **Windows konsolu:** PowerShell'de Türkçe yardım metni bozuk görünüyorsa `$env:PYTHONIOENCODING='utf-8'` ayarlayın. Dosyaların kendisi her zaman UTF-8'dir.
 - **Sektör paketleri** kontrol listesidir, hukuki tavsiye değildir. Mevzuatın güncel hâlini uyum ekibinizle teyit edin.
 
 ## Geliştirme ve katkı
 ```bash
 python tools/sync_shared.py          # shared/ dosyalarını skill'lere dağıtır
 python tools/validate_skills.py      # Agent Skills spesifikasyonu ve paket kuralları
+python tools/routing_proxy.py build evals/trigger-queries*.json --out prompt.txt   # vekil yönlendirme ölçümü
 python -m unittest discover -s tests # script regresyon testleri
 python tools/package_skills.py       # claude.ai için zip'ler (dist/)
 ```

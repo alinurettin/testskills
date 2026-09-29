@@ -1,0 +1,12 @@
+{
+  "columns": {
+    "customer_id": {"source": "MUSTERI_NO", "transform": ["trim", "strip_leading_zeros"]},
+    "full_name": {"transform": [{"concat": ["AD", "SOYAD", " "]}, "collapse_spaces", "upper_tr"]},
+    "birth_date": {"source": "DOGUM_TARIHI", "transform": ["trim", "date:%d.%m.%Y>%Y-%m-%d"]},
+    "branch": {"source": "SUBE_KODU", "transform": ["trim", {"map": {"34": "IST", "06": "ANK", "35": "IZM"}}]},
+    "balance": {"source": "BAKIYE", "transform": ["decimal:2:,"]},
+    "status": {"source": "DURUM", "transform": ["trim", "upper", {"map": {"A": "ACTIVE", "P": "PASSIVE", "K": "CLOSED"}}]},
+    "email": {"source": "EPOSTA", "transform": ["trim", "lower"]}
+  },
+  "not_migrated": ["FAKS"]
+}
