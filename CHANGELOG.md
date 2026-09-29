@@ -1,5 +1,12 @@
 # Değişiklik günlüğü
 
+**0.5.1**: Herkese açık paylaşıma hazırlık
+- **Lisans ve dokümantasyon:** MIT lisansı eklendi. README Türkçe ve İngilizce olarak yeniden yazıldı; kanıt tablosu, kurulum adımları, Mermaid akış şeması ve bilinen sınırlar bölümleri eklendi.
+- **Örnek çıktılar:** `examples/fast-transfer` klasörüne kör uçtan uca denemenin gerçek çıktıları kondu.
+- **Paketleme:** `tools/package_skills.py` ile claude.ai'ye yüklenecek skill zip'leri üretilebiliyor.
+- **Manifest:** Plugin ve marketplace manifest'ine lisans ve depo bilgisi eklendi. İkisi de `claude plugin validate` kontrolünden uyarısız geçiyor.
+- **Görsel:** Paylaşım görseli eklendi: `docs/assets/qa-suite-card.png`.
+
 **0.5.0**: Faz 4, sektör paketleri ve yayına hazırlık
 - **4 sektör paketi** (fintech/bankacılık, e-ticaret, sağlık, kamu). Her biri analiz ve tasarım skill'lerine eklendi ve şunları içeriyor: kontrol edilecek mevzuat, örtük gereksinimler, yüksek riskli kurallar ve teknikler, sentetik test verisi, tipik hatalar.
 - **`check_ids.py`:** TCKN/VKN/IBAN test verisini doğrular ve tek hatalı geçersiz varyantlar türetir. Geçerli kimlik üretmez.

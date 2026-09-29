@@ -1,0 +1,473 @@
+TCID,Summary,Description,Test Type,Priority,Labels,Component,Requirement Keys,Action,Data,Expected Result
+TC-001,"1,00 TL (alt sınır) transfer ücretsiz gerçekleşir ve dekont gösterilir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 1,00
+
+Gereksinimler: REQ-001, REQ-012 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-04) | QA-ID: TC-001",Manual,Medium,regression;REQ-001;REQ-012;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","1,00",'Transfer başarıyla gerçekleşti.' mesajı; SMS doğrulama adımı açılmaz
+TC-001,,,,,,,,'Dekont' bölümünü incele,,"Tutar: 1,00 TL; İşlem ücreti: 0,00 TL; Toplam: 1,00 TL; Alıcı: TR330006100519786457841326; Açıklama: Kira"
+TC-001,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 119.999,00 TL; 'Günlük kalan limit' 99.999,00 TL"
+TC-002,"0,99 TL (alt sınırın altı) reddedilir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 0,99
+
+Gereksinimler: REQ-001, REQ-012 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-15) | QA-ID: TC-002",Manual,Medium,regression;REQ-001;REQ-012;boundary-value-analysis;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","0,99","'Tutar en az 1,00 TL olmalıdır.' mesajı; dekont gösterilmez"
+TC-002,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 120.000,00 TL; 'Günlük kalan limit' 100.000,00 TL (değişmez)"
+TC-003,"50.000,00 TL (işlem üst sınırı) SMS doğrulama ile gerçekleşir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 50.000,00
+otp: 123456
+
+Gereksinimler: REQ-002, REQ-005 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-09; DS-006 D05) | QA-ID: TC-003",Manual,High,smoke;regression;REQ-002;REQ-005;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","50.000,00",'Bu işlem için SMS doğrulaması gerekiyor.' mesajı; 'SMS doğrulama' bölümü açılır
+TC-003,,,,,,,,"'SMS kodu' alanına kodu yaz, 'Onayla'ya tıkla",123456,"'Transfer başarıyla gerçekleşti.'; dekontta Tutar 50.000,00 TL, İşlem ücreti 5,00 TL, Toplam 50.005,00 TL"
+TC-003,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 69.995,00 TL; 'Günlük kalan limit' 50.000,00 TL"
+TC-004,"50.000,01 TL (işlem üst sınırının üstü) reddedilir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 50.000,01
+
+Gereksinimler: REQ-002 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-16) | QA-ID: TC-004",Manual,High,regression;REQ-002;boundary-value-analysis;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","50.000,01","'İşlem başına en fazla 50.000,00 TL gönderebilirsiniz.' mesajı; SMS adımı ve dekont gösterilmez"
+TC-004,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 120.000,00 TL; 'Günlük kalan limit' 100.000,00 TL"
+TC-005,"Günlük toplam tam 100.000,00 TL'ye ulaşan transfer kabul edilir","Amaç: Kümülatif limit sınırı dahil (varsayım Q-002: toplam tam 100.000,00 TL'ye izin var, ücret hariç)
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 49.999,99 TL ve 49.000,00 TL (her biri SMS kodu 123456 ile) başarılı transfer yapılmış
+- Günlük kullanım 98.999,99 TL; 'Günlük kalan limit' 1.000,01 TL
+
+Test verisi:
+tutar: 1.000,01
+
+Gereksinimler: REQ-003 (BANK-310) | Teknik: boundary-value-analysis (DS-002 C-05) | QA-ID: TC-005",Manual,High,regression;REQ-003;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Açıklama'ya 'Limit' yaz, 'Devam'a tıkla","1.000,01","'Transfer başarıyla gerçekleşti.'; dekontta Tutar 1.000,01 TL"
+TC-005,,,,,,,,Kalan limiti incele,,"'Günlük kalan limit' 0,00 TL"
+TC-006,"Günlük toplamı 100.000,01 TL'ye çıkaracak transfer reddedilir","Amaç: Kümülatif limit aşımının engellendiğinin go/no-go kontrolü (varsayım Q-002)
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 49.999,99 TL ve 49.000,00 TL (her biri SMS kodu 123456 ile) başarılı transfer yapılmış
+- Günlük kullanım 98.999,99 TL; 'Günlük kalan limit' 1.000,01 TL
+
+Test verisi:
+tutar: 1.000,02
+
+Gereksinimler: REQ-003 (BANK-310) | Teknik: boundary-value-analysis (DS-002 C-10) | QA-ID: TC-006",Manual,Highest,smoke;regression;REQ-003;boundary-value-analysis;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Açıklama'ya 'Limit' yaz, 'Devam'a tıkla","1.000,02",Günlük limit aşımını bildiren hata mesajı (role=alert); SMS adımı ve dekont gösterilmez
+TC-006,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye ve 'Günlük kalan limit' (1.000,01 TL) değişmez"
+TC-007,"Günlük toplamı 99.999,99 TL'ye çıkaran transfer kabul edilir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 49.999,99 TL ve 49.000,00 TL (her biri SMS kodu 123456 ile) başarılı transfer yapılmış
+- Günlük kullanım 98.999,99 TL; 'Günlük kalan limit' 1.000,01 TL
+
+Test verisi:
+tutar: 1.000,00
+
+Gereksinimler: REQ-003 (BANK-310) | Teknik: boundary-value-analysis (DS-002 C-04) | QA-ID: TC-007",Manual,Medium,regression;REQ-003;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Açıklama'ya 'Limit' yaz, 'Devam'a tıkla","1.000,00",'Transfer başarıyla gerçekleşti.'
+TC-007,,,,,,,,Kalan limiti incele,,"'Günlük kalan limit' 0,01 TL"
+TC-008,"Günlük limit dolduktan sonra 1,00 TL transfer reddedilir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 49.999,99 TL ve 49.000,00 TL (her biri SMS kodu 123456 ile) başarılı transfer yapılmış
+- Günlük kullanım 98.999,99 TL; 'Günlük kalan limit' 1.000,01 TL
+- Ek olarak 1.000,01 TL başarılı transfer yapılmış; 'Günlük kalan limit' 0,00 TL
+
+Test verisi:
+tutar: 1,00
+
+Gereksinimler: REQ-003 (BANK-310) | Teknik: equivalence-partitioning (DS-002 C-07) | QA-ID: TC-008",Manual,High,regression;REQ-003;equivalence-partitioning;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Açıklama'ya 'Limit2' yaz, 'Devam'a tıkla","1,00",Günlük limit aşımını bildiren hata mesajı; dekont gösterilmez
+TC-008,,,,,,,,Bakiyeyi incele,,"Bakiye değişmez; 'Günlük kalan limit' 0,00 TL"
+TC-009,Reddedilen transfer bakiyeyi ve günlük limiti tüketmez,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-016, REQ-003 (BANK-310) | Teknik: error-guessing (DS-002; fintech tutarlılık) | QA-ID: TC-009",Manual,Medium,regression;REQ-016;REQ-003;error-guessing;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","50.000,01","'İşlem başına en fazla 50.000,00 TL gönderebilirsiniz.'"
+TC-009,,,,,,,,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","0,99","'Tutar en az 1,00 TL olmalıdır.'"
+TC-009,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 120.000,00 TL; 'Günlük kalan limit' 100.000,00 TL"
+TC-010,Kontrol basamağı hatalı (mod-97) IBAN reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+iban: TR330006100519786457841327 (check_ids.py: INVALID mod-97)
+tutar: 100,00
+
+Gereksinimler: REQ-004 (BANK-310) | Teknik: equivalence-partitioning (check_ids.py varyant 'last digit changed') | QA-ID: TC-010",Manual,High,regression;REQ-004;equivalence-partitioning;negative,,BANK-310,"'Alıcı IBAN' alanına IBAN'ı, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",TR330006100519786457841327,'Geçersiz IBAN. Lütfen TR ile başlayan 26 karakterlik IBAN girin.' (veya kontrol basamağı hatasını belirten mesaj); dekont gösterilmez
+TC-010,,,,,,,,Bakiyeyi incele,,"Bakiye 120.000,00 TL (değişmez)"
+TC-011,25 karakterlik IBAN reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+iban: TR33000610051978645784132
+tutar: 100,00
+
+Gereksinimler: REQ-004 (BANK-310) | Teknik: boundary-value-analysis (check_ids.py varyant 'one character short') | QA-ID: TC-011",Manual,Medium,regression;REQ-004;boundary-value-analysis;negative,,BANK-310,"'Alıcı IBAN' alanına IBAN'ı, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",TR33000610051978645784132,'Geçersiz IBAN. Lütfen TR ile başlayan 26 karakterlik IBAN girin.'; dekont gösterilmez
+TC-012,27 karakterlik IBAN reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+iban: TR3300061005197864578413260
+tutar: 100,00
+
+Gereksinimler: REQ-004 (BANK-310) | Teknik: boundary-value-analysis (check_ids.py varyant 'one character long') | QA-ID: TC-012",Manual,Medium,regression;REQ-004;boundary-value-analysis;negative,,BANK-310,"'Alıcı IBAN' alanına IBAN'ı, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",TR3300061005197864578413260,'Geçersiz IBAN. Lütfen TR ile başlayan 26 karakterlik IBAN girin.'; dekont gösterilmez
+TC-013,TR dışı ülke kodlu IBAN reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+iban: DE330006100519786457841326
+tutar: 100,00
+
+Gereksinimler: REQ-004 (BANK-310) | Teknik: equivalence-partitioning (check_ids.py varyant 'wrong country code') | QA-ID: TC-013",Manual,Medium,regression;REQ-004;equivalence-partitioning;negative,,BANK-310,"'Alıcı IBAN' alanına IBAN'ı, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",DE330006100519786457841326,'Geçersiz IBAN. Lütfen TR ile başlayan 26 karakterlik IBAN girin.'; dekont gösterilmez
+TC-014,Boş IBAN reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-004 (BANK-310) | Teknik: equivalence-partitioning | QA-ID: TC-014",Manual,Low,regression;REQ-004;equivalence-partitioning;negative,,BANK-310,"'Alıcı IBAN' alanını boş bırak, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",,'Geçersiz IBAN. Lütfen TR ile başlayan 26 karakterlik IBAN girin.'; dekont gösterilmez
+TC-015,Boşluklu ve küçük harfli geçerli IBAN kabul edilir,"Amaç: Varsayım Q-011: biçim varyantları normalize edilerek kabul edilir
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-004 (BANK-310) | Teknik: equivalence-partitioning (check_ids.py varyantları (VALID); Q-011) | QA-ID: TC-015",Manual,Low,regression;REQ-004;equivalence-partitioning;positive,,BANK-310,"'Alıcı IBAN' alanına boşluklu IBAN'ı, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",TR33 0006 1005 1978 6457 8413 26,'Transfer başarıyla gerçekleşti.'; dekontta Alıcı TR330006100519786457841326
+TC-015,,,,,,,,"'Yeni transfer'e tıkla; 'Alıcı IBAN' alanına küçük harfli IBAN'ı, 'Tutar (TL)' alanına 200,00 yaz, 'Devam'a tıkla",tr330006100519786457841326,'Transfer başarıyla gerçekleşti.'; dekontta Alıcı TR330006100519786457841326
+TC-016,"10.000,00 TL'de (OTP eşiği, dahil) SMS doğrulama istenir","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 10.000,00
+
+Gereksinimler: REQ-005 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-08) | QA-ID: TC-016",Manual,High,smoke;regression;REQ-005;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","10.000,00",'Bu işlem için SMS doğrulaması gerekiyor.'; 'SMS doğrulama' bölümü açılır; dekont gösterilmez
+TC-016,,,,,,,,Bakiyeyi incele,,"Bakiye 120.000,00 TL (OTP onayı olmadan değişmez)"
+TC-016,,,,,,,,"'SMS kodu' alanına kodu yaz, 'Onayla'ya tıkla",123456,"'Transfer başarıyla gerçekleşti.'; dekontta Tutar 10.000,00 TL, İşlem ücreti 5,00 TL, Toplam 10.005,00 TL"
+TC-017,"9.999,99 TL'de OTP istenmez, 5,00 TL ücret alınır","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 9.999,99
+
+Gereksinimler: REQ-005, REQ-006 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-07; DS-006 D03) | QA-ID: TC-017",Manual,Medium,regression;REQ-005;REQ-006;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","9.999,99",'Transfer başarıyla gerçekleşti.'; SMS doğrulama adımı açılmaz
+TC-017,,,,,,,,'Dekont' bölümünü incele,,"Tutar 9.999,99 TL; İşlem ücreti 5,00 TL; Toplam 10.004,99 TL"
+TC-018,Hatalı SMS kodu ile transfer yapılmaz,"Amaç: Varsayım Q-004: hatalı kodda transfer yapılmaz, hata mesajı gösterilir
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 20.000,00
+otp: 000000
+
+Gereksinimler: REQ-018, REQ-005, REQ-006 (BANK-310) | Teknik: decision-table (DS-006 D06; DS-008 T9) | QA-ID: TC-018",Manual,High,regression;REQ-018;REQ-005;REQ-006;decision-table;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","20.000,00",'SMS doğrulama' bölümü açılır
+TC-018,,,,,,,,"'SMS kodu' alanına hatalı kodu yaz, 'Onayla'ya tıkla",000000,Hatalı kodu bildiren hata mesajı; dekont gösterilmez
+TC-018,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 120.000,00 TL; 'Günlük kalan limit' 100.000,00 TL"
+TC-019,SMS adımı açıkken değiştirilen tutar OTP ile onaylanamaz,"Amaç: Varsayım Q-014: OTP, istendiği andaki tutara bağlıdır; form kilitlenmeli ya da değişiklik yeni OTP gerektirmeli
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-018, REQ-005 (BANK-310) | Teknik: state-transition (DS-008 N-08; Q-014) | QA-ID: TC-019",Manual,High,regression;REQ-018;REQ-005;state-transition;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","20.000,00",'SMS doğrulama' bölümü açılır
+TC-019,,,,,,,,'Tutar (TL)' alanını değiştirmeyi dene,"45.000,00",Alan düzenlenemez VEYA değişiklik SMS adımını iptal eder
+TC-019,,,,,,,,"'SMS kodu' alanına kodu yaz, 'Onayla'ya tıkla",123456,"45.000,00 TL için transfer gerçekleşmez; dekont oluşursa Tutar 20.000,00 TL'dir"
+TC-020,"5.000,00 TL'de (ücret eşiği) ücret alınmaz","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 5.000,00
+
+Gereksinimler: REQ-006, REQ-007 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-05; DS-006 D01) | QA-ID: TC-020",Manual,High,regression;REQ-006;REQ-007;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","5.000,00",'Transfer başarıyla gerçekleşti.'
+TC-020,,,,,,,,'Dekont' bölümünü incele,,"Tutar 5.000,00 TL; İşlem ücreti 0,00 TL; Toplam 5.000,00 TL"
+TC-020,,,,,,,,Bakiyeyi incele,,"Bakiye 115.000,00 TL"
+TC-021,"5.000,01 TL'de 5,00 TL ücret alınır; bakiye ve limit doğru düşer","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+tutar: 5.000,01
+
+Gereksinimler: REQ-006, REQ-007, REQ-016 (BANK-310) | Teknik: boundary-value-analysis (DS-001 C-06; DS-006 D03) | QA-ID: TC-021",Manual,High,smoke;regression;REQ-006;REQ-007;REQ-016;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","5.000,01",'Transfer başarıyla gerçekleşti.'
+TC-021,,,,,,,,'Dekont' bölümünü incele,,"Tutar 5.000,01 TL; İşlem ücreti 5,00 TL; Toplam 5.005,01 TL"
+TC-021,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 114.994,99 TL; 'Günlük kalan limit' 94.999,99 TL (varsayım Q-002: ücret limite dahil değil)"
+TC-022,Tutar + ücret bakiyeye tam eşitse transfer gerçekleşir,"Amaç: Varsayım Q-006: tam eşitlik yeterli bakiye sayılır
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Bakiye 22.990,00 TL ve günlük kalan limit tutarı karşılıyor (seed gerekir; bu ortamda 49.000,00 TL + 48.000,00 TL transferleriyle hazırlanıyor, bkz. test planı bağımlılık B-1)
+
+Test verisi:
+tutar: 22.985,00
+ucret: 5,00
+toplam: 22.990,00
+
+Gereksinimler: REQ-008 (BANK-310) | Teknik: boundary-value-analysis (DS-004 C-03; Q-006) | QA-ID: TC-022",Manual,Medium,regression;REQ-008;boundary-value-analysis;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla, istenirse SMS kodu 123456 ile onayla","22.985,00","'Transfer başarıyla gerçekleşti.'; dekontta Toplam 22.990,00 TL"
+TC-022,,,,,,,,Bakiyeyi incele,,"Bakiye 0,00 TL"
+TC-023,"Tutar bakiyeye sığıp tutar + ücret bakiyeyi 0,01 TL aşarsa transfer yapılmaz","Amaç: Ücretin bakiye kontrolüne dahil edildiğinin kontrolü (tutar 22.985,01 ≤ bakiye; toplam 22.990,01 > bakiye)
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Bakiye 22.990,00 TL ve günlük kalan limit tutarı karşılıyor (seed gerekir; bu ortamda 49.000,00 TL + 48.000,00 TL transferleriyle hazırlanıyor, bkz. test planı bağımlılık B-1)
+
+Test verisi:
+tutar: 22.985,01
+
+Gereksinimler: REQ-008 (BANK-310) | Teknik: boundary-value-analysis (DS-004 C-07; DS-006 D07) | QA-ID: TC-023",Manual,High,regression;REQ-008;boundary-value-analysis;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla; SMS adımı açılırsa kodu 123456 ile onayla","22.985,01",Yetersiz bakiyeyi bildiren mesaj; dekont gösterilmez
+TC-023,,,,,,,,Bakiyeyi incele,,"Bakiye 22.990,00 TL (değişmez)"
+TC-024,Tutar bakiyeyi aşarsa SMS gönderilmeden reddedilir,"Amaç: Varsayım Q-013: bakiye kontrolü OTP'den önce yapılır
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174); test ortamı SMS kodu 123456
+- Bakiye 22.990,00 TL ve günlük kalan limit tutarı karşılıyor (seed gerekir; bu ortamda 49.000,00 TL + 48.000,00 TL transferleriyle hazırlanıyor, bkz. test planı bağımlılık B-1)
+
+Test verisi:
+tutar: 30.000,00
+
+Gereksinimler: REQ-008, REQ-005 (BANK-310) | Teknik: decision-table (DS-006 D07/D08; Q-013) | QA-ID: TC-024",Manual,Medium,regression;REQ-008;REQ-005;decision-table;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","30.000,00",Yetersiz bakiyeyi bildiren mesaj; 'SMS doğrulama' bölümü açılmaz; dekont gösterilmez
+TC-024,,,,,,,,Bakiyeyi incele,,"Bakiye 22.990,00 TL (değişmez)"
+TC-025,Boş açıklama ile transfer reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-009 (BANK-310) | Teknik: boundary-value-analysis (DS-003 C-04) | QA-ID: TC-025",Manual,Low,regression;REQ-009;boundary-value-analysis;negative,,BANK-310,"'Açıklama' alanını boş bırak, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",,'Açıklama zorunludur.' mesajı; dekont gösterilmez
+TC-026,Yalnız boşluktan oluşan açıklama reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-009 (BANK-310) | Teknik: equivalence-partitioning (DS-003 C-06; Q-007) | QA-ID: TC-026",Manual,Low,regression;REQ-009;equivalence-partitioning;negative,,BANK-310,"'Açıklama' alanına yalnız boşluk yaz, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",   ,'Açıklama zorunludur.' mesajı; dekont gösterilmez
+TC-027,Türkçe karakterli 50 karakterlik açıklama kabul edilir ve dekontta tam görünür,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Test verisi:
+aciklama: ÇĞİÖŞÜçğıöşü kira ödemesi Ekim 2026 daire 4B xxxxx (50 karakter)
+
+Gereksinimler: REQ-010, REQ-012 (BANK-310) | Teknik: boundary-value-analysis (DS-003 C-03) | QA-ID: TC-027",Manual,Low,regression;REQ-010;REQ-012;boundary-value-analysis;positive,,BANK-310,"'Açıklama' alanına 50 karakterlik metni, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",ÇĞİÖŞÜçğıöşü kira ödemesi Ekim 2026 daire 4B xxxxx,'Transfer başarıyla gerçekleşti.'
+TC-027,,,,,,,,'Dekont' bölümünü incele,,"Açıklama alanında metnin 50 karakterin tamamı, Türkçe karakterler bozulmadan görünür"
+TC-028,51 karakterlik açıklama ile transfer yapılmaz,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-010 (BANK-310) | Teknik: boundary-value-analysis (DS-003 C-07; Q-007) | QA-ID: TC-028",Manual,Low,regression;REQ-010;boundary-value-analysis;negative,,BANK-310,"'Açıklama' alanına 51 karakter yaz, 'Tutar (TL)' alanına 100,00 yaz, 'Devam'a tıkla",xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx,Uzunluk hatası mesajı VEYA alan 50 karakterden fazlasını kabul etmez; 51 karakterlik açıklamayla dekont oluşmaz
+TC-029,60 sn içinde aynı IBAN ve tutara ikinci transferde uyarı; 'Vazgeç' transferi durdurur,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 100,00 TL başarılı transfer yapılmış (bakiye 119.900,00 TL)
+
+Gereksinimler: REQ-011 (BANK-310) | Teknik: decision-table (DS-007 D03; DS-008 T4, T7) | QA-ID: TC-029",Manual,High,regression;REQ-011;decision-table;negative,,BANK-310,"'Yeni transfer'e tıkla; aynı IBAN'a 100,00 TL için 'Devam'a tıkla (ilk transferden < 60 sn sonra)","100,00",'Tekrar uyarısı' bölümünde 'Aynı alıcıya aynı tutarda 60 saniye içinde transfer yaptınız. Yine de göndermek istiyor musunuz?' metni
+TC-029,,,,,,,,'Vazgeç'e tıkla,,"Dekont gösterilmez; bakiye 119.900,00 TL (ikinci transfer yapılmaz)"
+TC-030,Tekrar uyarısında 'Yine de gönder' ikinci transferi gerçekleştirir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 100,00 TL başarılı transfer yapılmış
+
+Gereksinimler: REQ-011 (BANK-310) | Teknik: state-transition (DS-008 T5; Q-003) | QA-ID: TC-030",Manual,Medium,regression;REQ-011;state-transition;positive,,BANK-310,"'Yeni transfer'e tıkla; aynı IBAN'a 100,00 TL için 'Devam'a tıkla","100,00",'Tekrar uyarısı' bölümü görünür
+TC-030,,,,,,,,'Yine de gönder'e tıkla,,"'Transfer başarıyla gerçekleşti.'; bakiye 119.800,00 TL"
+TC-031,Önceki transferden 59 sn sonra aynı IBAN ve tutarda uyarı gösterilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Saat kontrol edilebilir (Playwright page.clock); 100,00 TL başarılı transfer yapılmış
+
+Gereksinimler: REQ-011 (BANK-310) | Teknik: boundary-value-analysis (DS-005 C-04; Q-003) | QA-ID: TC-031",Manual,Medium,regression;REQ-011;boundary-value-analysis;negative,,BANK-310,"Saati 59 sn ileri al; 'Yeni transfer'e tıkla; aynı IBAN'a 100,00 TL için 'Devam'a tıkla",59 sn,'Tekrar uyarısı' bölümü görünür
+TC-032,Önceki transferden 60 sn sonra aynı IBAN ve tutarda uyarı gösterilmez,"Amaç: Varsayım Q-003: 60. saniyede pencere kapanmıştır
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Saat kontrol edilebilir (Playwright page.clock); 100,00 TL başarılı transfer yapılmış
+
+Gereksinimler: REQ-011 (BANK-310) | Teknik: boundary-value-analysis (DS-005 C-05; DS-007 D01; Q-003) | QA-ID: TC-032",Manual,Medium,regression;REQ-011;boundary-value-analysis;positive,,BANK-310,"Saati 60 sn ileri al; 'Yeni transfer'e tıkla; aynı IBAN'a 100,00 TL için 'Devam'a tıkla",60 sn,Uyarı gösterilmez; 'Transfer başarıyla gerçekleşti.'
+TC-033,Aynı IBAN'a farklı tutarda 60 sn içinde transferde uyarı gösterilmez,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 100,00 TL başarılı transfer yapılmış
+
+Gereksinimler: REQ-011 (BANK-310) | Teknik: decision-table (DS-007 D02) | QA-ID: TC-033",Manual,Medium,regression;REQ-011;decision-table;positive,,BANK-310,"'Yeni transfer'e tıkla; aynı IBAN'a 100,01 TL için 'Devam'a tıkla","100,01",Uyarı gösterilmez; 'Transfer başarıyla gerçekleşti.'
+TC-034,Aynı IBAN boşluklu yazılsa da 60 sn içinde uyarı gösterilir,"Amaç: Varsayım Q-003: ""aynı alıcı"" normalize IBAN ile karşılaştırılır; biçim farkı kontrolü atlatmamalı
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 100,00 TL başarılı transfer yapılmış
+
+Gereksinimler: REQ-011 (BANK-310) | Teknik: error-guessing (Q-003, Q-011) | QA-ID: TC-034",Manual,Medium,regression;REQ-011;error-guessing;negative,,BANK-310,"'Yeni transfer'e tıkla; 'Alıcı IBAN'a boşluklu yaz, 100,00 TL için 'Devam'a tıkla",TR33 0006 1005 1978 6457 8413 26,'Tekrar uyarısı' bölümü görünür
+TC-035,"Tekrar uyarısı sonrası ≥ 10.000,00 TL transfer yine SMS doğrulaması ister","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Aynı oturumda TR330006100519786457841326'ya 20.000,00 TL (SMS kodu 123456) başarılı transfer yapılmış
+
+Gereksinimler: REQ-011, REQ-005 (BANK-310) | Teknik: state-transition (DS-008 T6, T8) | QA-ID: TC-035",Manual,Medium,regression;REQ-011;REQ-005;state-transition;positive,,BANK-310,"'Yeni transfer'e tıkla; aynı IBAN'a 20.000,00 TL için 'Devam'a tıkla","20.000,00",'Tekrar uyarısı' bölümü görünür
+TC-035,,,,,,,,'Yine de gönder'e tıkla,,'SMS doğrulama' bölümü açılır; dekont gösterilmez
+TC-035,,,,,,,,"'SMS kodu' alanına kodu yaz, 'Onayla'ya tıkla",123456,"'Transfer başarıyla gerçekleşti.'; bakiye 79.990,00 TL"
+TC-036,Sonuç ekranı ve dekont onaydan sonra 3 sn içinde görünür,"Amaç: Varsayım Q-008: tekil kullanıcı, test ortamı, onaydan dekonta ≤ 3 sn; yük altında hedef tanımlanmadı
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-013, REQ-012 (BANK-310) | Teknik: checklist (Q-008) | QA-ID: TC-036",Manual,Medium,regression;REQ-013;REQ-012;checklist;positive,,BANK-310,"'Tutar (TL)' alanına 250,00 yaz, 'Devam'a tıkla ve süreyi ölç","250,00",'Dekont' bölümü ≤ 3 sn içinde görünür
+TC-037,Pazar 23:30'da (mesai dışı) transfer gerçekleşir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Tarayıcı saati Pazar 04.10.2026 23:30 (Europe/Istanbul) olarak sabitlenmiş (Playwright page.clock)
+
+Gereksinimler: REQ-014 (BANK-310) | Teknik: equivalence-partitioning | QA-ID: TC-037",Manual,Medium,regression;REQ-014;equivalence-partitioning;positive,,BANK-310,"'Tutar (TL)' alanına 300,00 yaz, 'Devam'a tıkla","300,00",'Transfer başarıyla gerçekleşti.'; mesai saati uyarısı gösterilmez
+TC-038,Kayıtlı alıcı listeden seçilerek transfer yapılır,"Amaç: Varsayım Q-009: kayıtlı alıcı seçimi bu sürümde kapsamda
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+- Test müşterisinin en az bir kayıtlı alıcısı var
+
+Gereksinimler: REQ-015 (BANK-310) | Teknik: use-case (Q-009) | QA-ID: TC-038",Manual,Medium,regression;REQ-015;use-case;positive,,BANK-310,Transfer ekranında kayıtlı alıcı seçim kontrolünü aç,,Kayıtlı alıcılar listelenir
+TC-038,,,,,,,,Bir kayıtlı alıcı seç,,'Alıcı IBAN' ve 'Alıcı adı' otomatik dolar
+TC-039,'Devam'a çift tıklama tek transfer oluşturur,"Amaç: Çift tıklamanın iki kez para çıkarması riski
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-017 (BANK-310) | Teknik: error-guessing (fintech idempotency) | QA-ID: TC-039",Manual,High,regression;REQ-017;error-guessing;negative,,BANK-310,"'Tutar (TL)' alanına 700,00 yaz, 'Devam'a çift tıkla","700,00",'Transfer başarıyla gerçekleşti.'; en fazla bir transfer gerçekleşir
+TC-039,,,,,,,,Bakiye ve kalan limiti incele,,"Bakiye 119.300,00 TL; 'Günlük kalan limit' 99.300,00 TL (tek düşüş)"
+TC-040,"'1.000,50' biçimli tutar doğru ayrıştırılır","Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-019 (BANK-310) | Teknik: equivalence-partitioning | QA-ID: TC-040",Manual,High,regression;REQ-019;equivalence-partitioning;positive,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","1.000,50","'Transfer başarıyla gerçekleşti.'; dekontta Tutar 1.000,50 TL, Toplam 1.000,50 TL"
+TC-040,,,,,,,,Bakiyeyi incele,,"Bakiye 118.999,50 TL"
+TC-041,Sayısal olmayan tutar reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-019 (BANK-310) | Teknik: equivalence-partitioning (DS-001 C-13) | QA-ID: TC-041",Manual,Medium,regression;REQ-019;equivalence-partitioning;negative,,BANK-310,"'Tutar (TL)' alanına metin yaz, 'Devam'a tıkla",abc,"Tutar hatası mesajı; dekont gösterilmez; bakiye 120.000,00 TL"
+TC-042,İkiden fazla ondalık basamaklı tutar reddedilir,"Amaç: Varsayım Q-012: '1,005' yuvarlanmaz, reddedilir
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-019 (BANK-310) | Teknik: error-guessing (Q-012) | QA-ID: TC-042",Manual,Medium,regression;REQ-019;error-guessing;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","1,005","Tutar biçimi hatası mesajı; dekont gösterilmez; bakiye 120.000,00 TL"
+TC-043,Negatif tutar reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-001, REQ-019 (BANK-310) | Teknik: equivalence-partitioning (DS-001 C-14) | QA-ID: TC-043",Manual,Medium,regression;REQ-001;REQ-019;equivalence-partitioning;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla","-100,00","Tutar hatası mesajı (ör. 'Tutar en az 1,00 TL olmalıdır.'); dekont gösterilmez; bakiye 120.000,00 TL"
+TC-044,Boş tutar reddedilir,"Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-019 (BANK-310) | Teknik: equivalence-partitioning (DS-001 C-12) | QA-ID: TC-044",Manual,Low,regression;REQ-019;equivalence-partitioning;negative,,BANK-310,"'Tutar (TL)' alanını boş bırak, 'Devam'a tıkla",,Tutar hatası mesajı; dekont gösterilmez
+TC-045,Nokta ondalık ayırıcılı '100.50' tutarı 10.050 TL olarak işlenmez,"Amaç: Varsayım Q-012: yalnız TR biçimi; '100.50' geçersiz biçim olarak reddedilir. Risk: 100 kat fazla para gönderimi
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-019 (BANK-310) | Teknik: error-guessing (Q-012) | QA-ID: TC-045",Manual,High,regression;REQ-019;error-guessing;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla",100.50,"Tutar biçimi hatası mesajı; 10.050,00 TL veya 100,50 dışında bir tutarla dekont oluşmaz"
+TC-045,,,,,,,,Bakiyeyi incele,,"Bakiye 120.000,00 TL"
+TC-047,"Virgülsüz TR binlik biçimli '15.000' tutarı 15,00 TL olarak gönderilmez","Amaç: TR biçiminde '.' binlik ayırıcıdır; '15.000' 15.000,00 TL demektir. Risk: kullanıcının niyetinden 1000 kat farklı tutar gönderimi
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-019 (BANK-310) | Teknik: error-guessing (Q-012; hata tahmini (binlik/ondalık ayırıcı)) | QA-ID: TC-047",Manual,High,regression;REQ-019;error-guessing;negative,,BANK-310,"'Tutar (TL)' alanına tutarı yaz, 'Devam'a tıkla",15.000,"Ya 15.000,00 TL için SMS doğrulama adımı açılır ya da tutar biçimi hatası gösterilir; 15,00 TL tutarında dekont oluşmaz"
+TC-047,,,,,,,,Bakiyeyi incele,,"Bakiye 119.985,00 TL değildir (15,00 TL gönderilmemiştir)"
+TC-046,"Keşif turu: oturum, yenileme, geri tuşu ve çoklu sekmede FAST transferi","Amaç: 45 dk'lık keşif oturumu: sayfa yenileme ve çoklu sekmede günlük limit/mükerrer kontrolünün atlatılması, Enter tuşuyla gönderim, uzun/HTML açıklama, yavaş ağ
+
+Ön koşullar:
+- 'FAST ile Para Gönder' sayfası yeni oturumda açık (http://localhost:4174)
+- Bakiye 120.000,00 TL, 'Günlük kalan limit' 100.000,00 TL
+- Aksi belirtilmedikçe 'Alıcı IBAN' = TR330006100519786457841326, 'Alıcı adı' = Ayşe Test, 'Açıklama' = Kira
+- Test ortamı SMS kodu 123456
+
+Gereksinimler: REQ-003, REQ-011, REQ-017 (BANK-310) | Teknik: exploratory | QA-ID: TC-046",Manual,Medium,exploratory;REQ-003;REQ-011;REQ-017;negative,,BANK-310,Tüzüğü uygula; bulguları not al,,Oturum notları ve bulgular kayıtlı; limit/mükerrer kontrolünün atlatılabildiği her yol hata olarak açılmış

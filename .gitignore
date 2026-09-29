@@ -3,3 +3,4 @@ __pycache__/
 *-workspace/
 evals/workspace/
 .DS_Store
+dist/

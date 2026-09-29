@@ -1,120 +1,117 @@
 # QA Suite: Yapay zekâ için profesyonel yazılım test skill'leri
 
-Gereksinimden içe aktarılabilir test paketine ve çalışan Playwright otomasyonuna uzanan uçtan uca test sürecini yapay zekâ asistanlarına (Claude Code, claude.ai, Claude API ve Agent Skills standardını destekleyen diğer araçlar) **profesyonel bir test analisti disipliniyle** yaptıran skill paketi. Çıktılar Türkçe ve İngilizce üretilebilir.
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.5.1-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-11%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
-> **Farkı:** Kombinasyonları yapay zekâya tahmin ettirmez. Sınır değerleri, karar tabloları, durum geçişleri ve pairwise setleri **deterministik script'lerle hesaplanır**. Bu script'lerin bulduğu boşluklar ve çelişkiler, netleştirme sorusu olarak geri döner. Gereksinimden Jira'ya ve otomasyon sonucuna kadar **tek bir ID zinciri** (REQ → DS → TC → `@TC` etiketli Playwright testi → sonuç → RTM) korunur.
+**[English README →](README.en.md)**
+
+![QA Suite](docs/assets/qa-suite-card.png)
+
+Yapay zekâ asistanınıza (Claude Code, claude.ai, Claude API ve Agent Skills standardını destekleyen diğer araçlar) **kıdemli bir test analisti gibi çalışmayı** öğreten 11 skill'lik bir paket. Kapsadığı akış:
+
+1. gereksinim analizi
+2. ISTQB tekniklerine dayalı test tasarımı
+3. izlenebilirlik
+4. Xray/Zephyr/Excel'e aktarım
+5. Playwright ve BDD otomasyonu
+6. performans, erişilebilirlik ve güvenlik testleri
+7. hata ve tamamlama raporları
+
+Türkçe ve İngilizce çıktı üretir.
+
+## Neden farklı?
+- **Kombinasyonları tahmin ettirmez, hesaplatır.** Sınır değerler, karar tabloları, durum geçişleri ve pairwise setleri deterministik Python script'leriyle hesaplanır. Script'lerin bulduğu boşluk ve çelişkiler netleştirme sorusu olarak geri döner.
+- **Tek ID zinciri.** Her şey tek bir kimlik zinciriyle birbirine bağlı kalır:
+  `REQ-001` → tasarım kanıtı → `TC-001` → `@TC-001` etiketli Playwright testi → koşum sonucu → izlenebilirlik matrisi → Jira/Xray.
+- **Dürüst raporlama.** Uygulanmamış bir test asla "geçti" sayılmaz. Eksik veri "0" değil "bilinmiyor" olarak raporlanır. Beklenen sonuç, testi geçirmek için asla hatalı davranışa uydurulmaz.
+
+## Kanıt: kör uçtan uca deneme
+Yeni bir bankacılık senaryosu hazırlandı: FAST para transferi. Kullanılan demo uygulamaya, ajana söylenmeden **5 hata** yerleştirildi.
+
+| | Sonuç |
+|---|---|
+| Yerleştirilen hatalar | **5/5 bulundu**, artı yerleştirilmemiş gerçek bir hata |
+| Story'deki belirsizlikler ("hızlı", "uygun mesaj", "belirlenecek") | Hepsi soru olarak raporlandı |
+| Test tasarımı | 47 test; öncelik dağılımı %2 kritik, %34 yüksek |
+| Playwright | 46/46 aday otomatize edildi, sonuç 37 geçti / 9 kaldı. Bağımsız yeniden koşum aynı sonucu verdi. |
+| Yayın kararı | "Hazır değil" (9 çıkış kriterinden 4'ü karşılandı), doğru karar |
+
+Tüm gerçek çıktılar: **[examples/fast-transfer](examples/fast-transfer/README.md)**
 
 ## Skill'ler
+| Skill | Ne yapar |
+|---|---|
+| `qa-orchestrator` | Uçtan uca akışı, aşamaları ve kapıları yönetir |
+| `planning-tests` | ISO 29119-3 test planı yazar; ölçülebilir çıkış kriterleri ve efor aralığı içerir |
+| `analyzing-requirements` | ISO 29148 kalite incelemesi, TR/EN belirsizlik taraması, eksik gereksinim ve NFR keşfi (ISO 25010), risk puanlama ve soru listesi |
+| `designing-test-cases` | EP/BVA, karar tablosu, durum geçişi ve pairwise script'leri; risk bazlı test case'ler; TCKN/IBAN test verisi kontrolü |
+| `testing-nonfunctional` | Eşikleri gereksinimden gelen k6 yük testi; WCAG 2.2 A/AA (55 kriter); OWASP ASVS 5.0 |
+| `tracing-requirements` | İzlenebilirlik matrisi, kapsam boşlukları, öncelik şişmesi ve gereksiz tekrar kontrolleri, değişiklik etkisi |
+| `exporting-test-cases` | Xray, Zephyr Scale, Excel, CSV ve Markdown'a aktarım |
+| `automating-with-playwright` | Proje iskeleti, `@TC` etiketli spec'ler; sonuçları izlenebilirlik matrisine geri besler |
+| `writing-bdd-scenarios` | TR/EN Gherkin; playwright-bdd ile koşum |
+| `reporting-test-results` | Hata raporları; çıkış kriterlerini otomatik değerlendiren tamamlama raporu |
+| `reviewing-test-cases` | Excel/TestRail CSV içe aktarımı ve test kalitesi denetimi |
 
-| Skill | Ne yapar | Script |
-|---|---|---|
-| `qa-orchestrator` | Uçtan uca akışı yönetir: aşamalar, kapılar, final özeti | – |
-| `planning-tests` | ISO 29119-3 yapısında, riske dayalı test planı yazar. Ölçülebilir giriş/çıkış kriterleri (`exit-criteria.json`), ortam ve veri ihtiyaçları ile efor aralığı içerir. | `plan_facts.py` |
-| `analyzing-requirements` | Gereksinimleri atomik ve izlenebilir hale getirir. ISO 29148 kalite incelemesi, belirsizlik ve çelişki taraması, örtük ve fonksiyonel olmayan gereksinim keşfi (ISO 25010:2023), risk puanlama ve netleştirme soruları üretir. | `lint_requirements.py` (TR/EN belirsizlik linter'ı) |
-| `designing-test-cases` | ISTQB tekniklerini kullanarak risk bazlı test tasarımı yapar ve standart formatta manuel test case'ler yazar. | `ep_bva.py`, `decision_table.py`, `state_transition.py`, `pairwise.py` |
-| `testing-nonfunctional` | Fonksiyonel olmayan testleri gereksinime bağlı olarak tasarlar: performans (eşikleri gereksinimden gelen k6 script'leri; smoke, load, stress, spike ve soak profilleri), erişilebilirlik (WCAG 2.2 A/AA'nın 55 kriteri) ve güvenlik (OWASP ASVS 5.0 bölümleri). Taslaklar TR/EN üretilir. | `generate_k6.py`, `nfr_checklist.py` |
-| `tracing-requirements` | Çift yönlü izlenebilirlik matrisi (RTM) üretir. Şema doğrulaması, risk sıralı kapsam boşlukları, sahipsiz ve kopya testler ile değişiklik etki analizi yapar. | `build_rtm.py` |
-| `exporting-test-cases` | Xray, Zephyr Scale, Excel (.xlsx), CSV ve Markdown formatlarına export eder. Türkçe karakterleri güvenli şekilde kodlar. | `export_tests.py` |
-| `automating-with-playwright` | Test case'leri Playwright (TypeScript) otomasyonuna dönüştürür. Proje iskeleti, Page Object ve fixture'lar, `@TC` etiketli spec'ler üretir ve koşum sonuçlarını RTM'ye geri besler. Xray'e sonuç aktarımını da destekler. | `scaffold_project.py`, `generate_specs.py`, `check_automation.py`, `pw_results.py` |
-| `writing-bdd-scenarios` | Test case'lerden TR/EN Gherkin `.feature` dosyaları üretir, bunları bildirimsel dile çevirir ve playwright-bdd ile koşturur. | `generate_features.py` |
-| `reporting-test-results` | ISTQB alanlarına uygun hata raporları yazar. Test durum ve tamamlama raporlarında çıkış kriterlerini otomatik değerlendirir (karşılandı / karşılanmadı / bilinmiyor) ve kalan riskleri risk sırasıyla listeler. | `completion_report.py` |
-| `reviewing-test-cases` | Mevcut test setlerini (Excel, TestRail, Xray, Zephyr CSV) içe aktarır ve deterministik kontroller ile bir değerlendirme rubriğine göre denetler. | `import_tests.py`, `review_tests.py` |
-
-Tüm script'ler **yalnızca Python standart kütüphanesini** kullanır (Python 3.9+). Ek kurulum gerekmez. Otomasyonu koşturmak için ayrıca Node.js 18+ ve `@playwright/test` gerekir. BDD için `playwright-bdd` de gerekir.
-
-Gereksinimler ve test case'ler elle JSON olarak yazılmaz. Kompakt bir metin formatında (`*.src.md`) yazılır, `qa_compact.py` bunu doğrulayıp JSON'a çevirir. JSON'a göre yaklaşık %35–60 daha kısa, bozuk JSON riski yok, ortak ön koşullar `setup` bloklarıyla bir kez tanımlanıyor.
+Ek olarak **sektör paketleri** var: fintech/bankacılık, e-ticaret, sağlık ve kamu. Her birinde mevzuat kontrol listesi, sık unutulan gereksinimler, yüksek riskli kurallar ve sentetik test verisi bulunur.
 
 ## Kurulum
-
-**Claude Code (plugin olarak):**
+**Claude Code (önerilen):**
 ```bash
 claude plugin marketplace add alinurettin/testskills
 claude plugin install qa-suite@qa-suite-marketplace
 ```
 
-**Claude Code (tek tek skill olarak):** `skills/<skill-adı>` klasörlerini `~/.claude/skills/` (kişisel) veya projedeki `.claude/skills/` klasörüne kopyalayın.
+**claude.ai / Claude API:** [Releases](https://github.com/alinurettin/testskills/releases) sayfasından skill zip'lerini indirip **Settings → Skills** bölümünden yükleyin. Skill'ler birbirine görev devrettiği için 11'ini birlikte yüklemeniz önerilir.
 
-**claude.ai / Claude API:** Her skill klasörünü zip'leyip Skills bölümünden yükleyin. Frontmatter yalnızca taşınabilir alanlar içerdiği için olduğu gibi kabul edilir.
+**Diğer araçlar (Codex, Copilot, Cursor, Gemini CLI…):** Paket açık Agent Skills standardına uyar. `skills/` altındaki klasörleri aracın skills klasörüne kopyalayın.
 
-**Diğer araçlar (Codex, Copilot, Cursor, Gemini CLI…):** Paket açık Agent Skills standardına (SKILL.md) uyar. Aracın skills klasörüne kopyalamanız yeterlidir.
+**Gereksinimler:**
+- Python 3.9+ (script'ler yalnızca standart kütüphaneyi kullanır)
+- Otomasyon için Node.js 18+ ve `@playwright/test`
 
-## Kullanım örnekleri
-
+## Hızlı başlangıç
 ```
-Bu user story'yi analiz et, eksik gereksinimleri ve soruları çıkar: <story>
-Ekteki SRS için tüm test case'leri çıkar, Xray'e aktarılacak CSV hazırla.
+Bu user story için baştan sona test analizi yap ve Xray'e aktarılacak CSV'yi hazırla: <story>
 Kredi başvuru formu için sınır değer ve karar tablosu testlerini tasarla.
-Test kapsamımızı çıkar: hangi gereksinimler test edilmiyor?
-REQ-004 değişti, hangi testleri yeniden koşmalıyız?
-Smoke testlerini Playwright ile otomatize et ve sonuçları RTM'ye bağla.
-Bu test case'lerden Türkçe Gherkin senaryoları yaz.
+qa/test-cases.json'daki smoke testleri Playwright ile otomatize et, sonuçları RTM'ye bağla.
+Ekibin Excel'deki test case'lerini incele, eksik ve hatalı olanları bul.
+Sprint sonu test tamamlama raporu hazırla: çıkış kriterleri sağlandı mı?
 ```
+Çıktılar projenizde `qa/` klasörüne yazılır: gereksinimler, sorular, tasarım kanıtları, test case'ler, izlenebilirlik matrisi, export dosyaları ve raporlar. Otomasyon `automation/` klasörüne yazılır.
 
-Üretilen dosyalar projede `qa/` klasörüne yazılır:
-
+## Nasıl çalışır
+```mermaid
+flowchart LR
+  A[Story / SRS / Excel] --> B[Gereksinim analizi<br/>sorular, risk]
+  B --> C[Test tasarımı<br/>BVA, karar tablosu,<br/>durum, pairwise]
+  C --> D[İzlenebilirlik matrisi]
+  C --> E[Xray / Zephyr / Excel]
+  C --> F[Playwright / BDD]
+  F -->|sonuçlar| D
+  D --> G[Tamamlama raporu<br/>çıkış kriterleri]
 ```
-qa/requirements.json   qa/analysis-report.md   qa/clarifications.md
-qa/design/DS-*.json|md qa/test-cases.json      qa/rtm.md|csv   qa/exports/*
-qa/results.json        qa/automation-coverage.md
-automation/            (Playwright projesi: playwright.config.ts, pages/, tests/*.spec.ts)
-features/              (Gherkin, isteğe bağlı)
-```
-
-Otomasyon döngüsü:
-```
-test-cases.json ─generate_specs.py→ tests/*.spec.ts (@TC-001, test.fixme iskelet)
-   → uygulanır → npx playwright test → results.json ─pw_results.py→ qa/results.json ─build_rtm.py→ RTM
-```
-İskeletler `test.fixme` ile işaretlidir. Uygulanmamış bir test hiçbir zaman "passed" olarak raporlanmaz.
 
 ## Standart temeli
-
 - **Test tasarımı:** ISTQB CTFL v4.0 ve CTAL-TA v4.0, ISO/IEC/IEEE 29119-3/-4
-- **Gereksinim mühendisliği:** ISO/IEC/IEEE 29148:2018, INCOSE yazım kuralları, EARS, INVEST, Gherkin (TR anahtar kelimeleri dahil)
-- **Kalite modeli:** ISO/IEC 25010:2023 (9 karakteristik)
-- **Erişilebilirlik:** WCAG 2.2 AA
-- **Güvenlik:** OWASP ASVS 5.0, OWASP Top 10:2025, API Security Top 10, LLM Top 10
+- **Gereksinim ve kalite:** ISO/IEC/IEEE 29148, EARS, INVEST, ISO/IEC 25010:2023
+- **Erişilebilirlik ve güvenlik:** WCAG 2.2 AA, OWASP ASVS 5.0, OWASP Top 10:2025
 
-Standart metinleri kopyalanmamıştır. İçerikler uygulanabilir kontrol listeleri halinde yeniden ifade edilmiştir.
+Standart metinleri kopyalanmadı; içerikler uygulanabilir kontrol listelerine dönüştürüldü.
 
-## Geliştirme
+## Bilinen sınırlar
+- **Gerçek araçlarda denenmedi:** Xray/Zephyr içe aktarımı ve Xray sonuç reporter'ı gerçek bir Jira ortamında denenmedi. Resmi dokümantasyona göre hazırlandı; önce 2–3 testlik deneme importu yapın.
+- **k6:** Script'ler üretilip sözdizimi kontrolünden geçirildi, ama gerçek bir yük testi koşturulmadı.
+- **Otomatik devreye girme:** Skill'lerin otomatik devreye girmesi yalnızca vekil bir yöntemle ölçüldü (62/62).
+- **Sektör paketleri** kontrol listesidir, hukuki tavsiye değildir. Mevzuatın güncel hâlini uyum ekibinizle teyit edin.
 
+## Geliştirme ve katkı
 ```bash
-python tools/sync_shared.py          # shared/data-model.md dosyasını skill'lere kopyalar
-python tools/validate_skills.py      # Agent Skills spesifikasyonu + paket kuralları
+python tools/sync_shared.py          # shared/ dosyalarını skill'lere dağıtır
+python tools/validate_skills.py      # Agent Skills spesifikasyonu ve paket kuralları
 python -m unittest discover -s tests # script regresyon testleri
+python tools/package_skills.py       # claude.ai için zip'ler (dist/)
 ```
-
-Ortak veri modeli yalnızca `shared/data-model.md` dosyasında düzenlenir. Skill'lerdeki kopyalar `sync_shared.py` ile güncellenir.
-
-Skill kalite değerlendirmeleri (evals) `evals/` klasöründedir.
-
-## Sürüm notları
-
-Ayrıntılar için [CHANGELOG.md](CHANGELOG.md). Güncel sürüm: **0.5.0**.
-
-## Yol haritası
-
-- **Faz 1 (tamam):** Gereksinim analizi, test tasarımı, RTM, Xray/Zephyr/Excel export, evals
-- **Faz 2 (tamam, 0.3.0):** Playwright (TypeScript) otomasyonu ve BDD/Gherkin (TR/EN). Aynı TC ID'leri korunuyor, sonuçlar RTM'ye aktarılıyor.
-- **Faz 3 (tamam, 0.4.0):** Test planı, fonksiyonel olmayan testler (k6, WCAG 2.2, ASVS 5.0), hata ve tamamlama raporları, test case incelemesi
-- **Faz 4 (0.5.0):** Sektör paketleri (fintech, e-ticaret, sağlık, kamu), kimlik verisi doğrulayıcı, tetiklenme ölçüm aracı, depo CI'ı
-- **Sonraki adım:** Giriş yapılmış CLI ile gerçek tetiklenme ölçümü ve gerçek projelerden gelecek geri bildirimle iyileştirme.
+Issue ve pull request'ler açıktır. Değişiklik geçmişi için: [CHANGELOG.md](CHANGELOG.md).
 
 ## Lisans
-
-MIT. Frontmatter'daki `license` alanı; ihtiyaca göre değiştirilebilir.
-
----
-
-### English summary
-
-QA Suite is a bilingual (TR/EN) set of Agent Skills. It turns requirements into a professional, traceable test package:
-- requirement quality analysis with clarification questions
-- risk-based test design, where EP/BVA, decision tables, state transitions and pairwise are computed by standard-library Python scripts
-- an RTM with a gap report
-- import-ready exports for Xray, Zephyr Scale and Excel
-- Playwright (TypeScript) and BDD automation. Every automated test keeps its `@TC-###` tag, and the results flow back into the RTM.
-- Test planning with machine-checkable exit criteria, non-functional testing (k6 thresholds from requirements, WCAG 2.2 A/AA, OWASP ASVS 5.0), defect and completion reports, and review of existing suites imported from CSV.
-
-Install it as a Claude Code plugin (`claude plugin marketplace add <path-or-repo>`), or copy the `skills/*` folders into any client that supports Agent Skills.
+[MIT](LICENSE) © 2026 Ali Nurettin Demir
