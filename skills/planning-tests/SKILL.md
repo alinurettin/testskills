@@ -1,6 +1,6 @@
 ---
 name: planning-tests
-description: Writes a concrete, risk-based test plan in the ISO/IEC/IEEE 29119-3 structure for a release or feature. It covers scope, risk register, approach per level and type, measurable entry, exit and suspension criteria (machine-checkable exit-criteria.json), environments and test data, schedule with a transparent effort estimate, roles and deliverables. Its numbers are computed from the QA Suite artifacts, not guessed. Use this whenever someone asks for a test plan, test strategy, test approach, exit or entry criteria, test estimation, or "how will we test this release", including Turkish requests such as "test planı hazırla", "test stratejisi", "çıkış kriterleri", "test eforu tahmini", "yayın test planı".
+description: Writes a risk-based test plan for a release or feature (ISO/IEC/IEEE 29119-3) with scope, risk register, approach, measurable entry/exit criteria, environments, schedule and an effort estimate computed from QA Suite artifacts. Use when testing must be planned or estimated. Triggers include test plan, test strategy, entry and exit criteria, test estimation; Turkish "test planı hazırla", "test stratejisi", "test eforu tahmini".
 license: MIT
 metadata:
   suite: qa-suite

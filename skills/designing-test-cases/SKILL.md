@@ -1,6 +1,6 @@
 ---
 name: designing-test-cases
-description: Designs professional manual test cases from requirements using ISTQB/ISO 29119-4 techniques. Equivalence partitioning, boundary value analysis (2/3-value), decision tables, state transitions (0/1-switch plus invalid transitions) and pairwise combinations are computed by deterministic scripts, then complemented by use-case, CRUD, error-guessing and exploratory techniques. Test depth and per-test priority are risk-calibrated, and the output is traceable test-cases.json with stable IDs. Use this whenever someone asks for test cases, test scenarios, test conditions, negative or boundary tests, a regression suite, or wants to know "what should we test" for a feature, story, form, API or workflow. Also use it for Turkish requests such as "test case yaz", "test senaryosu çıkar", "sınır değer analizi", "karar tablosu", "negatif testler", "regresyon seti hazırla", even when no technique is named.
+description: Designs risk-based manual test cases from requirements with ISTQB techniques; boundaries, partitions, decision tables, state transitions and pairwise sets are computed by scripts, with stable TC IDs. Use when someone needs test cases or asks what to test. Triggers include write test cases, test scenarios, boundary value analysis, decision table, negative tests; Turkish "test case yaz", "test senaryosu çıkar", "sınır değer analizi".
 license: MIT
 metadata:
   suite: qa-suite
@@ -129,6 +129,7 @@ tags: regression | auto: yes, veri güdümlü | status: ready
 The essentials, with details in `references/test-case-standard.md`:
 - **One step, one action, one observable expected result.** Use concrete data and verbatim messages. Never write "works correctly".
 - **Valid values may share a test. Invalid values never do** (single fault).
+- **Turkish IDs (TCKN, VKN, IBAN):** take valid values from the generator (`python scripts/check_ids.py tckn --generate 2 --seed 1`) and invalid ones from `--variants`. Checksum-valid values may belong to real people, so they are for test environments only, never for production or shared systems. Never copy IDs from the internet.
 - Link every test to its requirements (`req:`), set the technique (`tech:`) and the design reference (`ref: DS-001 C-07`).
 - Cover functional rules with both **positive and negative** tests.
 - **Rate the priority of each test, not of the requirement.** Start one level below the requirement's risk. Only the happy-path proof and the prevention of the most damaging failure get the requirement's level. Boundary neighbours, extra representatives and message checks go lower. Error-guessing and exploratory tests are at most high.
@@ -166,7 +167,8 @@ Tell the user:
 - `scripts/decision_table.py`: expansion, gaps, conflicts, dead rules, collapsing.
 - `scripts/state_transition.py`: state table, model defects, 0/1-switch sequences, invalid transitions.
 - `scripts/pairwise.py`: t-wise covering array with constraints and verification.
-- `scripts/check_ids.py`: validates TCKN/VKN/IBAN test data and derives single-fault invalid variants (it never generates new valid IDs).
+- `scripts/check_ids.py`: validates TCKN/VKN/IBAN test data, derives single-fault invalid variants, and generates seeded synthetic valid IDs (`--generate`; test environments only).
+- `scripts/tr_ids.py`: the suite's single TCKN/VKN/IBAN implementation used by `check_ids.py`.
 - `assets/spec-examples/`: one example spec per script.
 - `references/technique-selection.md`: which technique to use when, risk-based depth, test budget.
 - `references/techniques.md`: procedures, coverage measures and pitfalls for each technique.

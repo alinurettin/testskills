@@ -25,4 +25,4 @@ Ajana verilen girdiler şunlardı:
 | Hata raporları | [qa/defect-reports.md](qa/defect-reports.md) |
 | Tamamlama raporu | [qa/completion-report.md](qa/completion-report.md) |
 
-Denemeyi kendiniz tekrar koşmak için [evals/trial-fast](../../evals/trial-fast/ANSWER-KEY.md) klasörüne bakın. Uygulamayı ajana cevap anahtarını göstermeden verin.
+Denemeyi kendiniz tekrar koşmak için [evals/trial-fast](../../evals/trial-fast/) klasörüne ve kör deneme kurallarına ([evals/README.md](../../evals/README.md)) bakın. Ajana yalnızca story'yi ve çalışan uygulamanın adresini verin; uygulama kodunu ve cevap anahtarını ([evals/keys/fast.md](../../evals/keys/fast.md)) göstermeyin.

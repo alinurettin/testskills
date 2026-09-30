@@ -1,0 +1,50 @@
+name: Sektör paketi isteği / Domain pack request
+description: Yeni bir sektör için mevzuat ve kontrol listesi önerin. / Propose regulations and checklists for a new industry.
+title: "[domain] "
+labels: ["domain-pack"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Mevcut paketler / Existing packs: fintech/bankacılık, e-ticaret, sağlık, kamu, sigorta/emeklilik, telekom.
+        Paketler kontrol listesidir, hukuki tavsiye değildir. / Packs are checklists, not legal advice.
+  - type: input
+    id: domain
+    attributes:
+      label: Sektör / Industry
+      placeholder: "Enerji, lojistik, eğitim... / Energy, logistics, education..."
+    validations:
+      required: true
+  - type: textarea
+    id: regulations
+    attributes:
+      label: Mevzuat ve standartlar / Regulations and standards
+      description: Ülke ve kaynaklarıyla birlikte; mümkünse resmi bağlantı verin. / With country and sources; official links where possible.
+    validations:
+      required: true
+  - type: textarea
+    id: forgotten
+    attributes:
+      label: Sık unutulan gereksinimler / Requirements people often forget
+    validations:
+      required: true
+  - type: textarea
+    id: high-risk
+    attributes:
+      label: Yüksek riskli kurallar / High-risk rules
+      description: Hangi kurallar hata verirse para, veri ya da mevzuat açısından ciddi sonuç doğurur? / Which rules cause serious money, data or regulatory damage when they fail?
+  - type: textarea
+    id: test-data
+    attributes:
+      label: Test verisi ihtiyaçları / Test data needs
+      description: Kimlik numaraları, kodlar, formatlar (yalnızca sentetik örnekler). / Identifiers, codes, formats (synthetic examples only).
+  - type: textarea
+    id: defects
+    attributes:
+      label: Tipik hatalar / Typical defects
+  - type: checkboxes
+    id: review
+    attributes:
+      label: Katkı / Contribution
+      options:
+        - label: Taslak paketi gözden geçirmeye gönüllüyüm. / I volunteer to review a draft pack.

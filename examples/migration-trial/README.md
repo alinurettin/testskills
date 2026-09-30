@@ -1,6 +1,6 @@
 # Örnek: kör veri taşıma denemesi (müşteri verisi, eski sistem → yeni CRM)
 
-`testing-data-migrations` skill'iyle yapılan kör denemenin **gerçek çıktıları**. Ajana yalnızca kaynak ve hedef extract'lar (`legacy_customers.csv` cp1254, `new_customers.csv` UTF-8) ile mapping dokümanı verildi. Doğru mapping ve cevap anahtarı ([evals/trial-migration/ANSWER-KEY.md](../../evals/trial-migration/ANSWER-KEY.md)) gösterilmedi.
+`testing-data-migrations` skill'iyle yapılan kör denemenin **gerçek çıktıları**. Ajana yalnızca kaynak ve hedef extract'lar (`legacy_customers.csv` cp1254, `new_customers.csv` UTF-8) ile mapping dokümanı verildi. Doğru mapping ve cevap anahtarı ([evals/keys/migration.md](../../evals/keys/migration.md)) gösterilmedi.
 
 | | Sonuç |
 |---|---|

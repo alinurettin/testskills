@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="TestSuite" time="3.018" tests="7" errors="0" skipped="1" failures="1">
+  <properties>
+    <property name="java.specification.version" value="17"/>
+    <property name="surefire.test.class.path" value="/home/ci/builds/shop/target/test-classes"/>
+  </properties>
+  <testcase name="tc151_addToCart" classname="com.example.shop.CartTest" time="0.611"/>
+  <!-- one @DataProvider method, three invocations: one of them fails -->
+  <testcase name="tc152_couponBoundary" classname="com.example.shop.CouponTest" time="0.105"/>
+  <testcase name="tc152_couponBoundary" classname="com.example.shop.CouponTest" time="0.098">
+    <failure message="expected [90.0] but found [100.0]" type="java.lang.AssertionError"><![CDATA[java.lang.AssertionError: expected [90.0] but found [100.0]
+	at org.testng.Assert.fail(Assert.java:111)
+	at com.example.shop.CouponTest.tc152_couponBoundary(CouponTest.java:58)
+]]></failure>
+  </testcase>
+  <testcase name="tc152_couponBoundary" classname="com.example.shop.CouponTest" time="0.101"/>
+  <testcase name="tc153_expiredCouponIsRejected" classname="com.example.shop.CouponTest" time="0">
+    <skipped message="depends on not successfully finished methods"/>
+  </testcase>
+  <testcase name="TC154_guestCheckout" classname="com.example.shop.CheckoutTest" time="1.2"/>
+  <!-- no ID in the method name: the class carries it -->
+  <testcase name="validatesIban" classname="com.example.shop.TC155PaymentTest" time="0.3"/>
+</testsuite>

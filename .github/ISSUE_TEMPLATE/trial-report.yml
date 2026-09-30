@@ -1,0 +1,95 @@
+name: Deneme raporu / Trial report
+description: Bir skill'i gerçek bir işte ya da kör denemede kullandınız; sonucu paylaşın. / You used a skill on real work or in a blind trial; share the result.
+title: "[trial] "
+labels: ["trial-report"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Başarısız sonuçlar da en az başarılılar kadar değerlidir. / Failed results are as valuable as successful ones.
+        Kör deneme kuralları / Blind trial rules: [evals/README.md](https://github.com/alinurettin/testskills/blob/main/evals/README.md)
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      multiple: true
+      options:
+        - qa-orchestrator
+        - planning-tests
+        - analyzing-requirements
+        - designing-test-cases
+        - testing-nonfunctional
+        - tracing-requirements
+        - exporting-test-cases
+        - automating-with-playwright
+        - writing-bdd-scenarios
+        - reporting-test-results
+        - reviewing-test-cases
+        - testing-apis
+        - running-exploratory-tests
+        - testing-ai-features
+        - preparing-test-data
+        - testing-mobile-apps
+        - testing-data-migrations
+    validations:
+      required: true
+  - type: input
+    id: model
+    attributes:
+      label: Model ve istemci / Model and client
+      placeholder: "Claude Opus, Claude Code"
+    validations:
+      required: true
+  - type: input
+    id: suite-version
+    attributes:
+      label: QA Suite sürümü / QA Suite version
+      placeholder: "0.7.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Deneme türü / Kind of trial
+      options:
+        - Depodaki kör deneme (evals/trial-*) / A blind trial from this repo (evals/trial-*)
+        - Kendi kör denemem (yerleştirilmiş hatalar) / My own blind trial (planted defects)
+        - Gerçek iş, kör değil / Real work, not blind
+    validations:
+      required: true
+  - type: textarea
+    id: task
+    attributes:
+      label: Görev / Task
+      description: Ajana ne verildi (dosyalar, istem), ne verilmedi? Kör denemede anahtar, testler ve uygulama kodu gizli tutuldu mu? / What the agent got (files, prompt) and what it did not get. In a blind trial, were the key, the tests and the application code kept away from it?
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Sonuç / Result
+      description: Bulunan ve kaçırılan hatalar, yanlış alarmlar, sorular, karar. Anahtarınız varsa "5/5" gibi sayı verin. / Defects found and missed, false positives, questions raised, the verdict. If you have a key, give counts such as "5/5".
+    validations:
+      required: true
+  - type: input
+    id: cost
+    attributes:
+      label: Süre ve maliyet / Time and cost
+      placeholder: "~12 dk, ~150k token / ~12 min, ~150k tokens"
+  - type: textarea
+    id: outputs
+    attributes:
+      label: Çıktılar / Outputs
+      description: Üretilen dosyalar (qa/ klasörü, raporlar). Sürükleyin ya da bağlantı verin. / The files produced (the qa/ folder, reports). Drag them here or link them.
+  - type: textarea
+    id: gaps
+    attributes:
+      label: Skill'deki eksikler / Gaps in the skill
+      description: İsteğe bağlı. Skill neyi yanlış yaptı ya da neyi atladı? / Optional. What did the skill get wrong or miss?
+  - type: checkboxes
+    id: data
+    attributes:
+      label: Veri / Data
+      options:
+        - label: Paylaştığım girdi ve çıktılar sentetik ya da anonimleştirilmiş. / The inputs and outputs I shared are synthetic or anonymised.
+          required: true

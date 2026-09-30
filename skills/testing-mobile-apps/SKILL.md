@@ -1,6 +1,6 @@
 ---
 name: testing-mobile-apps
-description: Tests native, hybrid and cross-platform iOS and Android apps (and mobile web) professionally. It drafts traceable mobile test cases for lifecycle, upgrade with data migration, process death, interruptions, offline and lost responses, permissions (Allow Once, Only this time, ATT), push, deep links, biometrics, payments, Turkish localisation, accessibility (TalkBack, VoiceOver, WCAG 2.2) and performance, plus OWASP MASVS v2 security and store-readiness checks. It builds a data-driven device coverage matrix and maps Maestro, Espresso, XCUITest or Appium results back by TC ID. Use this whenever someone wants to test a mobile app, plan devices and OS versions, choose a mobile automation tool, prepare an App Store or Google Play release, or test push, deep links, in-app purchases or app permissions, including Turkish requests such as "mobil uygulama testi", "iOS ve Android testi", "cihaz matrisi", "mobil test senaryoları", "uygulama mağazasına çıkmadan önce test".
+description: Tests native and hybrid iOS/Android apps. Drafts test cases for lifecycle, upgrades, offline, permissions, push, deep links, payments, OWASP MASVS and mobile accessibility (TalkBack/VoiceOver), builds a device matrix and maps Maestro/Appium/Espresso/XCUITest results by TC ID. Use for mobile apps and store releases. Triggers include mobile testing, device matrix, App Store or Google Play release; Turkish "mobil uygulama testi", "iOS ve Android testi", "cihaz matrisi".
 license: MIT
 metadata:
   suite: qa-suite
@@ -8,6 +8,8 @@ metadata:
 ---
 
 # Testing mobile apps
+
+**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
 
 Mobile apps fail in ways web apps do not: the system kills them in the background, the network drops mid-payment, users deny permissions, the OS changes every year, and a store review stands between a fix and the users. This skill turns those risks into **traceable test cases** (generated, then adapted to the app), a **device matrix based on real usage data**, and an **automation choice** that fits the team, with results mapped back by TC ID.
 
@@ -31,7 +33,7 @@ Match the user's language (`--lang tr|en`). Platform terms, commands, API names 
 ```
 - [ ] 1. Scope: app type, platforms, capabilities, minimum OS, risks (→ questions)
 - [ ] 2. Device and OS coverage matrix from analytics
-- [ ] 3. Generate mobile test cases (compact) and adapt them to the app
+- [ ] 3. Map capabilities to requirements (one REQ for everything hides gaps); generate mobile test cases (compact) and adapt them
 - [ ] 4. Choose automation per layer; write flows with TC IDs
 - [ ] 5. Execute on the matrix; triage per device and OS
 - [ ] 6. Store readiness, results → qa/results.json → RTM
@@ -44,7 +46,7 @@ Establish, and record open points as questions:
 - the capabilities (`python scripts/mobile_checklist.py --list-capabilities`);
 - the risky flows: payments, sign-in, data sync, anything that must not duplicate or get lost.
 
-If requirements exist (`qa/requirements.json`), link the mobile tests to the requirement for the feature, or to a dedicated one such as "Mobile platform quality (iOS/Android)". If not, create it with the analyzing-requirements skill.
+Link the mobile tests to requirements (`qa/requirements.json`; if it does not exist, create them with the analyzing-requirements skill): the feature requirements for the capabilities, and a dedicated one such as "Mobile platform quality (iOS/Android)" for the core set. Step 3 maps them capability by capability.
 
 ### 2. Device matrix
 ```bash
@@ -58,9 +60,14 @@ python scripts/mobile_checklist.py --platform both --devices qa/devices.json --t
 The selection is deterministic greedy, explained in the output. It lists what stays outside the matrix (the breadth tier: emulators, simulators, device cloud) and warns when the listed data cannot reach the target. Plan three tiers: emulators/simulators in CI for breadth, **real devices for release**, and a device cloud plus staged rollout for the long tail.
 
 ### 3. Generate the mobile test cases
+**Map capabilities to requirements first; one REQ for everything hides gaps.** A single `--req` hangs 30–80 checks off one REQ: coverage looks 100% and the RTM cannot report a thin or negative-free requirement. Put a `capabilities` section into `qa/req-map.json`:
+```json
+{"default": "REQ-030", "capabilities": {"core": "REQ-030", "push": "REQ-031", "payments": ["REQ-032", "REQ-033"]}}
+```
+Keys are capability names, `core` (the always-on set), or a check `id` from `assets/mobile-checks.json` for a finer link. Precedence: check id > capability (the union when a check belongs to several selected capabilities) > `default` > `--req`. A check without a requirement stops the script (exit 2) with the unmapped capabilities; `--req` still works as the fallback.
 ```bash
 python scripts/mobile_checklist.py --platform both --capabilities push,payments,deeplinks,auth,offline \
-    --req REQ-030 --tests qa/test-cases.json --lang tr --out qa/design/mobile.src.md
+    --req-map qa/req-map.json --tests qa/test-cases.json --lang tr --out qa/design/mobile.src.md
 ```
 - **Always generated (core set):** fresh install; upgrade from the previous version with data migration; reinstall (Android backup, iOS Keychain leftovers); cold start budget; background and foreground; process death (Android `am kill`, iOS termination); low memory; rotation; multi-window and foldables; interruptions; offline; connection lost mid-transaction (idempotency); slow network; captive portal; TLS and proxy; largest font scale; screen reader; touch targets and contrast; low storage; dark mode; Turkish locale; jank; store privacy disclosures.
 - **Per capability:** permissions (deny, one-time, revoke), camera, location, push, payments (StoreKit sandbox, Play Billing license testers, 3-D Secure, double charge), biometrics, offline-first sync, deep links (App Links and universal-link verification, malicious links), background work, files, Bluetooth, media, auth (storage, logs, sign-out, account deletion), WebView, and tracking (ATT, advertising ID).
@@ -100,8 +107,8 @@ For black-box flows start from `assets/maestro-flow-template.yaml`. **Every auto
 - Then build the RTM with the tracing-requirements skill and write the defect and completion reports with the reporting-test-results skill.
 
 ## Files
-- `scripts/mobile_checklist.py`: mobile test cases in compact format (core set + capabilities, platform variants, TR/EN) and the device coverage matrix from `devices.json` (deterministic greedy with mandatory edges).
-- `scripts/junit_results.py`: JUnit XML (Maestro, Espresso, XCUITest, Appium, Detox) → `qa/results.json` by TC ID, aggregated per device.
+- `scripts/mobile_checklist.py`: mobile test cases in compact format (core set + capabilities, platform variants, TR/EN, REQ links per capability via `--req-map`) and the device coverage matrix from `devices.json` (deterministic greedy with mandatory edges).
+- `scripts/junit_results.py`: JUnit XML (Maestro, Espresso/Gradle, XCUITest via a JUnit converter, Appium, Detox; one or more files, folders or quoted globs) → `qa/results.json` by TC ID, aggregated per device (`--device`). The same converter serves the tracing-requirements skill for non-mobile frameworks.
 - `scripts/qa_compact.py`: compact ⇄ JSON.
 - `assets/mobile-checks.json`: the check catalogue behind the generator (editable: add checks for your domain).
 - `assets/devices-example.json`: device list format with **illustrative, invented** share numbers.

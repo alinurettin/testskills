@@ -1,0 +1,7 @@
+{
+  "_comment": "One qa/req-map.json shared by openapi_tests.py (operations/tags) and reconcile.py (checks); each script ignores the other's section.",
+  "operations": {"createTransfer": "REQ-002", "getTransfer": "REQ-003"},
+  "tags": {"Accounts": "REQ-001"},
+  "checks": {"row_count": "REQ-004", "key_set": "REQ-004", "duplicate_keys": "REQ-004", "total": "REQ-004",
+             "column": "REQ-005", "coverage": "REQ-005"}
+}

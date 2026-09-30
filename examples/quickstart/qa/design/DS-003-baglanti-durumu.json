@@ -1,0 +1,24 @@
+{
+  "id": "DS-003",
+  "title": "Sıfırlama bağlantısının yaşam döngüsü",
+  "language": "tr",
+  "requirement_ids": ["REQ-003", "REQ-004", "REQ-013"],
+  "initial": "Bağlantı yok",
+  "final": ["Kullanıldı", "Süresi doldu", "Geçersiz kılındı"],
+  "transitions": [
+    {"id": "T1", "from": "Bağlantı yok", "event": "sıfırlama iste", "to": "Geçerli", "guard": "son 60 dk'da 3'ten az istek", "action": "sıfırlama e-postası"},
+    {"id": "T2", "from": "Geçerli", "event": "şifreyi kaydet", "to": "Kullanıldı", "guard": "şifre kurallara uyuyor", "action": "şifre değişir; bilgilendirme e-postası; oturumlar kapanır"},
+    {"id": "T3", "from": "Geçerli", "event": "şifreyi kaydet", "to": "Geçerli", "guard": "şifre kurallara uymuyor", "action": "kural mesajı"},
+    {"id": "T4", "from": "Geçerli", "event": "30 dk dolar", "to": "Süresi doldu"},
+    {"id": "T5", "from": "Geçerli", "event": "sıfırlama iste", "to": "Geçersiz kılındı", "guard": "son 60 dk'da 3'ten az istek", "action": "yeni bağlantı gönderilir"}
+  ],
+  "ignore_invalid": [
+    {"state": "Bağlantı yok", "event": "30 dk dolar"},
+    {"state": "Kullanıldı", "event": "sıfırlama iste"},
+    {"state": "Kullanıldı", "event": "30 dk dolar"},
+    {"state": "Süresi doldu", "event": "sıfırlama iste"},
+    {"state": "Süresi doldu", "event": "30 dk dolar"},
+    {"state": "Geçersiz kılındı", "event": "sıfırlama iste"},
+    {"state": "Geçersiz kılındı", "event": "30 dk dolar"}
+  ]
+}

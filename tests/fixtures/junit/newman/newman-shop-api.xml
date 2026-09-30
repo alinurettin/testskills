@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Shop API" tests="6" time="0.915">
+  <testsuite name="Coupons / TC-501 Apply a valid coupon" id="6f1c2d3e-0a4b-4c5d-8e9f-0a1b2c3d4e5f" timestamp="2026-09-28T07:40:12.345Z" tests="2" failures="0" errors="0" time="0.212">
+    <testcase name="Status code is 200" time="0.212" classname="CouponsTc501ApplyAValidCoupon"/>
+    <testcase name="Discount is 15.00" time="0.212" classname="CouponsTc501ApplyAValidCoupon"/>
+  </testsuite>
+  <testsuite name="Coupons / TC-502 Expired coupon is rejected" id="0b9a8c7d-6e5f-4a3b-2c1d-0e9f8a7b6c5d" timestamp="2026-09-28T07:40:12.561Z" tests="2" failures="1" errors="0" time="0.187">
+    <testcase name="Status code is 422" time="0.187" classname="CouponsTc502ExpiredCouponIsRejected">
+      <failure type="AssertionFailure" message="expected response to have status code 422 but got 200"><![CDATA[Failed 1 times.]]><![CDATA[Error message: expected response to have status code 422 but got 200.]]><![CDATA[Stacktrace: AssertionError: expected response to have status code 422 but got 200
+   at Object.eval sandbox-script.js:1:2).]]></failure>
+    </testcase>
+    <testcase name="Error code is COUPON_EXPIRED" time="0.187" classname="CouponsTc502ExpiredCouponIsRejected"/>
+  </testsuite>
+  <testsuite name="Orders / Create order" id="3c4d5e6f-7a8b-4c9d-8e0f-1a2b3c4d5e6f" timestamp="2026-09-28T07:40:12.752Z" tests="2" failures="0" errors="0" time="0.516">
+    <testcase name="TC-503 order is created" time="0.516" classname="OrdersCreateOrder"/>
+    <testcase name="Response time is below 800 ms" time="0.516" classname="OrdersCreateOrder"/>
+  </testsuite>
+</testsuites>

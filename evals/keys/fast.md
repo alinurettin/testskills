@@ -1,8 +1,11 @@
 # Trial: US-310 FAST transfer (end-to-end, black box)
 
-Reusable end-to-end evaluation: give an agent `docs/US-310-fast-transfer.md` and the running
-`demo-app` (`node demo-app/server.js`, http://localhost:4174) and ask it to run the whole QA Suite
-chain. **Do not show this file or the demo-app sources to the agent.**
+Evaluator only. This key lives in `evals/keys/`, outside the trial folder, so that copying the
+trial folder never copies the key. How to run and grade a blind trial: `evals/README.md`.
+
+Reusable end-to-end evaluation: give an agent `evals/trial-fast/docs/US-310-fast-transfer.md` and the
+running demo app (`node evals/trial-fast/demo-app/server.js`, http://localhost:4174) and ask it to run
+the whole QA Suite chain. **Do not show this file or the `demo-app/` sources to the agent.**
 
 ## Planted defects (the suite should find all five)
 | Key | Rule (story AC) | Defect in the demo app |

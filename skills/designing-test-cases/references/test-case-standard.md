@@ -25,7 +25,7 @@ This standard covers the fields and wording of a test case. The fields follow th
 | `polarity` | `positive` or `negative`. |
 | `category`, `technique`, `design_ref` | From the enumerations. `technique` is the primary technique that produced the case. |
 | `preconditions` | The state that must hold **before** step 1: user, role, data, configuration, feature flags. Make each one verifiable. Setup shared by many tests goes into a `setup` block of the compact file (`pre: @name`); do not repeat it in every test. |
-| `test_data` | Concrete values, never "valid data". For generated data, give the rule ("unique email: `qa+<timestamp>@example.com`"). |
+| `test_data` | Concrete values, never "valid data". For generated data, give the rule ("unique email: `qa+<timestamp>@example.com`"). Checksum-valid TCKN/VKN/IBAN values are synthetic output of `check_ids.py --generate` (or the preparing-test-data generator), for test environments only; say so ("TCKN: synthetic, check_ids seed 1"). |
 | `steps` | Numbered actions. **Each step has exactly one action and its own observable expected result.** |
 | `postconditions` | Cleanup, or the state left behind, when it matters for the next tests. |
 | `tags` | `smoke`, `regression`, `sanity`, technique tags, the feature area. |

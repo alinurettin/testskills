@@ -1,0 +1,14 @@
+{
+  "project": "Online Mağaza – Kupon (import kit)",
+  "language": "tr",
+  "version": 1,
+  "_note": "Copy of tests/fixtures/coupon/requirements.json with external_id rewritten to KIT-1..KIT-3, the keys of the first three stories in a fresh Jira project with key KIT. REQ-003 keeps an empty key on purpose (link must NOT appear); REQ-004 and REQ-006 are not used by any exported test.",
+  "requirements": [
+    {"id": "REQ-001", "external_id": "KIT-1", "title": "Kupon ile %10 indirim", "text": "Kayıtlı kullanıcı, sepet tutarı 100 TL ve üzerindeyse geçerli bir kupon kodu ile %10 indirim almalıdır.", "type": "business-rule", "source": "US-12 AC-1", "priority": "high", "status": "ready", "derived": false},
+    {"id": "REQ-002", "external_id": "KIT-2", "title": "Süresi dolmuş kupon reddi", "text": "Süresi dolmuş kupon uygulandığında sistem 'Bu kuponun süresi dolmuştur' mesajını göstermeli ve indirim uygulamamalıdır.", "type": "functional", "source": "US-12 AC-2", "priority": "high", "status": "ready", "derived": false},
+    {"id": "REQ-003", "external_id": "", "title": "Kupon kodu büyük/küçük harf duyarsız", "text": "Kupon kodu büyük/küçük harfe duyarsız doğrulanmalıdır (Türkçe İ/ı dahil).", "type": "functional", "source": "Analiz – örtük gereksinim", "priority": "medium", "status": "clarification-needed", "derived": true},
+    {"id": "REQ-004", "external_id": "", "title": "Kupon doğrulama yanıt süresi", "text": "Kupon doğrulama isteği 200 eşzamanlı kullanıcı altında p95 ≤ 800 ms içinde yanıtlanmalıdır.", "type": "non-functional", "source": "NFR-3", "priority": "medium", "status": "ready", "derived": false},
+    {"id": "REQ-005", "external_id": "KIT-3", "title": "Kupon tek kullanımlık", "text": "Bir kupon aynı kullanıcı tarafından yalnızca bir kez kullanılabilmelidir.", "type": "business-rule", "source": "US-13", "priority": "critical", "status": "ready", "derived": false},
+    {"id": "REQ-006", "title": "Eski kampanya ekranı", "text": "Eski kampanya ekranı kaldırılacak.", "type": "functional", "source": "US-9", "priority": "low", "status": "deferred", "derived": false}
+  ]
+}

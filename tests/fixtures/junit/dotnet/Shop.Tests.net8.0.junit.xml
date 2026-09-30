@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites>
+  <testsuite name="Shop.Tests.dll" tests="6" skipped="1" failures="1" errors="0" time="0.8231" timestamp="2026-09-28T08:20:31" hostname="ci-runner-2" id="0" package="Shop.Tests.dll">
+    <properties />
+    <testcase classname="Shop.Tests.CouponTests" name="TC801_ValidCouponIsApplied" time="0.0412" />
+    <testcase classname="Shop.Tests.CouponTests" name="TC802_MinimumBasket(basket: 99.99, expected: 0)" time="0.0031" />
+    <testcase classname="Shop.Tests.CouponTests" name="TC802_MinimumBasket(basket: 100.00, expected: 10)" time="0.0029">
+      <failure type="failure" message="Assert.Equal() Failure: Values differ&#xD;&#xA;Expected: 10&#xD;&#xA;Actual:   0">   at Shop.Tests.CouponTests.TC802_MinimumBasket(Decimal basket, Decimal expected) in /src/Shop.Tests/CouponTests.cs:line 41</failure>
+    </testcase>
+    <!-- Reqnroll/SpecFlow: "Scenario: TC-803 Guest can pay by card" becomes the method name below -->
+    <testcase classname="Shop.Tests.Features.CheckoutFeature" name="TC803GuestCanPayByCard" time="0.5123" />
+    <testcase classname="Shop.Tests.CouponTests" name="TC804_CouponForGuestUsers" time="0">
+      <skipped />
+    </testcase>
+    <testcase classname="Shop.Tests.HealthTests" name="ApiIsUp" time="0.2636" />
+    <system-out></system-out>
+    <system-err></system-err>
+  </testsuite>
+</testsuites>

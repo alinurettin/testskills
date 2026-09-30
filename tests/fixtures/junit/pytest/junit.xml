@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<testsuites name="pytest tests">
+<testsuite name="pytest" errors="1" failures="1" skipped="2" tests="8" time="1.873" timestamp="2026-09-28T10:02:11.402117+03:00" hostname="ci-runner-3">
+<testcase classname="tests.api.test_coupons" name="test_TC301_valid_coupon_applies" time="0.041" />
+<testcase classname="tests.api.test_coupons" name="test_coupon_boundaries[TC-302-99.99]" time="0.012" />
+<testcase classname="tests.api.test_coupons" name="test_coupon_boundaries[TC-302-100.00]" time="0.011"><failure message="AssertionError: assert Decimal('0.00') == Decimal('10.00')">def test_coupon_boundaries(api, basket, expected):
+&gt;       assert api.apply("YAZ10", basket).discount == expected
+E       AssertionError: assert Decimal('0.00') == Decimal('10.00')
+
+tests/api/test_coupons.py:31: AssertionError</failure></testcase>
+<testcase classname="tests.api.test_coupons" name="test_expired_coupon_is_rejected" time="0.020"><properties><property name="test_id" value="TC-303" /></properties></testcase>
+<testcase classname="tests.api.test_coupons" name="test_stacked_coupons" time="0.001"><properties><property name="tc" value="TC-304" /></properties><skipped type="pytest.xfail" message="SHOP-512: a second coupon is still accepted" /></testcase>
+<testcase classname="tests.api.test_coupons" name="test_TC305_coupon_audit_log" time="0.000"><skipped type="pytest.skip" message="audit service not deployed on staging">tests/api/test_coupons.py:88: audit service not deployed on staging</skipped></testcase>
+<testcase classname="tests.api.test_orders" name="test_TC306_order_total" time="0.003"><error message="failed on setup with &quot;psycopg.OperationalError: connection refused&quot;">@pytest.fixture
+    def db():
+&gt;       return psycopg.connect(DSN)
+E       psycopg.OperationalError: connection refused
+
+tests/conftest.py:12: OperationalError</error></testcase>
+<testcase classname="tests.api.test_health" name="test_health" time="0.002" />
+</testsuite>
+</testsuites>

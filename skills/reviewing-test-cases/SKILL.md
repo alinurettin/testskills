@@ -1,6 +1,6 @@
 ---
 name: reviewing-test-cases
-description: Reviews an existing test-case suite, whether written by the team, by AI, or imported from Excel, TestRail, Xray or Zephyr CSV. An importer maps TR/EN column names and both row layouts into QA Suite format. A deterministic checker flags missing or vague expected results, missing test data, test dependencies, multi-action steps, missing requirement links, weak titles and priority skew. A rubric covers what scripts cannot judge (oracle correctness, technique depth, negative and risk coverage, traceability, executability), and the review ends with prioritised fixes and rewrites. Use this whenever someone asks to review, audit, assess, clean up or improve test cases or a test suite, including Turkish requests such as "test case'leri incele", "test setimizi değerlendir", "Excel'deki testleri kontrol et", "test kalitesi", "bu testler yeterli mi".
+description: Reviews an existing test suite written by people or AI. Imports Excel (.xlsx) or tool CSV exports, flags vague or missing expected results, missing data, multi-action steps and unlinked tests, and applies a rubric for oracles, depth and risk coverage. Use when test cases need a quality audit. Triggers include review test cases, test case quality, Excel test import; Turkish "test case'leri incele", "bu testler yeterli mi".
 license: MIT
 metadata:
   suite: qa-suite
@@ -33,17 +33,20 @@ Write the review in the user's language (TR/EN). The script detects Turkish and 
 
 ### 1. Get the suite into QA Suite format
 - If it is already `qa/test-cases.json`, use it directly.
-- If it is a CSV export (from Excel, save as "CSV UTF-8"):
+- If it is an Excel workbook (`.xlsx`) or a CSV export (TestRail, Xray, Zephyr, Qase, or Excel saved as CSV), import it directly. No conversion is needed for `.xlsx`:
   ```bash
-  python scripts/import_tests.py suite.csv --out qa/test-cases.src.md --lang tr [--delimiter ";"] [--map title=Summary,steps=Action,expected=Result]
+  python scripts/import_tests.py suite.xlsx --list-sheets
+  python scripts/import_tests.py suite.xlsx --out qa/test-cases.src.md --lang tr [--sheet "Test Case'ler" | --sheet 2 | --sheet all] [--map title=Summary,steps=Action,expected=Result]
+  python scripts/import_tests.py suite.csv --out qa/test-cases.src.md --lang tr [--delimiter ";"]
   python scripts/qa_compact.py tc qa/test-cases.src.md --out qa/test-cases.json --lenient
   ```
-  The importer does three things:
-  - It detects the columns by TR/EN name, and detects both layouts: numbered steps in one cell, or one row per step sharing an ID.
-  - It keeps the original ID as a `src-…` tag.
-  - It fills safe defaults: priority mapped, polarity guessed, technique `rb`, and `UNLINKED` when there is no requirement column.
+  The importer does four things:
+  - It finds the header row even below title rows, and detects the columns by TR/EN name (`Adımlar`, `ADIMLAR` and `Adimlar` all match). It detects both layouts: numbered steps in one cell, or one row per step (ID repeated, left empty or merged over the step rows).
+  - It reads the workbook with the standard library: several sheets (by default the first sheet with a test header; `--sheet all` imports every such sheet and tags each test with its sheet name), merged cells, multi-line cells, and dates stored as numbers (written as `2026-03-01`).
+  - It keeps the IDs when they are all unique `TC-###`; otherwise it numbers from `--start` and keeps the original ID as a `src-…` tag.
+  - It fills safe defaults where no column says otherwise: priority mapped, polarity guessed, technique `rb`, status `draft`, and `UNLINKED` when there is no requirement column.
 
-  `--lenient` lets steps without an expected result through, so that the review can report them.
+  `--lenient` lets steps without an expected result through, so that the review can report them. Legacy `.xls` and password-protected workbooks cannot be read: ask the user to save them as `.xlsx`. If the columns are not found, run `--list-sheets` and pass `--map`.
 - If the tests are in another form, such as a document or a pasted table, transcribe them into the compact format first.
 - If requirements exist (a story, SRS or `qa/requirements.json`), get them. Without them, only writing quality can be reviewed. Say so.
 
@@ -78,7 +81,7 @@ Write `qa/review-report.md`: the automated summary plus the rubric sections, fol
 Offer to apply the fixes. Edit `qa/test-cases.src.md`, keeping the IDs, and hand the missing tests to `designing-test-cases`.
 
 ## Files
-- `scripts/import_tests.py`: CSV (Excel, TestRail, Xray, Zephyr exports) → compact format, with TR/EN column aliases and both layouts.
+- `scripts/import_tests.py`: Excel `.xlsx` (read directly, several sheets, merged cells, dates) and CSV (TestRail, Xray, Zephyr, Qase exports) → compact format, with header-row detection, TR/EN column aliases and both layouts.
 - `scripts/review_tests.py`: deterministic writing-quality checks (TR/EN), scores, suite observations. Output is Markdown or JSON.
 - `scripts/qa_compact.py`: compact ⇄ JSON (`--lenient` for imports).
 - `references/review-rubric.md`: judgement dimensions D1–D8, sampling, typical fixes, report structure.

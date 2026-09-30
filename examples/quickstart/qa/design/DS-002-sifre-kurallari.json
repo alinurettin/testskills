@@ -1,0 +1,22 @@
+{
+  "id": "DS-002",
+  "title": "Yeni şifre kabul kuralları",
+  "language": "tr",
+  "requirement_ids": ["REQ-006", "REQ-007", "REQ-008"],
+  "conditions": [
+    {"name": "uzunluk_8_20", "values": ["E", "H"]},
+    {"name": "buyuk_harf", "values": ["E", "H"]},
+    {"name": "kucuk_harf", "values": ["E", "H"]},
+    {"name": "rakam", "values": ["E", "H"]},
+    {"name": "son_3_sifreden", "values": ["E", "H"]}
+  ],
+  "actions": ["sonuc", "mesaj"],
+  "rules": [
+    {"id": "R1", "when": {"uzunluk_8_20": "E", "buyuk_harf": "E", "kucuk_harf": "E", "rakam": "E", "son_3_sifreden": "H"}, "then": {"sonuc": "kaydedilir", "mesaj": "başarı"}},
+    {"id": "R2", "when": {"uzunluk_8_20": "H"}, "then": {"sonuc": "reddedilir", "mesaj": "kural"}},
+    {"id": "R3", "when": {"buyuk_harf": "H"}, "then": {"sonuc": "reddedilir", "mesaj": "kural"}},
+    {"id": "R4", "when": {"kucuk_harf": "H"}, "then": {"sonuc": "reddedilir", "mesaj": "kural"}},
+    {"id": "R5", "when": {"rakam": "H"}, "then": {"sonuc": "reddedilir", "mesaj": "kural"}},
+    {"id": "R6", "when": {"son_3_sifreden": "E"}, "then": {"sonuc": "reddedilir", "mesaj": "son 3 şifre"}}
+  ]
+}

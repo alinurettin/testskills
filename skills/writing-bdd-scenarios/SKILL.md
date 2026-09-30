@@ -1,6 +1,6 @@
 ---
 name: writing-bdd-scenarios
-description: Writes BDD Gherkin scenarios (.feature files, Turkish or English) from QA Suite test cases or acceptance criteria. Every scenario keeps its TC ID as a tag. Drafts are generated deterministically, rewritten into declarative business language, and run as Playwright tests through playwright-bdd with shared page objects and the same results loop into the traceability matrix. Use this whenever someone asks for Gherkin, BDD, Cucumber, Given/When/Then scenarios, feature files, "living documentation", or wants acceptance criteria turned into executable specifications. Also use it for Turkish requests such as "Gherkin yaz", "BDD senaryosu", "feature dosyası", "Diyelim ki / Eğer ki / O zaman", "kabul kriterlerini senaryoya çevir".
+description: Writes BDD Gherkin scenarios (.feature files, TR/EN) from QA Suite test cases or story criteria, keeping each TC ID as a tag, in declarative business language, runnable through playwright-bdd with shared page objects. Use when executable specifications or living documentation are wanted. Triggers include Gherkin, BDD, Cucumber, Given/When/Then, feature files; Turkish "Gherkin yaz", "BDD senaryosu", "Diyelim ki / Eğer ki / O zaman".
 license: MIT
 metadata:
   suite: qa-suite

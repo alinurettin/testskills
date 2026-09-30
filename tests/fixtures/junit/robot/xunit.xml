@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="Acceptance" tests="4" errors="0" failures="1" skipped="1" time="6.184" timestamp="2026-09-28T08:05:44.120000">
+<testsuite name="Login" tests="3" errors="0" failures="1" skipped="1" time="4.427" timestamp="2026-09-28T08:05:44.130000">
+<testcase classname="Acceptance.Login" name="TC-701 Valid Login" time="1.804">
+</testcase>
+<testcase classname="Acceptance.Login" name="TC-702 Invalid Password Shows Error" time="2.611">
+<failure message="Page should have contained text 'Hatalı şifre' but did not." type="AssertionError"/>
+</testcase>
+<testcase classname="Acceptance.Login" name="TC-703 Locked Account" time="0.012">
+<skipped message="Locked-account fixture not available on staging." type="SkipExecution"/>
+</testcase>
+<properties>
+<property name="Documentation" value="Login tests. All data is synthetic."/>
+</properties>
+</testsuite>
+<testsuite name="TC-704 Password Reset" tests="1" errors="0" failures="0" skipped="0" time="1.757" timestamp="2026-09-28T08:05:48.560000">
+<testcase classname="Acceptance.TC-704 Password Reset" name="Reset Link Is Sent" time="1.757">
+</testcase>
+</testsuite>
+<properties>
+<property name="Documentation" value="Shop acceptance suite"/>
+<property name="Version" value="2.4.0"/>
+</properties>
+</testsuite>

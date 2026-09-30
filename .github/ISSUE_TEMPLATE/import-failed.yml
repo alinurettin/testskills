@@ -1,0 +1,75 @@
+name: İçe aktarma başarısız / Import failed
+description: Dışa aktarılan dosya test yönetim aracına ya da Excel'e aktarılamadı. / An exported file did not import into a test-management tool or Excel.
+title: "[import] "
+labels: ["import"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Bu içe aktarımlar resmi dokümantasyona göre hazırlandı ve henüz gerçek sunucularda denenmedi; raporunuz doğrudan düzeltmeye dönüşür.
+        These imports follow the vendors' documentation and have not yet been tried against real servers, so your report turns directly into a fix.
+        Yalnızca sentetik ya da anonimleştirilmiş test case'ler paylaşın. / Share synthetic or anonymised test cases only.
+  - type: dropdown
+    id: tool
+    attributes:
+      label: Araç / Tool
+      options:
+        - Xray (Jira)
+        - Zephyr Scale
+        - TestRail
+        - Azure DevOps Test Plans
+        - Qase
+        - Excel (xlsx)
+        - Excel (CSV)
+        - Diğer / Other
+    validations:
+      required: true
+  - type: input
+    id: tool-version
+    attributes:
+      label: Araç sürümü ve kurulum türü / Tool version and deployment
+      description: Bulut mu, Server/Data Center mı; sürüm numarası; kullanılan içe aktarıcı. / Cloud or Server/Data Center; version number; which importer.
+      placeholder: "Xray Cloud, Test Case Importer (CSV)"
+    validations:
+      required: true
+  - type: input
+    id: suite-version
+    attributes:
+      label: QA Suite sürümü / QA Suite version
+      placeholder: "0.7.0"
+    validations:
+      required: true
+  - type: textarea
+    id: file
+    attributes:
+      label: Dosya / File
+      description: Dışa aktarılan dosyayı (2–3 test yeterli) buraya sürükleyin ya da ilk satırlarını yapıştırın. Kullandığınız export komutunu da ekleyin. / Drag the exported file here (2–3 tests are enough) or paste its first rows. Add the export command you used.
+      placeholder: |
+        python skills/exporting-test-cases/scripts/export_tests.py --tests qa/test-cases.json --requirements qa/requirements.json --format xray --out qa/exports/xray.csv
+    validations:
+      required: true
+  - type: textarea
+    id: error
+    attributes:
+      label: Hata mesajı / Error message
+      description: Aracın gösterdiği mesajı birebir kopyalayın. / Copy the tool's message verbatim.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Ekran görüntüsü / Screenshot
+      description: Alan eşleme ekranı ya da hata ekranı. Gerçek proje adlarını ve kişileri gizleyin. / The field-mapping screen or the error screen. Hide real project names and people.
+  - type: textarea
+    id: mapping
+    attributes:
+      label: Alan eşleme ve denenenler / Field mapping and what you tried
+      description: İsteğe bağlı. Hangi alanı hangi sütuna eşlediniz, ayraç ve kodlama ayarları. / Optional. Which field you mapped to which column; delimiter and encoding settings.
+  - type: checkboxes
+    id: data
+    attributes:
+      label: Veri / Data
+      options:
+        - label: Paylaştığım dosya ve görüntüler sentetik ya da anonimleştirilmiş. / The file and screenshots I shared are synthetic or anonymised.
+          required: true

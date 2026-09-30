@@ -62,6 +62,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import gen_data as gd  # noqa: E402
+from tr_ids import gen_tckn, gen_tr_iban, gen_vkn, is_valid_iban, is_valid_tckn  # noqa: E402
 
 RULES = {"drop", "redact", "hash", "fake", "generalize", "keep"}
 FAKE_TYPES = {"first_name", "last_name", "full_name", "email", "phone_tr", "tckn", "vkn", "iban_tr", "city_tr"}
@@ -134,8 +135,8 @@ def pii_values(values: list[str]) -> tuple[str, int] | None:
     vals = [v.strip() for v in values if v and v.strip()]
     if not vals:
         return None
-    checks = [("e-mail", lambda v: bool(EMAIL_RE.match(v))), ("TCKN", gd.is_valid_tckn),
-              ("IBAN", gd.is_valid_iban), ("phone", lambda v: bool(PHONE_RE.match(v)))]
+    checks = [("e-mail", lambda v: bool(EMAIL_RE.match(v))), ("TCKN", is_valid_tckn),
+              ("IBAN", is_valid_iban), ("phone", lambda v: bool(PHONE_RE.match(v)))]
     for label, fn in checks:
         pct = round(100 * sum(1 for v in vals if fn(v)) / len(vals))
         if pct >= 50:
@@ -218,11 +219,11 @@ def fake_value(kind: str, value: str, secret: bytes, pool: str = "tr") -> str:
     if kind == "phone_tr":
         return gd.phone_format(gd.gen_phone_digits(rng), "e164")
     if kind == "tckn":
-        return gd.gen_tckn(rng)
+        return gen_tckn(rng)
     if kind == "vkn":
-        return gd.gen_vkn(rng)
+        return gen_vkn(rng)
     if kind == "iban_tr":
-        return gd.gen_iban_tr(rng)
+        return gen_tr_iban(rng, gd.BANK_CODES)
     if kind == "city_tr":
         return rng.choice(gd.CITIES_TR)
     raise RulesError(f"unknown fake type {kind}")

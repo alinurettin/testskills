@@ -14,6 +14,7 @@
 11. Defect classification
 12. Sign-off criteria (template)
 13. reconcile.py: how it works and its limits
+14. Reconciliation checks as test cases (REQ → TC → results → RTM)
 
 ---
 
@@ -213,3 +214,21 @@ Money is summed with `Decimal`. Numeric columns (the `decimal` op, `"type": "dec
 - **Hints are heuristics.** They suggest a class of defect; confirm it before filing.
 - **Implicit mappings.** Without a mapping, or for target columns that are not in the mapping, same-named columns are compared as they are. The report lists these, so that they can be confirmed in the specification.
 - **The extracts must be right.** Check that the row counts of the extracts equal the table counts. A truncated extract gives a clean but meaningless PASS.
+
+## 14. Reconciliation checks as test cases (REQ → TC → results → RTM)
+A reconciliation report on its own never reaches the RTM or the completion report. `reconcile.py --compact-out` therefore turns every check into a test case that traces to a requirement, and `--results` writes the verdict of each check into `qa/results.json` under that TC ID.
+
+| Check id | Test case | Fails when (after accepted exceptions) |
+|---|---|---|
+| `row_count` | row counts, overall and per `--group-by` | the counts differ, and the difference is not fully covered by accepted exceptions |
+| `key_set` | no missing, unexpected or empty keys | any missing, unexpected or empty key |
+| `duplicate_keys` | no duplicate keys on either side | any duplicate key in the source or the target |
+| `column:<col>` | one per compared target column | any field mismatch or transform error, or the column is absent from the target file |
+| `total:<col>` | one per `--sum` column | overall or per-group difference above `--total-tolerance` |
+| `coverage` | mapping coverage and null rates (with `--mapping` only) | a source column without a decision, or a null-rate change of 1 percentage point or more that no row-level finding explains |
+
+- **Consequences fail too.** In the trial, the missing, unexpected and duplicate rows also fail `row_count`, and the ×100 balance also fails `total:balance`. Link each defect to the root-cause test case and treat the others as consequences (§4). Counts that are equal while keys are missing and unexpected pass `row_count`; `key_set` catches that case.
+- **Consistency with the verdict.** Every failing sign-off rule fails at least one check, and every accepted exception is honoured by the checks too, so a PASS verdict leaves no failed reconciliation test case behind.
+- **Privacy.** `results.json` goes into repositories and reports. Its entries therefore carry keys, counts, totals and hints only, never field values. The values stay in the Markdown report inside the secure zone (§10).
+- **Stable IDs.** A check keeps its TC ID across regenerations: through the `# reconcile-tc-map:` header line of the generated file, and through the `design_ref` `reconcile:<object>:<check>` in `qa/test-cases.json`. Use the same `--object` for design and run, one per migration object. A check that disappears (a column removed from the mapping, a dropped `--sum`) stays as a `deprecated` test case, so that its ID is never reused.
+- **What is not covered.** These test cases cover reconciliation levels 1–4 of one entity. Referential integrity, business rules, reject handling (negative cases), rehearsal timing and application-level regression still need their own test cases.

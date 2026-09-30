@@ -1,6 +1,6 @@
 ---
 name: running-exploratory-tests
-description: Plans, runs and reports professional exploratory testing with Session-Based Test Management (SBTM). It ranks requirements by risk and writes charters ("Explore target with resources to discover information") with heuristics (SFDIPOT, FEW HICCUPPS oracles, boundaries, CRUD, interruptions, follow the data, role swap, Whittaker tours) and time boxes. It guides time-boxed sessions with tagged notes, including sessions an AI agent runs in a browser on a test environment. Session sheets become a summary with TBS metrics, PROOF debrief prompts, defect-report drafts and draft regression test cases linked to REQ IDs. Use this whenever someone wants exploratory, ad-hoc or session-based testing, charters, bug hunts, test tours, a debrief, "click through the app and find bugs", or to turn exploratory findings into defects and regression tests, including Turkish requests such as "keşif testi", "keşifsel test", "exploratory test yap", "charter yaz", "oturum bazlı test", "uygulamayı gez ve hata bul".
+description: Plans and reports session-based exploratory testing (SBTM). Writes risk-ranked charters with heuristics and time boxes, guides tagged-note sessions, also by an AI agent in a browser, and turns session notes into metrics, defect drafts and draft regression tests. Use when an app should be explored for unknown bugs. Triggers include exploratory testing, charters, bug hunt, test tours; Turkish "keşif testi", "keşifsel test", "uygulamayı gez ve hata bul".
 license: MIT
 metadata:
   suite: qa-suite
@@ -8,6 +8,8 @@ metadata:
 ---
 
 # Running exploratory tests
+
+**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
 
 Scripted tests check what someone already expected. Exploratory testing finds what nobody expected: the tester learns, designs and executes tests at the same time. It stays professional and accountable through **Session-Based Test Management**: a charter per session, a time box, tagged notes, a debrief and a few honest metrics. This skill picks charters from requirement risk, supports the session (human or AI agent), and feeds the findings back into the REQ → TC → RTM chain as defects and regression tests.
 

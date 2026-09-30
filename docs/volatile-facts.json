@@ -1,0 +1,218 @@
+[
+  {
+    "id": "google-play-target-api",
+    "fact": "Since 31 August 2026, new Google Play apps and app updates must target Android 16 (API 36); Wear OS and Android Automotive OS API 35; Android TV and Android XR API 34. Existing apps must target API 35+ to stay available to new users on newer Android versions. An extension to 1 November 2026 can be requested. The requirement moves up every August.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md"],
+    "source_url": "https://developer.android.com/google/play/requirements/target-sdk",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "android-16-large-screen-orientation",
+    "fact": "For apps targeting Android 16 (API 36), orientation, resizability and aspect-ratio restrictions are ignored on displays with smallest width >= 600dp. A temporary opt-out (PROPERTY_COMPAT_ALLOW_RESTRICTED_RESIZABILITY) stops working when targeting API 37.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md", "skills/testing-mobile-apps/assets/mobile-checks.json"],
+    "source_url": "https://developer.android.com/about/versions/16/behavior-changes-16",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "apple-xcode-sdk-minimum",
+    "fact": "Since 28 April 2026, apps uploaded to App Store Connect must be built with Xcode 26 or later using the iOS/iPadOS/tvOS/visionOS/watchOS 26 SDK. Apple announces the next minimum each year.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md"],
+    "source_url": "https://developer.apple.com/news/upcoming-requirements/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "apple-privacy-manifest",
+    "fact": "Since 1 May 2024, new or updated apps must declare approved reasons for the listed required-reason APIs, including those used by third-party SDKs (privacy manifest, PrivacyInfo.xcprivacy).",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md", "skills/testing-mobile-apps/assets/mobile-checks.json", "skills/testing-mobile-apps/SKILL.md"],
+    "source_url": "https://developer.apple.com/news/upcoming-requirements/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "google-play-new-personal-account-testing",
+    "fact": "Personal Google Play developer accounts created after 13 November 2023 must run a closed test with at least 12 testers opted in continuously for at least 14 days before applying for production access.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md"],
+    "source_url": "https://support.google.com/googleplay/android-developer/answer/14151465?hl=en",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "google-play-vitals-thresholds",
+    "fact": "Google Play bad-behaviour thresholds: user-perceived crash rate 1.09% overall and 8% per phone model; user-perceived ANR rate 0.47% overall and 8% per phone model. Excessive partial wake locks is also a core vital (5% overall); memory-related thresholds may affect store visibility from February 2027.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md"],
+    "source_url": "https://developer.android.com/topic/performance/vitals",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "firebase-dynamic-links-shutdown",
+    "fact": "Firebase Dynamic Links shut down on 25 August 2025.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md"],
+    "source_url": "https://firebase.google.com/support/dynamic-links-faq",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "owasp-masvs-version",
+    "fact": "OWASP MASVS v2.1.0 (18 January 2024) is the latest release: eight control groups including MASVS-PRIVACY; the old L1/L2/R levels moved to MAS testing profiles in MASTG.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md", "skills/testing-mobile-apps/SKILL.md", "skills/testing-mobile-apps/assets/mobile-checks.json", "README.md", "README.en.md"],
+    "source_url": "https://github.com/OWASP/masvs/releases",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "owasp-top10-web",
+    "fact": "OWASP Top 10:2025 is the current edition (A01 Broken Access Control ... A03 Software Supply Chain Failures ... A10 Mishandling of Exceptional Conditions).",
+    "files": ["skills/analyzing-requirements/references/nfr-checklist.md", "skills/testing-nonfunctional/references/security.md", "README.md", "README.en.md"],
+    "source_url": "https://top10.owasp.org/2025",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "owasp-asvs-version",
+    "fact": "OWASP ASVS 5.0.0 is the latest stable version (chapters V1-V17).",
+    "files": ["skills/testing-nonfunctional/SKILL.md", "skills/testing-nonfunctional/references/security.md", "skills/testing-nonfunctional/assets/asvs5-chapters.json", "skills/testing-nonfunctional/scripts/nfr_checklist.py", "skills/analyzing-requirements/references/nfr-checklist.md", "skills/qa-orchestrator/SKILL.md", "shared/domains/fintech.md", "shared/domains/ecommerce.md", "README.md", "README.en.md"],
+    "source_url": "https://owasp.org/www-project-application-security-verification-standard/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "owasp-api-top10",
+    "fact": "The OWASP API Security Top 10 2023 is still the latest edition (API1 BOLA, API3 BOPLA, API5 BFLA).",
+    "files": ["skills/analyzing-requirements/references/nfr-checklist.md", "skills/testing-nonfunctional/references/security.md", "skills/testing-apis/references/api-testing.md"],
+    "source_url": "https://api-security.owasp.org/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "owasp-llm-top10",
+    "fact": "OWASP published the Top 10 for LLM Applications 2026 in August 2026. It re-ranks the 2025 list: LLM01 Prompt Injection, LLM02 Sensitive Information Disclosure, LLM03 Excessive Agency, LLM04 Supply Chain, LLM05 Data and Model Poisoning, LLM06 Unbounded Consumption, LLM07 Misinformation, LLM08 Hidden Context Exposure (was System Prompt Leakage), LLM09 Vector and Embedding Weaknesses, LLM10 Improper Output Handling.",
+    "files": ["skills/testing-ai-features/references/ai-testing.md", "skills/testing-ai-features/SKILL.md", "skills/testing-ai-features/scripts/ai_eval.py", "skills/analyzing-requirements/references/nfr-checklist.md", "docs/DESCRIPTIONS.md", "README.md", "README.en.md"],
+    "source_url": "https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/",
+    "verified_on": "2026-09-30",
+    "note": "Rank order confirmed in https://aembit.io/blog/the-owasp-top-10-for-llm-applications-2026-what-changed-and-why-it-matters/ and https://www.aigl.blog/owasp-top-10-for-llm-applications-2026/. ai-testing.md section 7 has the 2025-to-2026 mapping; ai_eval.py (OWASP_LLM_2025, seed tags), the testing-ai-features SKILL.md and the READMEs still cite the 2025 edition - migrating them is open."
+  },
+  {
+    "id": "owasp-agentic-top10",
+    "fact": "OWASP Top 10 for Agentic Applications 2026 (ASI01 Agent Goal Hijack ... ASI10 Rogue Agents) was published on 9 December 2025.",
+    "files": ["skills/analyzing-requirements/references/nfr-checklist.md"],
+    "source_url": "https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "wcag-version",
+    "fact": "WCAG 2.2 (5 October 2023, updated 12 December 2024) is the latest W3C Recommendation and is ISO/IEC 40500:2025; WCAG 3 is still an early draft.",
+    "files": ["skills/testing-nonfunctional/references/accessibility.md", "skills/testing-nonfunctional/assets/wcag22-aa.json", "skills/testing-nonfunctional/SKILL.md", "skills/analyzing-requirements/references/nfr-checklist.md", "skills/testing-mobile-apps/references/mobile-testing.md", "shared/domains/ecommerce.md", "shared/domains/health.md", "README.md", "README.en.md"],
+    "source_url": "https://www.w3.org/WAI/standards-guidelines/wcag/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "european-accessibility-act",
+    "fact": "The European Accessibility Act (Directive (EU) 2019/882) applies since 28 June 2025; services already provided before that date may continue until 28 June 2030 if not substantially changed.",
+    "files": ["skills/testing-mobile-apps/references/mobile-testing.md", "skills/testing-nonfunctional/references/accessibility.md", "shared/domains/ecommerce.md", "shared/domains/fintech.md", "shared/domains/telecom.md"],
+    "source_url": "https://eur-lex.europa.eu/eli/dir/2019/882/oj/eng",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "eu-ai-act-dates",
+    "fact": "EU AI Act (Regulation (EU) 2024/1689) as amended by the Digital Omnibus on AI (Regulation (EU) 2026/1744, in force 27 July 2026): prohibitions and AI literacy from 2 February 2025; GPAI obligations from 2 August 2025; Article 50 transparency from 2 August 2026 (watermarking grace period to 2 December 2026 for systems already on the market); Annex III high-risk obligations from 2 December 2027; Annex I high-risk obligations from 2 August 2028.",
+    "files": ["skills/testing-ai-features/references/ai-testing.md", "skills/testing-ai-features/SKILL.md"],
+    "source_url": "https://usercentrics.com/knowledge-hub/eu-ai-act-high-risk-delay-article-50-transparency-consent/",
+    "verified_on": "2026-09-30",
+    "note": "Dates also in https://www.gibsondunn.com/eu-ai-act-omnibus-agreement-postponed-high-risk-deadlines-and-other-key-changes/ (agreement text). The EUR-Lex page of Regulation (EU) 2026/1744 could not be rendered; re-check there."
+  },
+  {
+    "id": "playwright-version",
+    "fact": "Playwright 1.63 is the latest release (September 2026); the automation template pins @playwright/test ^1.63.0 and the references assume Playwright 1.5x-1.6x.",
+    "files": ["skills/automating-with-playwright/assets/template/package.json", "skills/automating-with-playwright/references/playwright-patterns.md", "skills/writing-bdd-scenarios/references/playwright-bdd.md"],
+    "source_url": "https://playwright.dev/docs/release-notes",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "playwright-node-requirement",
+    "fact": "Playwright requires the latest Node.js 22.x, 24.x or 26.x (Node.js 18 support was deprecated in 1.54).",
+    "files": ["skills/automating-with-playwright/SKILL.md", "README.md", "README.en.md", "skills/automating-with-playwright/assets/template/.github/workflows/playwright.yml", ".github/workflows/ci.yml"],
+    "source_url": "https://playwright.dev/docs/intro",
+    "verified_on": "2026-09-30",
+    "note": "STALE, not fixed in this change: README.md, README.en.md and skills/automating-with-playwright/SKILL.md still say 'Node.js 18+'. The workflows already use Node 22."
+  },
+  {
+    "id": "playwright-init-agents",
+    "fact": "npx playwright init-agents --loop=claude (or vscode, codex, opencode) exists since Playwright 1.56.",
+    "files": ["skills/automating-with-playwright/references/ci-and-reporting.md"],
+    "source_url": "https://playwright.dev/docs/release-notes",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "playwright-bdd-version",
+    "fact": "playwright-bdd is at v9.x; v9.2.1 supports Playwright 1.63.",
+    "files": ["skills/writing-bdd-scenarios/references/playwright-bdd.md"],
+    "source_url": "https://github.com/vitalets/playwright-bdd/releases",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "xray-test-case-importer",
+    "fact": "Xray Test Case Importer: Cloud via Apps > Xray > Test Case Importer, mandatory mappings Issue Id, Summary, Test Type; Server/DC via Tests > Test Case Importer, mandatory Test Case Identifier, Summary, Action. Both update existing tests when a column is mapped to the Issue Key.",
+    "files": ["skills/exporting-test-cases/references/xray.md", "skills/exporting-test-cases/scripts/export_tests.py"],
+    "source_url": "https://docs.getxray.app/display/XRAYCLOUD/Importing+Tests+using+Test+Case+Importer",
+    "verified_on": "2026-09-30",
+    "note": "Server/DC details: https://docs.getxray.app/display/XRAY/Importing+Manual+Tests+using+Test+Case+Importer"
+  },
+  {
+    "id": "azure-devops-csv-import",
+    "fact": "Azure Test Plans: Test Plans > a plan > a suite > Import test cases from CSV/XLSX; one row per step; Azure DevOps Services requires nine mapped fields (ID, Work Item Type, Title, Test Step, Step Action, Step Expected, Area Path, Assigned To, State).",
+    "files": ["skills/exporting-test-cases/references/other-tools.md", "skills/exporting-test-cases/scripts/export_tests.py"],
+    "source_url": "https://learn.microsoft.com/en-us/azure/devops/test/bulk-import-export-test-cases",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "testrail-csv-import",
+    "fact": "TestRail imports test cases via Test Cases > Import Cases > Import from CSV, including separated steps spread over multiple rows per case.",
+    "files": ["skills/exporting-test-cases/references/other-tools.md", "skills/exporting-test-cases/scripts/export_tests.py"],
+    "source_url": "https://support.testrail.com/hc/en-us/articles/7101779988372-Import-test-cases-from-CSV-or-Excel",
+    "verified_on": "2026-09-30",
+    "note": "The support page returned HTTP 403 to the fetcher; verified through the search result summary of that page."
+  },
+  {
+    "id": "qase-csv-import",
+    "fact": "Qase imports via the repository's ... menu > Import Data; the V2 CSV format (labelled Qase.io) keeps all steps of a case in one cell per field.",
+    "files": ["skills/exporting-test-cases/references/other-tools.md", "skills/exporting-test-cases/scripts/export_tests.py"],
+    "source_url": "https://docs.qase.io/general/get-started-with-the-qase-platform/test-cases/import-test-cases",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "bddk-information-systems-regulation",
+    "fact": "BDDK's Regulation on Banks' Information Systems and Electronic Banking Services (Official Gazette 15 March 2020, No. 31069; most provisions applied from 1 January 2021) governs banking IT and e-banking authentication.",
+    "files": ["shared/domains/fintech.md", "skills/analyzing-requirements/references/implicit-requirements.md"],
+    "source_url": "https://www.mevzuat.gov.tr/mevzuat?MevzuatNo=34360&MevzuatTur=7&MevzuatTertip=5",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "seddk-insurance-supervisor",
+    "fact": "SEDDK (Sigortacılık ve Özel Emeklilik Düzenleme ve Denetleme Kurumu) regulates and supervises insurance and private pensions under Insurance Law No. 5684.",
+    "files": ["shared/domains/insurance.md"],
+    "source_url": "https://www.seddk.gov.tr/tr/gorevimiz",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "btk-electronic-communications-law",
+    "fact": "Electronic Communications Law No. 5809 (Official Gazette 10 November 2008) is enforced by BTK; subscriptions require identity verification by methods BTK sets.",
+    "files": ["shared/domains/telecom.md"],
+    "source_url": "https://www.mevzuat.gov.tr/MevzuatMetin/1.5.5809.pdf",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "dora-application",
+    "fact": "DORA (EU Digital Operational Resilience Act) applies since 17 January 2025 to financial entities including insurance and reinsurance undertakings.",
+    "files": ["shared/domains/insurance.md"],
+    "source_url": "https://www.eiopa.europa.eu/digital-operational-resilience-act-dora_en",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "pci-dss-version",
+    "fact": "PCI DSS v4.0.1 is the current version of the standard (the v4.x line).",
+    "files": ["shared/domains/fintech.md", "skills/analyzing-requirements/references/implicit-requirements.md"],
+    "source_url": "https://www.pcisecuritystandards.org/document_library/",
+    "verified_on": "2026-09-30"
+  },
+  {
+    "id": "vkn-checksum-published-examples",
+    "fact": "The VKN check-digit algorithm in shared/scripts/tr_ids.py validates VKNs that legal entities publish under Turkish Commercial Code art. 1524: 4730030397 (İLBANK A.Ş.) and 1430023849 (BASF Türk).",
+    "files": ["shared/scripts/tr_ids.py", "tests/test_tr_ids.py"],
+    "source_url": "https://www.ilbank.gov.tr/sayfa/bilgi-toplumu-hizmetleri",
+    "verified_on": "2026-09-30",
+    "note": "Second source: https://www.basf.com/tr/tr/legal/bilgi-toplumu-hizmetleri"
+  }
+]

@@ -1,0 +1,51 @@
+TCID,Summary,Description,Test Type,Priority,Labels,Component,Requirement Keys,Action,Data,Expected Result,Test Repository Folder
+TC-001,"Kupon 100,00 TL sınırında uygulanır","Amaç: DS-001 C-02: tam sınır değerinde indirim
+
+Ön koşullar:
+- Kullanıcı 'ayse.test@example.com' ile giriş yapmış
+- 'YAZ10' kuponu aktif
+
+Test verisi:
+sepet: 100,00 TL
+kupon: YAZ10
+
+Gereksinimler: REQ-001 (SHOP-101) | Teknik: boundary-value-analysis (DS-001) | QA-ID: TC-001",Manual,High,regression;smoke;REQ-001;boundary-value-analysis;positive,,SHOP-101,"Sepete 100,00 TL tutarında ürün ekle",Ürün A x1,"Sepet toplamı 100,00 TL",QA Suite/Kupon
+TC-001,,,Manual,,,,,Kupon alanına kodu yaz ve 'Uygula'ya tıkla,YAZ10,"'Kupon uygulandı' mesajı; indirim -10,00 TL; toplam 90,00 TL",
+TC-002,"Kupon 99,99 TL sepette reddedilir","Amaç: DS-001 C-26: sınırın hemen altı
+
+Ön koşullar:
+- Kullanıcı giriş yapmış
+- 'YAZ10' kuponu aktif
+
+Test verisi:
+sepet: 99,99 TL
+kupon: YAZ10
+
+Gereksinimler: REQ-001 (SHOP-101) | Teknik: boundary-value-analysis (DS-001) | QA-ID: TC-002",Manual,High,regression;REQ-001;boundary-value-analysis;negative,,SHOP-101,"Sepete 99,99 TL tutarında ürün ekle",,"Sepet toplamı 99,99 TL",QA Suite/Kupon
+TC-002,,,Manual,,,,,Kupon alanına kodu yaz ve 'Uygula'ya tıkla,YAZ10,"'Asgari sepet tutarı 100 TL' mesajı; toplam 99,99 TL kalır",
+TC-003,Süresi dolmuş kupon reddedilir,"Ön koşullar:
+- Sepet toplamı 150,00 TL
+- 'BAHAR5' kuponu 01.04.2026'da sona ermiş
+
+Gereksinimler: REQ-002 (SHOP-102) | Teknik: decision-table (DS-002) | QA-ID: TC-003",Manual,High,regression;REQ-002;decision-table;negative,,SHOP-102,"Kupon alanına 'BAHAR5' yaz, 'Uygula'ya tıkla",,"'Bu kuponun süresi dolmuştur' mesajı; toplam 150,00 TL",QA Suite/Kupon
+TC-004,Kupon kodu küçük harfle girilince kabul edilir,"Amaç: Varsayım (Q-001): kod harf duyarsız
+
+Ön koşullar:
+- Sepet toplamı 150,00 TL
+
+Gereksinimler: REQ-003 | Teknik: error-guessing | QA-ID: TC-004",Manual,Medium,REQ-003;error-guessing;positive,,,"Kupon alanına 'yaz10' yaz, 'Uygula'ya tıkla",,"'Kupon uygulandı'; toplam 135,00 TL",QA Suite/Kupon
+TC-005,Aynı kupon ikinci kez kullanılamaz,"Ön koşullar:
+- Kullanıcı 'YAZ10' ile daha önce sipariş tamamlamış
+
+Gereksinimler: REQ-005 (SHOP-105) | Teknik: state-transition | QA-ID: TC-005",Manual,Highest,regression;REQ-005;state-transition;negative,,SHOP-105,"150,00 TL'lik sepette 'YAZ10' uygula",,'Bu kuponu daha önce kullandınız' mesajı; indirim uygulanmaz,QA Suite/Kupon
+TC-007,Sahipsiz test örneği,Gereksinimler: - | Teknik: checklist | QA-ID: TC-007,Manual,Low,checklist;positive,,,Ana sayfayı aç,,Sayfa yüklenir,QA Suite/Kupon
+TC-008,"Kupon 100,00 TL sınırında uygulanır - kopya","Ön koşullar:
+- Kullanıcı 'ayse.test@example.com' ile giriş yapmış
+- 'YAZ10' kuponu aktif
+
+Test verisi:
+sepet: 100,00 TL
+kupon: YAZ10
+
+Gereksinimler: REQ-001, REQ-099 (SHOP-101) | Teknik: boundary-value-analysis | QA-ID: TC-008",Manual,High,REQ-001;REQ-099;boundary-value-analysis;positive,,SHOP-101,"Sepete 100,00 TL tutarında ürün ekle",Ürün A x1,"Sepet toplamı 100,00 TL",QA Suite/Kupon
+TC-008,,,Manual,,,,,Kupon alanına kodu yaz ve 'Uygula'ya tıkla,YAZ10,"'Kupon uygulandı' mesajı; indirim -10,00 TL; toplam 90,00 TL",

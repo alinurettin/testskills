@@ -1,0 +1,41 @@
+﻿musteri_no;ad_soyad;kimlik_no;musteri_tipi;dogum_tarihi;cinsiyet;il;posta_kodu;cep_telefonu;eposta;eski_musteri_kodu;segment;kayit_tarihi
+MS-100411;Gülizar Karakoçan;73486009478;BIREYSEL;12.03.1984;K;İstanbul;34718;+90 551 960 07 12;gulizar.karakocan@example.test;EMK-081387;Bireysel;14.05.2019
+MS-100422;Tunç Eğilmez;61651603064;BIREYSEL;07.11.1979;E;İzmir;35530;+90 555 478 81 39;tunc.egilmez@eposta.example.test;EMK-070746;Bireysel Premium;22.08.2018
+MS-100436;Şebnem Oğuzhanoğlu;34586842280;BIREYSEL;23.06.1991;K;Ankara;06680;+90 532 607 98 44;sebnem.oguzhanoglu@posta.example.test;EMK-092910;Bireysel;03.02.2020
+MS-100439;Karaçam Tekstil Sanayi Ltd. Şti.;8535452123;KURUMSAL;;;Bursa;16245;+90 507 946 74 57;info@karacamtekstil.example.test;EMK-084183;KOBİ;12.06.2019
+MS-100442;İlkay Dönmezer;94410424648;BIREYSEL;15.01.1988;E;Bursa;16140;+90 536 004 19 55;ilkay.donmezer1988@example.test;EMK-002719;Bireysel;19.09.2021
+MS-100445;Özgür Çelikbilek;48016669606;BIREYSEL;30.08.1975;E;Antalya;07070;+90 542 459 09 55;ozgur.celikbilek@eposta.example.test;EMK-046521;Bireysel Premium;11.11.2018
+MS-100460;Nurcihan Yağcıoğlu;11417982520;BIREYSEL;02.04.1969;K;Eskişehir;26010;+90 555 983 61 11;nurcihan.yagcioglu@posta.example.test;11417982520;Bireysel;07.03.2016
+MS-100477;Ertuğrul Sarıkaya;58916725968;BIREYSEL;19.12.1983;E;Trabzon;61030;+90 532 617 02 50;ertugrul.sarikaya@example.test;EMK-012609;Bireysel;25.06.2022
+MS-100485;Ayşegül Pehlivanoğlu;28303808574;BIREYSEL;08.09.1972;K;İstanbul;34381;+90 542 668 53 66;aysegul.pehlivanoglu1972@eposta.example.test;28303808574;Bireysel Premium;14.01.2015
+MS-100497;Çağla Işıksoy;42179998818;BIREYSEL;29.02.2000;K;Muğla;48400;+90 532 768 29 21;cagla.isiksoy@posta.example.test;EMK-087129;Bireysel;05.05.2022
+MS-100512;Barış Gündoğdu;27075526846;BIREYSEL;21.07.1986;E;Kayseri;38280;+90 551 381 96 68;baris.gundogdu@example.test;27075526846;Bireysel;30.10.2017
+MS-100528;Poyrazlı Gıda Pazarlama A.Ş.;6085623925;KURUMSAL;;;İzmir;35410;+90 532 709 67 98;muhasebe@poyrazligida.example.test;EMK-022359;Ticari;21.09.2016
+MS-100536;Müjgan Tekinalp;22928586978;BIREYSEL;11.05.1958;K;İzmir;35220;+90 501 423 18 35;mujgan.tekinalp@eposta.example.test;22928586978;Bireysel Premium;16.02.2016
+MS-100545;Oğuz Kağan Ertürk;63506614270;BIREYSEL;04.10.1994;E;Ankara;06810;+90 501 634 27 97;oguz.erturk1994@posta.example.test;;Bireysel;08.08.2023
+MS-100559;Şükran Beşiroğlu;48915119660;BIREYSEL;27.03.1965;K;Gaziantep;27060;+90 555 605 58 97;sukran.besiroglu@example.test;48915119660;Bireysel;21.04.2015
+MS-100574;Ümit Karagözlü;95819938248;BIREYSEL;13.06.1981;E;Çanakkale;17100;+90 546 321 16 18;umit.karagozlu@eposta.example.test;EMK-030958;Bireysel;17.07.2019
+MS-100583;Irmak Söğütlü;73902115424;BIREYSEL;09.12.1998;K;İstanbul;34440;+90 536 496 34 78;irmak.sogutlu@posta.example.test;EMK-027840;Bireysel;02.03.2021
+MS-100594;Hülya Çağlayan;15263337718;BIREYSEL;16.08.1977;K;Diyarbakır;21070;+90 551 519 97 30;hulya.caglayan1977@example.test;15263337718;Bireysel;28.11.2017
+MS-100606;Doğan Özbilgin;12934291898;BIREYSEL;24.02.1962;E;Bursa;16059;+90 538 594 81 35;dogan.ozbilgin@eposta.example.test;12934291898;Bireysel Premium;09.09.2016
+MS-100617;Sevgi Ilgaz;52402967498;BIREYSEL;29.02.1996;K;Iğdır;76000;+90 555 981 71 29;sevgi.ilgaz@posta.example.test;EMK-058885;Bireysel;12.12.2020
+MS-100623;Mavikanat Lojistik A.Ş.;1981411476;KURUMSAL;;;İstanbul;34956;+90 536 911 92 09;iletisim@mavikanat.example.test;EMK-074799;Ticari;08.02.2021
+MS-100634;Kıvanç Eryiğit;80299970970;BIREYSEL;01.01.1990;E;İstanbul;34906;+90 532 132 97 85;kivanc.eryigit@example.test;EMK-092597;Bireysel;06.06.2018
+MS-100647;Gönül Aşıkoğlu;91070078204;BIREYSEL;18.04.1970;K;Şanlıurfa;63040;+90 555 748 31 31;gonul.asikoglu1970@eposta.example.test;91070078204;Bireysel;23.05.2017
+MS-100662;Emre Çobanoğlu;65659641158;BIREYSEL;31.10.1987;E;Ankara;06520;+90 546 170 24 19;emre.cobanoglu@posta.example.test;EMK-024056;Bireysel;10.10.2020
+MS-100677;Feride Kuşçuoğlu;98919691686;BIREYSEL;05.05.1955;K;İzmir;35160;+90 546 769 34 29;feride.kuscuoglu@example.test;98919691686;Bireysel Premium;04.04.2015
+MS-100683;Tuğba Yiğitbaşı;61867139876;BIREYSEL;22.07.1993;K;Antalya;07160;+90 533 611 55 42;tugba.yigitbasi@eposta.example.test;EMK-092362;Bireysel;18.01.2019
+MS-100688;İsmail Hakkı Dağdelen;15494969894;BIREYSEL;14.09.1949;E;Kayseri;38030;+90 551 336 22 96;ismail.dagdelen1949@posta.example.test;15494969894;Bireysel;11.03.2016
+MS-100703;Pınar Gökçeli;14815668874;BIREYSEL;06.02.1985;K;Eskişehir;26170;+90 551 467 87 36;pinar.gokceli@example.test;EMK-079977;Bireysel;27.08.2021
+MS-100717;Çınaraltı Yazılım Teknolojileri A.Ş.;7135914327;KURUMSAL;;;Ankara;06800;+90 542 669 28 24;info@cinaralti.example.test;EMK-087505;KOBİ;17.10.2022
+MS-100728;Selçuk Tümerkan;63699659980;BIREYSEL;25.11.1973;E;İstanbul;34752;+90 542 964 36 10;selcuk.tumerkan@eposta.example.test;63699659980;Bireysel Premium;15.03.2017
+MS-100741;Ebru Küçükçınar;33015949408;BIREYSEL;03.03.1997;K;Trabzon;61080;+90 538 277 41 63;ebru.kucukcinar@posta.example.test;EMK-038471;Bireysel;09.12.2022
+MS-100757;Levent Şahinbaş;63137665030;BIREYSEL;12.08.1966;E;Muğla;48300;+90 538 638 40 13;levent.sahinbas1966@example.test;63137665030;Bireysel;20.06.2016
+MS-100762;Zeynep Ağırbaş;74443827302;BIREYSEL;17.10.2003;K;Bursa;16330;+90 536 490 25 88;zeynep.agirbas@eposta.example.test;;Bireysel;01.09.2023
+MS-100779;Cemil Öztoprak;45612894616;BIREYSEL;28.05.1960;E;Gaziantep;27500;+90 555 437 46 31;cemil.oztoprak@posta.example.test;45612894616;Bireysel;13.02.2015
+MS-100788;Derya Işınsu;90051128624;BIREYSEL;10.01.1982;K;İzmir;35590;+90 544 743 31 89;derya.isinsu@example.test;EMK-065756;Bireysel;26.04.2019
+MS-100805;Hakan Eşmeli;41373647690;BIREYSEL;20.06.1978;E;Ankara;06460;+90 533 139 18 09;hakan.esmeli1978@eposta.example.test;41373647690;Bireysel;05.07.2017
+MS-100821;Göksu Tarım Ürünleri Ltd. Şti.;9168893977;KURUMSAL;;;Şanlıurfa;63300;+90 538 846 84 00;bilgi@goksutarim.example.test;EMK-021950;KOBİ;04.07.2018
+MS-100827;Gizem Uğurlu;55415067698;BIREYSEL;08.11.1999;K;İstanbul;34349;+90 542 324 57 78;gizem.ugurlu@posta.example.test;;Bireysel;19.02.2024
+MS-100836;Serkan Bozdoğan;16910951226;BIREYSEL;02.12.1971;E;Çanakkale;17400;+90 501 787 35 77;serkan.bozdogan@example.test;16910951226;Bireysel;30.11.2016
+MS-100847;Katarina Novak;99086354688;BIREYSEL;14.04.1980;K;Antalya;07400;+90 533 054 72 74;k.novak@example.test;;Bireysel;03.05.2023

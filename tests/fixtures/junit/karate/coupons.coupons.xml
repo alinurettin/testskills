@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<testsuite failures="1" name="coupons/coupons.feature" skipped="0" tests="4" time="1.412">
+  <testcase classname="coupons.coupons" name="[1:7] TC-601 apply a valid coupon" time="0.412">
+    <system-out>* url baseUrl ......................................................... passed
+* path 'coupons', 'apply' ............................................ passed
+* request { code: 'YAZ10', basket: 150.00 } .......................... passed
+* method post ........................................................ passed
+* status 200 ......................................................... passed
+* match response.discount == 15.00 ................................... passed
+</system-out>
+  </testcase>
+  <testcase classname="coupons.coupons" name="[2:16] TC-602 expired coupon is rejected" time="0.286">
+    <failure message="coupons/coupons.feature:22 - status code was: 200, expected: 422, response time in milliseconds: 41, url: https://staging.shop.example/api/coupons/apply, response: {&quot;discount&quot;:15.0}">* url baseUrl ......................................................... passed
+* path 'coupons', 'apply' ............................................ passed
+* request { code: 'BAHAR5', basket: 150.00 } ......................... passed
+* method post ........................................................ passed
+* status 422 ......................................................... failed
+</failure>
+  </testcase>
+  <testcase classname="coupons.coupons" name="[3.1:30] TC-603 minimum basket 99.99" time="0.351">
+    <system-out>* status 422 ......................................................... passed
+</system-out>
+  </testcase>
+  <testcase classname="coupons.coupons" name="[3.2:30] TC-603 minimum basket 100.00" time="0.363">
+    <system-out>* status 200 ......................................................... passed
+</system-out>
+  </testcase>
+</testsuite>

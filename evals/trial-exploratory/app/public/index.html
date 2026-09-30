@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Perdeaçık Bilet</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%238c1c2c'/%3E%3Cpath d='M6 6h9v20H6zM17 6h9v20h-9z' fill='%23f3d9a4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <header class="ust">
+    <div class="ust-ic">
+      <a class="logo" href="#/">Perdeaçık <span>Bilet</span></a>
+      <nav aria-label="Ana menü">
+        <a href="#/">Etkinlikler</a>
+        <a href="#/biletlerim">Biletlerim</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="icerik" tabindex="-1"></main>
+
+  <footer class="alt-bilgi">
+    © 2026 Perdeaçık Etkinlik Hizmetleri (kurgusal) · Demo / test ortamı · Ödemeler etkinlik girişinde gişede alınır.
+  </footer>
+
+  <dialog id="iptalKutusu" aria-labelledby="iptalBaslik">
+    <form method="dialog">
+      <h2 id="iptalBaslik">Siparişi iptal et</h2>
+      <p id="iptalMetin"></p>
+      <div class="dugmeler">
+        <button value="vazgec" class="ikincil">Vazgeç</button>
+        <button value="onayla" class="tehlike">Evet, iptal et</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/app.js"></script>
+</body>
+</html>

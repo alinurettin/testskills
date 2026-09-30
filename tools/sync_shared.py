@@ -23,6 +23,10 @@ SHARED = {
     "scripts/qa_compact.py": ("scripts", ["analyzing-requirements", "designing-test-cases", "reviewing-test-cases",
                                           "testing-nonfunctional", "testing-apis", "running-exploratory-tests",
                                           "testing-ai-features", "testing-mobile-apps"]),
+    # Turkish identifier checksums (TCKN, VKN, IBAN): one implementation for validation and synthetic generation
+    "scripts/tr_ids.py": ("scripts", ["designing-test-cases", "preparing-test-data", "testing-ai-features"]),
+    # JUnit XML (any framework) -> qa/results.json by @TC ID
+    "scripts/junit_results.py": ("scripts", ["tracing-requirements", "testing-mobile-apps"]),
 }
 # shared folder -> (target folder inside each skill, skills that receive every file of it)
 SHARED_DIRS = {
@@ -40,6 +44,10 @@ def main() -> int:
         for f in sorted((ROOT / "shared" / d).glob("*.md")):
             items[f"{d}/{f.name}"] = (folder, skills)
     for name, (folder, skills) in items.items():
+        if not (ROOT / "shared" / name).exists():
+            print(f"missing shared source: shared/{name}", file=sys.stderr)
+            stale.append(f"shared/{name}")
+            continue
         src = (ROOT / "shared" / name).read_bytes()
         for skill in skills:
             dst = ROOT / "skills" / skill / folder / Path(name).name

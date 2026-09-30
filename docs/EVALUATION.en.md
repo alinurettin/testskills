@@ -23,7 +23,7 @@ This document summarises how the package was tested and what the results were, *
   - The Playwright run gave 37 passed / 9 failed, and an independent rerun gave the same result.
   - The decision was "not ready", because 4 of 9 exit criteria were met.
 - **Cost:** about 334k tokens and about 26 minutes.
-- Files: [evals/trial-fast](../evals/trial-fast/ANSWER-KEY.md) · real outputs: [examples/fast-transfer](../examples/fast-transfer/README.md)
+- Files: [evals/trial-fast](../evals/trial-fast/) · answer key: [evals/keys/fast.md](../evals/keys/fast.md) · real outputs: [examples/fast-transfer](../examples/fast-transfer/README.md)
 
 ## 2. Blind API trial: Demo Bank API
 - **Setup:** an OpenAPI 3 document, a locally running API and two test users. Five defects were planted:
@@ -51,7 +51,7 @@ This document summarises how the package was tested and what the results were, *
   - warnings about reporters and about budgeting test state;
   - no more false "REDUNDANT" warnings in the RTM for generated tests.
 - **The final generator on the same API and a fresh server:** 31 tests. With no human changes, 20 passed, 9 failed and 2 are skeletons. The 9 failures catch all 5 planted defects and the `Bearer` defect.
-- Files: [evals/trial-api](../evals/trial-api/ANSWER-KEY.md) · real outputs: [examples/api-trial](../examples/api-trial/README.md)
+- Files: [evals/trial-api](../evals/trial-api/) · answer key: [evals/keys/api.md](../evals/keys/api.md) · real outputs: [examples/api-trial](../examples/api-trial/README.md)
 
 ## 3. Blind data-migration trial: customer data
 - **Setup:**
@@ -70,7 +70,7 @@ This document summarises how the package was tested and what the results were, *
   - the "rounding" hint now also covers precision loss;
   - the report explains the denominator effect on null rates;
   - the report shows file names instead of full paths.
-- Files: [evals/trial-migration](../evals/trial-migration/ANSWER-KEY.md) · real outputs: [examples/migration-trial](../examples/migration-trial/README.md)
+- Files: [evals/trial-migration](../evals/trial-migration/) · answer key: [evals/keys/migration.md](../evals/keys/migration.md) · real outputs: [examples/migration-trial](../examples/migration-trial/README.md)
 
 ## 4. With vs without skills (0.2.0)
 The same three tasks ran with and without the skills: Turkish end-to-end coupons, Turkish payment test design, and an English loan requirements review. A fixed checklist graded the outputs.
@@ -116,6 +116,8 @@ The skills raise quality, but they cost more time and tokens. 0.2.0 cut token us
 ## Repeat a trial yourself
 ```bash
 node evals/trial-api/api/server.js      # http://127.0.0.1:4180, token-alice / token-bob
-# Give the agent only evals/trial-api/api/openapi.json. Do not show it server.js or ANSWER-KEY.md.
+# Give the agent only evals/trial-api/api/openapi.json. Do not show it server.js or the evals/keys/ folder.
 ```
 For the migration trial, give the agent only the two CSV files and `mapping-spec.md` from `evals/trial-migration/`.
+
+How to set up a blind trial correctly (copy the folder outside the repo, keep the answer keys away from the agent) and how to grade it: [evals/README.md](../evals/README.md).

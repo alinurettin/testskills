@@ -1,6 +1,6 @@
 ---
 name: exporting-test-cases
-description: Exports QA Suite test cases (test-cases.json) into import-ready files for test management tools. Supports Xray Test Case Importer CSV (one row per step, grouped by Test ID, requirement links via Jira keys), Zephyr Scale CSV (step rows or plain-text script), TestRail CSV, Azure DevOps Test Plans CSV, Qase CSV, Excel .xlsx, generic CSV and a Markdown review document, with validation, priority mapping and Turkish-safe encoding. Use this whenever the user wants to move test cases into Jira, Xray, Zephyr, TestRail, Azure DevOps, Qase, Excel or Confluence, or asks for an import file, a CSV/XLSX of tests, or a printable or reviewable test case document. Also use it for Turkish requests such as "Xray'e aktar", "Zephyr'e yükle", "Jira'ya import", "Excel'e dök", "test case'leri dışa aktar", "import dosyası hazırla".
+description: Exports QA Suite test-cases.json into validated import files for Xray, Zephyr Scale, TestRail, Azure DevOps and Qase, or an Excel workbook, CSV or Markdown document, keeping Jira requirement links and Turkish characters intact. Use when test cases must move into a test management tool. Triggers include Xray, Zephyr, TestRail, Jira import file, export to Excel; Turkish "Xray'e aktar", "Jira'ya import", "Excel'e dök".
 license: MIT
 metadata:
   suite: qa-suite
@@ -61,13 +61,15 @@ When all requirements come from one Jira story or epic, derived and split requir
    - `--include-deprecated`
    - `--priority-map '{"medium":"Normal"}'`
    - `--test-type Manual`, `--component`
-   - `--zephyr-steps rows|single`
+   - `--folder "A/B"` or `"A > B"`, written in each tool's own folder syntax (Xray, Zephyr, TestRail, Qase)
+   - `--xray-links columns` (Xray Server/DC: one column per requirement key)
+   - `--zephyr-steps rows|single`, and `--zephyr-data inline` when the Zephyr wizard offers no Test Data target
    - `--area-path`, `--assigned-to` (Azure DevOps)
-   - `--list-delimiter`
+   - `--list-delimiter` (default `;` for Xray, `,` for Zephyr)
    - `--bom`
    - `--lang tr|en` (column headers of csv, xlsx and markdown)
 
-   The script validates before writing and exits 1 without writing anything if a test has no ID, no title or no steps. It warns about missing Jira keys, unknown requirement IDs and tests with no requirement.
+   The script validates before writing and exits 1 without writing anything if a test has no ID, no title or no steps. It warns about missing Jira keys, unknown requirement IDs and tests with no requirement. It also warns about documented importer limits and required fields: Xray Cloud 1000 issues per file, TestRail 10 MB, Azure DevOps 20 MB, 128-character titles, and an empty Area Path.
 
 4. **Give import instructions** tailored to the target: read `references/xray.md`, `references/zephyr-scale.md` or `references/other-tools.md` (TestRail, Azure DevOps, Qase). Always recommend a **trial import of 2–3 tests** in a sandbox project first. Importers differ between versions, and a bulk import with the wrong mapping is painful to undo.
 
@@ -87,7 +89,7 @@ When all requirements come from one Jira story or epic, derived and split requir
 ## Files
 
 - `scripts/export_tests.py`: exporter for xray, zephyr, testrail, azure-devops, qase, csv, xlsx and markdown. Standard library only; it includes a minimal xlsx writer.
-- `references/xray.md`: Xray Test Case Importer mapping, steps and pitfalls.
+- `references/xray.md`: Xray Test Case Importer mapping, steps, limits and pitfalls, plus the JUnit results path (Playwright `test_key`). Like the other references, it names the vendor pages it was checked against and the date.
 - `references/zephyr-scale.md`: Zephyr Scale import mapping, the two step layouts and pitfalls.
 - `references/other-tools.md`: TestRail, Azure DevOps Test Plans and Qase import mapping, what is certain and what to verify.
 - `references/data-model.md`: shared JSON schema.

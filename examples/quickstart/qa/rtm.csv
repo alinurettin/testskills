@@ -1,0 +1,15 @@
+﻿Gereksinim,External ID,Kaynak,Başlık,Type,Öncelik,Risk score,Risk,Durum,Derived,Testler,Poz,Neg,Teknikler,Koşum,Hatalar,Gaps
+REQ-001,SHOP-128,US-128 AK-1,"""Şifremi unuttum"" ile e-postaya sıfırlama bağlantısı istenir",functional,high,8,medium,ready,,TC-001 TC-002,1,1,equivalence-partitioning use-case,not-run,,
+REQ-002,SHOP-128,US-128 AK-1,Kayıtlı ve kayıtsız adres için aynı ekran mesajı,business-rule,high,12,high,ready,,TC-002 TC-004 TC-006,0,3,boundary-value-analysis equivalence-partitioning error-guessing,not-run,,
+REQ-003,SHOP-128,US-128 AK-2,Sıfırlama bağlantısı 30 dakika geçerlidir,business-rule,high,12,high,clarification-needed,,TC-007 TC-008 TC-009,1,2,boundary-value-analysis state-transition,not-run,,OPEN_QUESTIONS
+REQ-004,SHOP-128,US-128 AK-2,Sıfırlama bağlantısı yalnızca bir kez kullanılabilir,business-rule,high,10,high,ready,,TC-010 TC-011 TC-013,0,3,error-guessing state-transition,not-run,,
+REQ-005,SHOP-128,US-128 AK-3,Aynı e-posta için 1 saatte en fazla 3 sıfırlama isteği,business-rule,medium,9,medium,clarification-needed,,TC-005 TC-006,1,1,boundary-value-analysis,not-run,,OPEN_QUESTIONS
+REQ-006,SHOP-128,US-128 AK-4,Yeni şifre uzunluğu 8–20 karakter,business-rule,medium,6,medium,ready,,TC-001 TC-007 TC-014 TC-015,2,2,boundary-value-analysis use-case,not-run,,
+REQ-007,SHOP-128,US-128 AK-4,"Yeni şifre büyük harf, küçük harf ve rakam içerir",business-rule,medium,9,medium,clarification-needed,,TC-001 TC-016 TC-017 TC-018 TC-019,2,3,decision-table error-guessing use-case,not-run,,OPEN_QUESTIONS
+REQ-008,SHOP-128,US-128 AK-5,Yeni şifre son 3 şifreden biri olamaz,business-rule,medium,9,medium,clarification-needed,,TC-001 TC-020 TC-021 TC-022,2,2,decision-table error-guessing use-case,not-run,,OPEN_QUESTIONS
+REQ-009,SHOP-128,US-128 AK-6,Şifre değişince bilgilendirme e-postası gönderilir,functional,medium,6,medium,clarification-needed,,TC-014 TC-025,1,1,boundary-value-analysis requirements-based,not-run,,OPEN_QUESTIONS
+REQ-010,SHOP-128,US-128 AK-6,Şifre değişince açık oturumların tümü kapatılır,business-rule,high,12,high,clarification-needed,,TC-023 TC-024,1,1,error-guessing requirements-based,not-run,,OPEN_QUESTIONS
+REQ-011,SHOP-128,US-128 AK-6,Hatalı durumlarda kullanıcıya mesaj gösterilir,functional,low,4,low,clarification-needed,,TC-008 TC-010 TC-014,0,3,boundary-value-analysis state-transition,not-run,,OPEN_QUESTIONS
+REQ-012,SHOP-128,US-128 Notlar,Sayfalar hızlı açılmalı,non-functional,low,4,low,clarification-needed,,,0,0,,-,,OPEN_QUESTIONS UNCOVERED
+REQ-013,SHOP-128,US-128 AK-2 (türetilmiş),Yeni istek önceki sıfırlama bağlantılarını geçersiz kılar,business-rule,medium,8,medium,clarification-needed,yes,TC-012,0,1,state-transition,not-run,,OPEN_QUESTIONS UNCONFIRMED
+REQ-014,SHOP-128,US-128 AK-1 (türetilmiş),E-posta adresi büyük/küçük harf ve boşluktan bağımsız eşleştirilir,business-rule,medium,9,medium,clarification-needed,yes,TC-003 TC-004,1,1,error-guessing,not-run,,OPEN_QUESTIONS UNCONFIRMED

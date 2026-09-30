@@ -26,7 +26,7 @@ Adjust the paths to where the skills are installed.
 
 ## 2. Xray results import
 - Install `@xray-app/playwright-junit-reporter` (`npm i -D`) and enable it in `playwright.config.ts`: `['@xray-app/playwright-junit-reporter', { outputFile: 'test-results/xray-junit.xml', embedAnnotationsAsProperties: true }]`.
-- Tests carry a `test_key` annotation with the Xray test issue key. `generate_specs.py` adds it when the test case has `ext:` / `external_id`. The `requirements` annotation holds the requirement Jira keys.
+- Tests carry a `test_key` annotation with the Xray test issue key. `generate_specs.py` adds it when the test case has `ext:` / `external_id`. The `requirements` annotation holds only the requirement Jira keys (it is omitted when no requirement has an `external_id`, since Xray cannot resolve internal IDs); `qa_requirements` carries the REQ IDs for the RTM.
 - Import the XML with Xray's JUnit import, from the UI or its REST API, into a Test Execution. Tests without `test_key` are matched or created by name, which can create duplicates. Set `ignoreTestCasesWithoutTestKey: true` once all tests have keys.
 - Zephyr Scale and other tools accept standard JUnit (`test-results/junit.xml`). Map by test name, which starts with `TC-###`.
 

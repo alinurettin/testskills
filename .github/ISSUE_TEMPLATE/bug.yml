@@ -1,0 +1,83 @@
+name: Hata / Bug
+description: Bir skill ya da script yanlış çalışıyor. / A skill or a script does the wrong thing.
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Yalnızca sentetik ya da anonimleştirilmiş veri paylaşın. / Share synthetic or anonymised data only.
+        İçe aktarma sorunları için "İçe aktarma başarısız" şablonunu kullanın. / For import problems, use the "Import failed" template.
+  - type: dropdown
+    id: skill
+    attributes:
+      label: Skill
+      options:
+        - qa-orchestrator
+        - planning-tests
+        - analyzing-requirements
+        - designing-test-cases
+        - testing-nonfunctional
+        - tracing-requirements
+        - exporting-test-cases
+        - automating-with-playwright
+        - writing-bdd-scenarios
+        - reporting-test-results
+        - reviewing-test-cases
+        - testing-apis
+        - running-exploratory-tests
+        - testing-ai-features
+        - preparing-test-data
+        - testing-mobile-apps
+        - testing-data-migrations
+        - Bilmiyorum / Not sure
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Ne oldu? / What happened?
+      description: Gözlenen davranış; çıktıdan ilgili parça. / The observed behaviour, with the relevant part of the output.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ne bekliyordunuz? / What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Nasıl tekrarlanır? / How to reproduce
+      description: İstem, komut ve (sentetik) girdi dosyası. Dosyaları buraya sürükleyebilirsiniz. / The prompt, the command and a (synthetic) input file. You can drag files here.
+      placeholder: |
+        1. python skills/designing-test-cases/scripts/ep_bva.py spec.json --lang tr
+        2. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: QA Suite sürümü / QA Suite version
+      placeholder: "0.7.0"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Ortam / Environment
+      description: İstemci, model, işletim sistemi, Python sürümü. / Client, model, OS, Python version.
+      placeholder: "Claude Code, Opus, Windows 11, Python 3.13"
+  - type: textarea
+    id: logs
+    attributes:
+      label: Hata mesajı ya da log / Error message or log
+      render: shell
+  - type: checkboxes
+    id: data
+    attributes:
+      label: Veri / Data
+      options:
+        - label: Paylaştığım veri sentetik ya da anonimleştirilmiş. / The data I shared is synthetic or anonymised.
+          required: true

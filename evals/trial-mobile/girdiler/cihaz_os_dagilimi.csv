@@ -1,0 +1,28 @@
+platform,uretici,model,cihaz_tipi,os_surumu,api_seviyesi,aktif_kullanici_30g,platform_ici_pay_yuzde
+iOS,Apple,iPhone 15,telefon,26,,25315,16.70
+iOS,Apple,iPhone 13,telefon,26,,24036,15.85
+iOS,Apple,iPhone 11,telefon,26,,20900,13.78
+iOS,Apple,iPhone 16 Pro,telefon,26,,18442,12.16
+iOS,Apple,iPad (9. nesil),tablet,26,,6216,4.10
+iOS,Apple,iPhone 12,telefon,18,,19076,12.58
+iOS,Apple,iPhone XR,telefon,18,,13770,9.08
+iOS,Apple,iPhone SE (2. nesil),telefon,17,,6951,4.58
+iOS,Apple,iPad Air (4. nesil),tablet,17,,4520,2.98
+iOS,Apple,iPhone 8,telefon,16,,7764,5.12
+iOS,Apple,iPhone 7,telefon,15,,4635,3.06
+Android,Samsung,Galaxy A56,telefon,16,36,22745,9.12
+Android,Samsung,Galaxy S25,telefon,16,36,17093,6.86
+Android,Samsung,Galaxy Z Flip6,katlanabilir,16,36,5067,2.03
+Android,Samsung,Galaxy A55,telefon,15,35,29818,11.96
+Android,Xiaomi,Redmi Note 13 Pro,telefon,15,35,22327,8.96
+Android,Samsung,Galaxy Tab A9+,tablet,15,35,7539,3.02
+Android,Samsung,Galaxy A34,telefon,14,34,24804,9.95
+Android,Xiaomi,Redmi Note 12,telefon,14,34,22814,9.15
+Android,Samsung,Galaxy Z Fold5,katlanabilir,14,34,4979,2.00
+Android,Xiaomi,Redmi 12C,telefon,13,33,20168,8.09
+Android,Samsung,Galaxy A13,telefon,13,33,14727,5.91
+Android,Xiaomi,Redmi Note 10,telefon,12,31,22490,9.02
+Android,Samsung,Galaxy A21s,telefon,11,30,14619,5.86
+Android,Huawei,P30 Lite,telefon,10,29,9995,4.01
+Android,Xiaomi,Redmi 7,telefon,9,28,6329,2.54
+Android,Samsung,Galaxy J7 Prime,telefon,8.1,27,3799,1.52

@@ -1,6 +1,6 @@
 ---
 name: testing-data-migrations
-description: Tests data migrations, ETL/ELT pipelines and system replacements (legacy to new core, database upgrades, cloud moves). It treats the mapping specification as the requirement, profiles source data (nulls, duplicates, orphans, invalid codes, cp1254 vs UTF-8 Turkish characters, decimal comma, date formats) and reconciles source and target with a script. The script applies the transformation rules and reports counts, duplicate, missing and unexpected keys, field mismatches with hints (mojibake, x100, day/month swap), Decimal control totals per group and a PASS/FAIL verdict. It also covers mock migrations with cutover timing, rollback, delta and re-run tests, post-migration regression, privacy of production extracts, defect classification and sign-off tolerances. Use this whenever someone migrates, converts or moves data, or tests ETL, reconciliation or cutover, including Turkish requests such as "veri göçü testi", "veri taşıma", "migrasyon testi", "mutabakat", "eski sistemden yeni sisteme geçiş", "ETL testi".
+description: Tests data migrations, ETL pipelines and system replacements against the mapping specification. Profiles source data (duplicates, cp1254 vs UTF-8, decimal comma), reconciles source and target by script (counts, keys, field mismatches, control totals) and rehearses cutover and rollback. Use when data moves between systems. Triggers include data migration, ETL testing, reconciliation, cutover; Turkish "veri göçü testi", "migrasyon testi", "mutabakat".
 license: MIT
 metadata:
   suite: qa-suite
@@ -16,7 +16,7 @@ Match the user's language (`--lang tr|en` for the report). Table, column and cod
 
 ## Reading plan
 - This file covers the workflow.
-- Read `references/migration-testing.md` before writing the strategy or sign-off criteria. It covers the mapping specification, profiling, reconciliation levels, sampling, rehearsals and cutover, delta and idempotency, regression, performance, privacy, defect classification, and the limits of `reconcile.py`.
+- Read `references/migration-testing.md` before writing the strategy or sign-off criteria. It covers the mapping specification, profiling, reconciliation levels, sampling, rehearsals and cutover, delta and idempotency, regression, performance, privacy, defect classification, the limits of `reconcile.py`, and how its checks become test cases and results (§14).
 - Use `assets/reconciliation-queries.sql` for database-side checks, and `assets/mapping-example.json` as the starting point for a mapping file.
 - The script's full option list is at `python scripts/reconcile.py --help`.
 
@@ -31,12 +31,12 @@ Match the user's language (`--lang tr|en` for the report). Table, column and cod
 ```
 - [ ] 1. Mapping specification review (the requirement; gaps → questions)
 - [ ] 2. Profile the source before the first mock migration
-- [ ] 3. Strategy and sign-off criteria (levels, full vs sample, tolerances)
-- [ ] 4. Mock migration: run, time, reconcile
+- [ ] 3. Strategy, sign-off criteria and reconciliation test cases (REQ → TC)
+- [ ] 4. Mock migration: run, time, reconcile, write results (TC → qa/results.json)
 - [ ] 5. Triage: classify every finding
 - [ ] 6. Post-migration functional regression and performance
 - [ ] 7. Cutover rehearsal: timing, delta, re-run, rollback, go/no-go
-- [ ] 8. Sign-off report
+- [ ] 8. Sign-off report (RTM and completion report)
 ```
 
 ### 1. Mapping specification review
@@ -61,19 +61,32 @@ Profile before the first run. Profiling findings are cheaper to fix in the sourc
 
 Report each profiling finding to the data owner with a decision request: cleanse in the source, handle it in a transformation rule, or accept it as a documented exception.
 
-### 3. Strategy and sign-off criteria
+### 3. Strategy, sign-off criteria and reconciliation test cases
 Write these into the test plan (`planning-tests`) before the first mock run, so that nobody negotiates the tolerances after seeing the results:
 - **Reconciliation levels** (`references/migration-testing.md` §4): counts; control totals per group; key-set comparison; field-level comparison with transformation; referential integrity; business rules.
 - **Full comparison vs sampling.** Compare fully whenever the volume allows it; the script and the SQL are built for that. Use sampling only for checks that need a human, such as viewing records in the new UI, and size the sample deliberately (§5).
 - **Explicit tolerances.** A typical baseline: 0 missing keys, 0 unexpected keys, 0 duplicates, 0 control-total difference on money, 0 field mismatches, except documented and accepted exceptions, each with an owner and a reason.
 
-### 4. Mock migration: run, time, reconcile
-Run the migration as in production: same scripts, same order, production-size volume. Measure how long each step takes. Then reconcile:
+**Generate the reconciliation test cases now, before the first run**, so that migration verdicts reach the RTM and the completion report. The mapping file is enough; no extract is needed yet:
+```bash
+python scripts/reconcile.py --key customer_id --mapping qa/migration/mapping.json --sum balance --group-by branch \
+    --object customers --req-map qa/req-map.json --req REQ-060 --tests qa/test-cases.json --lang tr \
+    --compact-out qa/design/migration-customers.src.md
+```
+- The script writes one compact test case per check: row counts, key set (missing, unexpected and empty keys), duplicate keys, one per compared target column, one per `--sum` column (control total), and mapping coverage with null rates.
+- Requirements come from `--req-map` (`{"default": "REQ-060", "checks": {"key_set": "REQ-061", "column:balance": "REQ-062"}}`). A specific check wins over its family (`"column"`, `"total"`), the family over `default`, and `default` over `--req`. Map money, key and status columns to their own requirements rather than one REQ for everything.
+- TC IDs are stable. A regeneration reuses the IDs in the file's `# reconcile-tc-map:` header line and in the `design_ref` of `qa/test-cases.json`. Checks that were dropped stay in the file as `deprecated`.
+- Append the file to `qa/test-cases.src.md` and run `qa_compact.py` (`designing-test-cases`). Regenerate after every mapping change instead of editing the cases by hand.
+- All generated cases are positive. The RTM flags `NO_NEGATIVE` until reject handling (unknown codes, impossible dates, empty keys) is tested with a crafted edge-case dataset; design those cases with `designing-test-cases`.
+
+### 4. Mock migration: run, time, reconcile, write results
+Run the migration as in production: same scripts, same order, production-size volume. Measure how long each step takes. Then reconcile and write the results:
 ```bash
 python scripts/reconcile.py --source extract/legacy_customers.csv --target extract/new_customers.csv \
     --key customer_id --mapping qa/migration/mapping.json --sum balance --group-by branch \
-    --encoding-source cp1254 --delimiter-source ";" --lang tr \
-    --out qa/migration/reconciliation-mock1.md --json qa/migration/reconciliation-mock1.json
+    --encoding-source cp1254 --delimiter-source ";" --object customers --lang tr \
+    --out qa/migration/reconciliation-mock1.md --json qa/migration/reconciliation-mock1.json \
+    --results qa/results.json --tc-map qa/design/migration-customers.src.md --run "Mock 1"
 ```
 The script applies the mapping's transformations to each source row and compares the result with the target. The report lists:
 - row counts, and duplicate keys on each side;
@@ -82,6 +95,8 @@ The script applies the mapping's transformations to each source row and compares
 - control totals in Decimal, overall and per group, plus counts per group;
 - null-rate changes, and source columns that have no mapping decision;
 - a PASS/FAIL verdict: exit code 0 for PASS, 1 for FAIL.
+
+`--results` writes `passed` or `failed` for each mapped test case into `qa/results.json` (`"source": "reconcile"`). Each entry gets up to three findings in `errors` (keys and hints only, never field values) and a `note` that names the report. Other entries and linked defect keys are kept. A mapped check the run did not produce becomes `not-run`, and a check without a test case is reported as a warning. `--tc-map` also accepts `qa/test-cases.json`.
 
 Accepted exceptions go into `mapping.json` with a reason, so they stay visible in every report. The script holds the source in memory (about 0.5–1 KB per row). Above a few million rows, use the SQL templates inside the database, or compare "key + row hash" extracts.
 
@@ -96,7 +111,7 @@ Classify each finding before you file it. The class decides who fixes it:
 | Load defect | missing or duplicate rows, truncation, encoding broken on write, disabled constraints | migration developers / DBA |
 | Test (reconciliation) defect | wrong comparison rule or extract | the test team |
 
-Group rows by root cause. One misparsed decimal format may affect 40,000 rows, so file one defect that lists sample keys and the count (`reporting-test-results`). Re-run the full reconciliation after every fix, because fixes to transformations often shift other rows.
+Group rows by root cause. One misparsed decimal format may affect 40,000 rows, so file one defect that lists sample keys and the count (`reporting-test-results`). Link the defect key to the root-cause test case (the column or key-set check) in `qa/results.json`; row-count and control-total failures that follow from it are consequences, not extra defects. Re-run the full reconciliation, with `--results`, after every fix, because fixes to transformations often shift other rows.
 
 ### 6. Post-migration functional regression and performance
 Reconciled data can still break the application. Test the application on migrated data:
@@ -124,10 +139,10 @@ Report per migration object (customers, accounts, transactions …):
 - rehearsal timings against the cutover window;
 - the result of the regression tests.
 
-`reporting-test-results` produces the completion report. Attach the reconciliation Markdown files as evidence.
+Run the RTM (`tracing-requirements`) and the completion report (`reporting-test-results`) on `qa/`: the reconciliation test cases count as executed by automation, and a failed check fails its requirement. Attach the reconciliation Markdown files as evidence.
 
 ## Files
-- `scripts/reconcile.py`: CSV source/target reconciliation with a mapping (transform ops: trim, upper_tr/lower_tr, date, decimal, map, default, concat, strip_leading_zeros …). It reports counts, duplicates, missing and unexpected keys, field mismatches with hints, Decimal control totals per group, null rates and mapping coverage, and gives a PASS/FAIL verdict with accepted exceptions. Output is TR/EN.
+- `scripts/reconcile.py`: CSV source/target reconciliation with a mapping (transform ops: trim, upper_tr/lower_tr, date, decimal, map, default, concat, strip_leading_zeros …). It reports counts, duplicates, missing and unexpected keys, field mismatches with hints, Decimal control totals per group, null rates and mapping coverage, and gives a PASS/FAIL verdict with accepted exceptions. `--compact-out` writes one test case per check with stable TC IDs; `--results` writes the verdict per test case into `qa/results.json`. Output is TR/EN.
 - `assets/mapping-example.json`: an annotated mapping file that uses every op, ignored columns, not-migrated columns and accepted exceptions.
 - `assets/reconciliation-queries.sql`: parametrised SQL for profiling, counts, control totals per group, key anti-joins, row-hash comparison (with PostgreSQL, SQL Server, Oracle and MySQL notes), orphan and business-rule checks.
 - `references/migration-testing.md`: strategy, profiling, reconciliation levels, sampling, rehearsals and cutover, delta and idempotency, regression, performance, privacy, defect classification, sign-off template, and script limits.

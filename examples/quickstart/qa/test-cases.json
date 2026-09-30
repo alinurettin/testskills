@@ -1,0 +1,968 @@
+{
+ "project": "Demo Mağaza – Şifre sıfırlama (US-128)",
+ "language": "tr",
+ "test_cases": [
+  {
+   "id": "TC-001",
+   "title": "Şifre, e-postadaki bağlantıyla baştan sona sıfırlanır",
+   "objective": "Ana akış; DS-001 C-01 (14 karakter) ve DS-003 S-01 (T1 → T2)",
+   "requirement_ids": [
+    "REQ-001",
+    "REQ-006",
+    "REQ-007",
+    "REQ-008"
+   ],
+   "priority": "critical",
+   "polarity": "positive",
+   "category": "functional",
+   "technique": "use-case",
+   "design_ref": "DS-002 D05",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş"
+   ],
+   "steps": [
+    {
+     "action": "Giriş sayfasında 'Şifremi unuttum' bağlantısına tıkla",
+     "expected": "'Şifre sıfırlama' sayfası açılır; 'E-posta' alanı boş"
+    },
+    {
+     "action": "'E-posta' alanına adresi yaz, 'Bağlantı gönder'e tıkla",
+     "expected": "'E-posta adresiniz kayıtlıysa şifre sıfırlama bağlantısı gönderdik.' mesajı görünür",
+     "data": "ayse.test@example.com"
+    },
+    {
+     "action": "Test e-posta kutusunu aç",
+     "expected": "1 dakika içinde 'ayse.test@example.com' adresine sıfırlama bağlantısı içeren 1 e-posta gelmiş (Q-006)"
+    },
+    {
+     "action": "E-postadaki bağlantıyı aç",
+     "expected": "'Yeni şifre' formu açılır"
+    },
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı; giriş sayfası açılır (Q-005, Q-007)",
+     "data": "Guvenli2026Yaz"
+    },
+    {
+     "action": "Yeni şifreyle giriş yap",
+     "expected": "Giriş başarılı; 'Hesabım' sayfası açılır",
+     "data": "ayse.test@example.com / Guvenli2026Yaz"
+    }
+   ],
+   "tags": [
+    "smoke",
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "e-posta kutusu API'si ile uçtan uca"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-002",
+   "title": "Kayıtsız adres için aynı mesaj gösterilir, e-posta gönderilmez",
+   "objective": "Hesap numaralandırma koruması: ekran, kayıtlı adresle (TC-001 adım 2) birebir aynı olmalı",
+   "requirement_ids": [
+    "REQ-002",
+    "REQ-001"
+   ],
+   "priority": "high",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "equivalence-partitioning",
+   "preconditions": [
+    "'yok.test@example.com' adresiyle kayıtlı hesap yok",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş"
+   ],
+   "steps": [
+    {
+     "action": "'Şifre sıfırlama' sayfasında adresi yaz, 'Bağlantı gönder'e tıkla",
+     "expected": "'E-posta adresiniz kayıtlıysa şifre sıfırlama bağlantısı gönderdik.' mesajı görünür; metin, sayfa adresi ve alan durumu kayıtlı adresle aynı",
+     "data": "yok.test@example.com"
+    },
+    {
+     "action": "2 dakika bekle, test e-posta kutusunu kontrol et",
+     "expected": "'yok.test@example.com' adresine hiçbir e-posta gelmemiş"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "e-posta kutusu API'si"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-003",
+   "title": "Büyük harfli ve boşluklu adres kayıtlı hesapla eşleşir",
+   "objective": "Türkçe 'I' tuzağı: dil kurallı küçük harf 'ırem' üretir ve adres bulunamaz (Q-010 varsayımı)",
+   "requirement_ids": [
+    "REQ-014"
+   ],
+   "priority": "medium",
+   "polarity": "positive",
+   "category": "localization",
+   "technique": "error-guessing",
+   "preconditions": [
+    "'irem.test@example.com' adresiyle aktif bir müşteri hesabı var",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş"
+   ],
+   "steps": [
+    {
+     "action": "'Şifre sıfırlama' sayfasında adresi yaz, 'Bağlantı gönder'e tıkla",
+     "expected": "Genel mesaj görünür: 'E-posta adresiniz kayıtlıysa şifre sıfırlama bağlantısı gönderdik.'",
+     "data": " IREM.TEST@EXAMPLE.COM "
+    },
+    {
+     "action": "Test e-posta kutusunu aç",
+     "expected": "1 dakika içinde 'irem.test@example.com' adresine sıfırlama bağlantısı gelmiş"
+    }
+   ],
+   "tags": [
+    "regression",
+    "localization",
+    "error-guessing"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-004",
+   "title": "Noktasız 'ı' içeren adres kayıtlı hesapla eşleşmez",
+   "objective": "Bilinen hata sınıfı: Unicode harf katlamasıyla 'ı' → 'i' eşleşip bağlantı yazılan adrese giderse hesap ele geçirilir (Q-010)",
+   "requirement_ids": [
+    "REQ-014",
+    "REQ-002"
+   ],
+   "priority": "high",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "error-guessing",
+   "preconditions": [
+    "'irem.test@example.com' adresiyle aktif bir müşteri hesabı var",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş; 'ırem.test@example.com' adresi de bu kutuda izleniyor"
+   ],
+   "steps": [
+    {
+     "action": "'Şifre sıfırlama' sayfasında adresi yaz, 'Bağlantı gönder'e tıkla",
+     "expected": "Genel mesaj görünür: 'E-posta adresiniz kayıtlıysa şifre sıfırlama bağlantısı gönderdik.'",
+     "data": "ırem.test@example.com"
+    },
+    {
+     "action": "2 dakika bekle, test e-posta kutusunu kontrol et",
+     "expected": "Ne 'ırem.test@example.com' ne de 'irem.test@example.com' adresine sıfırlama e-postası gelmiş"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security",
+    "localization",
+    "error-guessing"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-005",
+   "title": "60 dakika içindeki 3. istek e-posta gönderir",
+   "objective": "Varsayım Q-002: kayan 60 dakika",
+   "requirement_ids": [
+    "REQ-005"
+   ],
+   "priority": "medium",
+   "polarity": "positive",
+   "category": "functional",
+   "technique": "boundary-value-analysis",
+   "design_ref": "DS-001 C-03",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Son 60 dakika içinde 'ayse.test@example.com' için 2 sıfırlama isteği yapılmış ve 2 e-posta gelmiş"
+   ],
+   "steps": [
+    {
+     "action": "'Şifre sıfırlama' sayfasında 'Bağlantı gönder'e tıkla",
+     "expected": "Genel mesaj görünür",
+     "data": "ayse.test@example.com"
+    },
+    {
+     "action": "Test e-posta kutusunu aç",
+     "expected": "1 dakika içinde 3. sıfırlama e-postası gelmiş"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "saat kontrolü gerekir"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-006",
+   "title": "60 dakika içindeki 4. istekte e-posta gönderilmez",
+   "objective": "Varsayım Q-002: 4. istekte ekran değişmez (numaralandırmayı önler), yalnızca e-posta gönderilmez",
+   "requirement_ids": [
+    "REQ-005",
+    "REQ-002"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "boundary-value-analysis",
+   "design_ref": "DS-001 C-16",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Son 60 dakika içinde 'ayse.test@example.com' için 3 sıfırlama isteği yapılmış ve 3 e-posta gelmiş"
+   ],
+   "steps": [
+    {
+     "action": "'Şifre sıfırlama' sayfasında 'Bağlantı gönder'e tıkla",
+     "expected": "Aynı genel mesaj görünür; 'çok fazla deneme' gibi farklı bir metin yok",
+     "data": "ayse.test@example.com"
+    },
+    {
+     "action": "2 dakika bekle, test e-posta kutusunu kontrol et",
+     "expected": "Yeni e-posta gelmemiş; toplam 3 e-posta"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "saat kontrolü gerekir"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-007",
+   "title": "29:59'luk bağlantıyla 20 karakterlik şifre kaydedilir",
+   "objective": "İki geçerli üst sınır birlikte: bağlantı yaşı 1799 sn ve şifre uzunluğu 20 (Q-001 varsayımı)",
+   "requirement_ids": [
+    "REQ-003",
+    "REQ-006"
+   ],
+   "priority": "medium",
+   "polarity": "positive",
+   "category": "functional",
+   "technique": "boundary-value-analysis",
+   "design_ref": "DS-001 C-03",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Test ortamında saat kontrolü açık; 'ayse.test@example.com' için sıfırlama bağlantısı 29 dakika 59 saniye önce istenmiş"
+   ],
+   "steps": [
+    {
+     "action": "Bağlantıyı aç",
+     "expected": "'Yeni şifre' formu açılır"
+    },
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı görünür",
+     "data": "GuvenliSifre20262026"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "saat kontrolü gerekir"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-008",
+   "title": "30. dakikada açılan bağlantı reddedilir",
+   "objective": "Varsayım Q-001: 30:00 ve sonrası geçersiz; mesaj Q-005 önerisi",
+   "requirement_ids": [
+    "REQ-003",
+    "REQ-011"
+   ],
+   "priority": "high",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "boundary-value-analysis",
+   "design_ref": "DS-001 C-12",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Test ortamında saat kontrolü açık; 'ayse.test@example.com' için kullanılmamış sıfırlama bağlantısı tam 30 dakika önce istenmiş"
+   ],
+   "steps": [
+    {
+     "action": "Bağlantıyı aç",
+     "expected": "'Yeni şifre' formu açılmaz; 'Bu bağlantı artık geçerli değil. Lütfen yeni bir sıfırlama bağlantısı isteyin.' mesajı görünür"
+    },
+    {
+     "action": "Mevcut şifreyle giriş yap",
+     "expected": "Giriş başarılı; şifre değişmemiş",
+     "data": "ayse.test@example.com / Mevcut2026"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "saat kontrolü gerekir"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-009",
+   "title": "Form açıkken süresi dolan bağlantıyla şifre kaydedilmez",
+   "objective": "Varsayım Q-001: süre 'Şifreyi kaydet' anında da kontrol edilir",
+   "requirement_ids": [
+    "REQ-003"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "state-transition",
+   "design_ref": "DS-003 N-03",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Test ortamında saat kontrolü açık; bağlantı 29 dakika önce istenmiş ve 'Yeni şifre' formu açık"
+   ],
+   "steps": [
+    {
+     "action": "Saati 2 dakika ileri al",
+     "expected": "Form ekranda açık kalır"
+    },
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Bu bağlantı artık geçerli değil. Lütfen yeni bir sıfırlama bağlantısı isteyin.' mesajı görünür",
+     "data": "Guvenli2026Yaz"
+    },
+    {
+     "action": "Mevcut şifreyle giriş yap",
+     "expected": "Giriş başarılı",
+     "data": "ayse.test@example.com / Mevcut2026"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "saat kontrolü gerekir"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-010",
+   "title": "Kullanılmış bağlantı ikinci kez açılamaz",
+   "objective": "Tekrar kullanılabilen bağlantı hesabın yeniden ele geçirilmesine izin verir",
+   "requirement_ids": [
+    "REQ-004",
+    "REQ-011"
+   ],
+   "priority": "critical",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "state-transition",
+   "design_ref": "DS-003 N-02",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' 5 dakika önce sıfırlama bağlantısıyla şifresini 'Guvenli2026Yaz' yapmış"
+   ],
+   "steps": [
+    {
+     "action": "Aynı sıfırlama bağlantısını yeniden aç",
+     "expected": "'Yeni şifre' formu açılmaz; 'Bu bağlantı artık geçerli değil. Lütfen yeni bir sıfırlama bağlantısı isteyin.' mesajı görünür"
+    },
+    {
+     "action": "Şifreyle giriş yap",
+     "expected": "Giriş başarılı; şifre ikinci kez değişmemiş",
+     "data": "ayse.test@example.com / Guvenli2026Yaz"
+    }
+   ],
+   "tags": [
+    "smoke",
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": ""
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-011",
+   "title": "İkinci sekmede açık kalan formdan şifre kaydedilemez",
+   "objective": "Aynı bağlantının iki sekmede açılması (tekrar gönderim) N-02'nin ikinci yolu",
+   "requirement_ids": [
+    "REQ-004"
+   ],
+   "priority": "high",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "error-guessing",
+   "design_ref": "DS-003 N-02",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Aynı sıfırlama bağlantısı aynı tarayıcıda iki sekmede açık; iki sekmede de 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "1. sekmede 'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı görünür",
+     "data": "Guvenli2026Yaz"
+    },
+    {
+     "action": "2. sekmede 'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Bu bağlantı artık geçerli değil. Lütfen yeni bir sıfırlama bağlantısı isteyin.' mesajı görünür",
+     "data": "BaskaSifre2026"
+    },
+    {
+     "action": "Şifreyle giriş yap",
+     "expected": "Giriş başarılı",
+     "data": "ayse.test@example.com / Guvenli2026Yaz"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security",
+    "error-guessing"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "iki sayfa bağlamı"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-012",
+   "title": "Yeni bağlantı istenince eski bağlantı geçersiz olur",
+   "objective": "DS-003 S-03 (T1 → T5); varsayım Q-009: yalnızca en son bağlantı geçerli",
+   "requirement_ids": [
+    "REQ-013"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "state-transition",
+   "design_ref": "DS-003 N-04",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 10 dakika önce 1. bağlantı, 2 dakika önce 2. bağlantı istenmiş; ikisi de kullanılmamış"
+   ],
+   "steps": [
+    {
+     "action": "1. e-postadaki bağlantıyı aç",
+     "expected": "'Yeni şifre' formu açılmaz; 'Bu bağlantı artık geçerli değil. Lütfen yeni bir sıfırlama bağlantısı isteyin.' mesajı görünür"
+    },
+    {
+     "action": "2. e-postadaki bağlantıyı aç",
+     "expected": "'Yeni şifre' formu açılır"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": ""
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-013",
+   "title": "Değiştirilmiş token'lı bağlantı formu açmaz",
+   "objective": "Sistemin üretmediği bir token hiçbir durumda form açmamalı",
+   "requirement_ids": [
+    "REQ-004"
+   ],
+   "priority": "high",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "state-transition",
+   "design_ref": "DS-003 N-01",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenmiş, kullanılmamış sıfırlama bağlantısı var"
+   ],
+   "steps": [
+    {
+     "action": "Bağlantıdaki token'ın son karakterini değiştirip adresi tarayıcıda aç",
+     "expected": "'Yeni şifre' formu açılmaz; 'Bu bağlantı artık geçerli değil. Lütfen yeni bir sıfırlama bağlantısı isteyin.' mesajı görünür",
+     "data": "son karakter 'a' ise 'b', değilse 'a'"
+    },
+    {
+     "action": "Orijinal bağlantıyı aç",
+     "expected": "'Yeni şifre' formu açılır; geçersiz deneme orijinal bağlantıyı bozmamış"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": ""
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-014",
+   "title": "7 karakterlik şifre reddedilir, bağlantı geçerli kalır",
+   "objective": "Kural ihlali bağlantıyı tüketmez (DS-003 T3); adım 3 alt sınırı doğrular (DS-001 C-02)",
+   "requirement_ids": [
+    "REQ-006",
+    "REQ-009",
+    "REQ-011"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "boundary-value-analysis",
+   "design_ref": "DS-001 C-07",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Şifre 8–20 karakter olmalı ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.' mesajı görünür",
+     "data": "Guven12"
+    },
+    {
+     "action": "Test e-posta kutusunu kontrol et",
+     "expected": "'Şifreniz değiştirildi' e-postası gelmemiş"
+    },
+    {
+     "action": "Aynı formda 'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı görünür",
+     "data": "Guvenli8"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-015",
+   "title": "21 karakterlik şifre reddedilir",
+   "requirement_ids": [
+    "REQ-006"
+   ],
+   "priority": "low",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "boundary-value-analysis",
+   "design_ref": "DS-001 C-08",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Şifre 8–20 karakter olmalı ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.' mesajı görünür",
+     "data": "GuvenliSifre202620261"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-016",
+   "title": "Rakamsız şifre reddedilir",
+   "requirement_ids": [
+    "REQ-007"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "decision-table",
+   "design_ref": "DS-002 D01",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Şifre 8–20 karakter olmalı ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.' mesajı görünür",
+     "data": "GuvenliSifre"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-017",
+   "title": "Küçük harfsiz şifre reddedilir",
+   "requirement_ids": [
+    "REQ-007"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "decision-table",
+   "design_ref": "DS-002 D02",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Şifre 8–20 karakter olmalı ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.' mesajı görünür",
+     "data": "GUVENLI2026"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-018",
+   "title": "Büyük harfsiz şifre reddedilir",
+   "requirement_ids": [
+    "REQ-007"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "decision-table",
+   "design_ref": "DS-002 D03",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Şifre 8–20 karakter olmalı ve en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.' mesajı görünür",
+     "data": "yenisifre2026"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-019",
+   "title": "Tek büyük harfi 'Ş' olan şifre kabul edilir",
+   "objective": "Varsayım Q-003: Türkçe harfler kabul edilir ve büyük/küçük harf sayılır",
+   "requirement_ids": [
+    "REQ-007"
+   ],
+   "priority": "medium",
+   "polarity": "positive",
+   "category": "localization",
+   "technique": "error-guessing",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı görünür",
+     "data": "Şifre2026"
+    },
+    {
+     "action": "Yeni şifreyle giriş yap",
+     "expected": "Giriş başarılı",
+     "data": "ayse.test@example.com / Şifre2026"
+    }
+   ],
+   "tags": [
+    "regression",
+    "localization",
+    "error-guessing"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-020",
+   "title": "İki önceki şifre yeni şifre olarak reddedilir",
+   "objective": "Varsayım Q-004: son 3 = mevcut + önceki 2; 'Onceki2024' son 3'ün en eskisi",
+   "requirement_ids": [
+    "REQ-008"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "decision-table",
+   "design_ref": "DS-002 D04",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Şifre geçmişi (yeniden eskiye): 'Mevcut2026' (mevcut), 'Onceki2025' (bir önceki), 'Onceki2024' (iki önceki), 'Onceki2023' (üç önceki)",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Yeni şifreniz son 3 şifrenizden farklı olmalıdır.' mesajı görünür",
+     "data": "Onceki2024"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-021",
+   "title": "Mevcut şifre yeni şifre olarak reddedilir",
+   "objective": "Ayrı risk: mevcut şifre çoğu uygulamada geçmiş listesinde değil ayrı alanda tutulur; kabul kriterindeki örnek (Q-004)",
+   "requirement_ids": [
+    "REQ-008"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "functional",
+   "technique": "error-guessing",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Şifre geçmişi (yeniden eskiye): 'Mevcut2026' (mevcut), 'Onceki2025' (bir önceki), 'Onceki2024' (iki önceki), 'Onceki2023' (üç önceki)",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "Şifre kaydedilmez; 'Yeni şifreniz son 3 şifrenizden farklı olmalıdır.' mesajı görünür",
+     "data": "Mevcut2026"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-022",
+   "title": "Üç önceki şifre yeniden kullanılabilir",
+   "objective": "D05'in geçmiş sınırındaki temsilcisi: son 3'ün dışındaki ilk şifre (Q-004)",
+   "requirement_ids": [
+    "REQ-008"
+   ],
+   "priority": "low",
+   "polarity": "positive",
+   "category": "functional",
+   "technique": "decision-table",
+   "design_ref": "DS-002 D05",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "Şifre geçmişi (yeniden eskiye): 'Mevcut2026' (mevcut), 'Onceki2025' (bir önceki), 'Onceki2024' (iki önceki), 'Onceki2023' (üç önceki)",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı görünür",
+     "data": "Onceki2023"
+    }
+   ],
+   "tags": [
+    "regression"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "veri güdümlü"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-023",
+   "title": "Şifre sıfırlanınca diğer tarayıcıdaki oturum kapanır",
+   "objective": "Varsayım Q-007: 'Beni hatırla' dahil tüm oturumlar sonlanır; otomatik giriş yok",
+   "requirement_ids": [
+    "REQ-010"
+   ],
+   "priority": "high",
+   "polarity": "positive",
+   "category": "security",
+   "technique": "requirements-based",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' Firefox'ta 'Beni hatırla' işaretli giriş yapmış; 'Hesabım' sayfası açık",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür",
+    "Sıfırlama formu Chrome'da açık; Chrome'da oturum yok"
+   ],
+   "steps": [
+    {
+     "action": "Chrome'daki formda 'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı; Chrome'da oturum açılmamış",
+     "data": "Guvenli2026Yaz"
+    },
+    {
+     "action": "Firefox'ta 'Hesabım' sayfasını yenile",
+     "expected": "Giriş sayfasına yönlendirilir"
+    },
+    {
+     "action": "Firefox'u kapatıp yeniden aç, siteye git",
+     "expected": "Oturum açık değil; 'Beni hatırla' ile otomatik giriş olmaz"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "iki tarayıcı bağlamı"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-024",
+   "title": "Yalnızca sıfırlama istemek açık oturumu kapatmaz",
+   "objective": "Herkes her adres için istek yapabilir; istek tek başına oturumu kapatırsa kullanıcıyı sistemden atmak için kötüye kullanılır",
+   "requirement_ids": [
+    "REQ-010"
+   ],
+   "priority": "medium",
+   "polarity": "negative",
+   "category": "security",
+   "technique": "error-guessing",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' Firefox'ta giriş yapmış; 'Hesabım' sayfası açık"
+   ],
+   "steps": [
+    {
+     "action": "Chrome'da 'Şifre sıfırlama' sayfasında 'Bağlantı gönder'e tıkla",
+     "expected": "Genel mesaj görünür",
+     "data": "ayse.test@example.com"
+    },
+    {
+     "action": "Firefox'ta 'Hesabım' sayfasını yenile",
+     "expected": "Oturum açık kalır; 'Hesabım' sayfası görünür"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security",
+    "error-guessing"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "iki tarayıcı bağlamı"
+   },
+   "status": "ready"
+  },
+  {
+   "id": "TC-025",
+   "title": "Şifre değişince bilgilendirme e-postası şifre içermeden gelir",
+   "objective": "Varsayım Q-008: e-postada tarih-saat ve destek bağlantısı var; şifre ve sıfırlama bağlantısı yok",
+   "requirement_ids": [
+    "REQ-009"
+   ],
+   "priority": "medium",
+   "polarity": "positive",
+   "category": "security",
+   "technique": "requirements-based",
+   "preconditions": [
+    "'ayse.test@example.com' adresiyle aktif bir müşteri hesabı var; mevcut şifre 'Mevcut2026'",
+    "Test ortamının e-posta kutusu (sahte SMTP) açık ve boş",
+    "'ayse.test@example.com' için 5 dakika önce istenen, kullanılmamış sıfırlama bağlantısı açılmış; 'Yeni şifre' formu görünür"
+   ],
+   "steps": [
+    {
+     "action": "'Yeni şifre' alanına yaz, 'Şifreyi kaydet'e tıkla",
+     "expected": "'Şifreniz değiştirildi. Yeni şifrenizle giriş yapabilirsiniz.' mesajı görünür",
+     "data": "Guvenli2026Yaz"
+    },
+    {
+     "action": "Test e-posta kutusunu aç",
+     "expected": "1 dakika içinde 'Şifreniz değiştirildi' konulu e-posta gelmiş; değişiklik tarihi-saati (TSİ) ve 'Bu işlemi siz yapmadıysanız' destek bağlantısı var"
+    },
+    {
+     "action": "E-posta gövdesinde yeni şifreyi ara",
+     "expected": "Şifre geçmiyor; sıfırlama bağlantısı da yok",
+     "data": "Guvenli2026Yaz"
+    }
+   ],
+   "tags": [
+    "regression",
+    "security"
+   ],
+   "automation": {
+    "candidate": true,
+    "reason": "e-posta kutusu API'si"
+   },
+   "status": "ready"
+  }
+ ]
+}

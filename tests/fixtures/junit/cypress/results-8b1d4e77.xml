@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="3.1040" tests="2" failures="0" skipped="0">
+  <testsuite name="Root Suite" timestamp="2026-09-28T07:31:11" tests="0" file="cypress/e2e/checkout.cy.ts" time="0.0000" failures="0">
+  </testsuite>
+  <testsuite name="Checkout" timestamp="2026-09-28T07:31:11" tests="2" time="3.1040" failures="0">
+    <testcase name="Checkout TC-404 guest can pay by card" time="2.7010" classname="TC-404 guest can pay by card">
+    </testcase>
+    <testcase name="Checkout shows the cart badge" time="0.4030" classname="shows the cart badge">
+    </testcase>
+  </testsuite>
+</testsuites>

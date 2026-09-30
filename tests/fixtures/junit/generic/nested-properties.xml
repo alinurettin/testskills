@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Not one specific tool: the variants other reporters use for IDs, statuses and times -->
+<testsuites name="nightly" tests="11" failures="2">
+  <testsuite name="api">
+    <properties>
+      <property name="build" value="TC-999-nightly"/>
+    </properties>
+    <testsuite name="TC-906 Refund flow">
+      <testcase name="refund is created" classname="refunds" time="0.4"/>
+      <testcase name="refund is booked" classname="refunds" time="0.3">
+        <failure message="ledger entry missing"/>
+      </testcase>
+    </testsuite>
+    <testcase name="coupon by property" classname="coupons" time="0.1">
+      <properties><property name="tc" value="TC-901"/></properties>
+    </testcase>
+    <testcase name="coupon by tag list" classname="coupons" time="0.1">
+      <properties><property name="tags" value="smoke, TC-902"/></properties>
+    </testcase>
+    <testcase name="coupon by bare number" classname="coupons" time="0,25">
+      <properties><property name="test_case_id" value="903"/></properties>
+    </testcase>
+    <testcase name="coupon by attribute" classname="coupons" id="TC-904" time="1,234.5"/>
+    <testcase name="TC-905 onboarding flow" classname="flows" time="3.2" status="ERROR"/>
+    <testcase name="retry once" classname="com.example.TC907RetryTest" time="1.0">
+      <flakyError message="Read timed out" type="java.net.SocketTimeoutException"/>
+    </testcase>
+    <testcase name="TC-908 and TC-909 share one test" classname="coupons" time="0.2"/>
+    <testcase name="report export" classname="reports" time="0.1"/>
+  </testsuite>
+</testsuites>

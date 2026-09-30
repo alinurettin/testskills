@@ -1,0 +1,90 @@
+{
+  "openapi": "3.0.3",
+  "info": {"title": "Req mapping fixture API (synthetic)", "version": "1.0.0"},
+  "security": [{"bearer": []}],
+  "components": {
+    "securitySchemes": {"bearer": {"type": "http", "scheme": "bearer"}},
+    "schemas": {
+      "Item": {
+        "type": "object",
+        "required": ["id", "name"],
+        "properties": {
+          "id": {"type": "string", "readOnly": true},
+          "name": {"type": "string", "minLength": 1, "maxLength": 40}
+        }
+      },
+      "NewItem": {
+        "type": "object",
+        "required": ["name"],
+        "additionalProperties": false,
+        "properties": {"name": {"type": "string", "minLength": 1, "maxLength": 40, "example": "Kalem"}}
+      },
+      "Error": {"type": "object", "required": ["code"], "properties": {"code": {"type": "string"}}}
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "getHealth",
+        "tags": ["System"],
+        "security": [],
+        "responses": {
+          "200": {"description": "up", "content": {"application/json": {"schema": {"type": "object", "properties": {"status": {"type": "string"}}}}}}
+        }
+      }
+    },
+    "/items": {
+      "get": {
+        "operationId": "listItems",
+        "tags": ["Items"],
+        "responses": {
+          "200": {"description": "items", "content": {"application/json": {"schema": {"type": "array", "items": {"$ref": "#/components/schemas/Item"}}}}},
+          "401": {"description": "no credentials", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      },
+      "post": {
+        "operationId": "createItem",
+        "tags": ["Items"],
+        "x-req": ["REQ-105", "REQ-106"],
+        "parameters": [{"name": "Idempotency-Key", "in": "header", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/NewItem"}}}},
+        "responses": {
+          "201": {"description": "created", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Item"}}}},
+          "400": {"description": "invalid", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+          "401": {"description": "no credentials", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      }
+    },
+    "/items/{itemId}": {
+      "parameters": [{"name": "itemId", "in": "path", "required": true, "schema": {"type": "string"}, "example": "item-0001"}],
+      "get": {
+        "operationId": "getItem",
+        "tags": ["Items"],
+        "responses": {
+          "200": {"description": "item", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Item"}}}},
+          "401": {"description": "no credentials", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+          "404": {"description": "unknown", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      },
+      "put": {
+        "tags": ["Items"],
+        "requestBody": {"required": true, "content": {"application/json": {"schema": {"$ref": "#/components/schemas/NewItem"}}}},
+        "responses": {
+          "200": {"description": "updated", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Item"}}}},
+          "400": {"description": "invalid", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+          "401": {"description": "no credentials", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+          "404": {"description": "unknown", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      },
+      "delete": {
+        "operationId": "deleteItem",
+        "tags": ["Admin", "Items"],
+        "responses": {
+          "204": {"description": "deleted"},
+          "401": {"description": "no credentials", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}},
+          "404": {"description": "unknown", "content": {"application/json": {"schema": {"$ref": "#/components/schemas/Error"}}}}
+        }
+      }
+    }
+  }
+}

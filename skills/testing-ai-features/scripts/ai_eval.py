@@ -54,14 +54,23 @@ Gate (exit 1 when it fails):
   - a case with an explicit "min_pass_rate" is below it, or
   - latency p95 > --max-p95-ms / mean tokens per run > --max-mean-tokens (when given).
 
+Requirement links (seed --compact-out): each compact test case traces to the requirement(s) of its category.
+  --req-map FILE  {"default": "REQ-040", "categories": {"functional": "REQ-040", "injection": "REQ-041",
+                   "pii": ["REQ-042", "REQ-043"], "LLM06": "REQ-044"}}
+  "categories" keys: a category (injection_direct), the group "injection" (injection_direct +
+  injection_indirect) or an OWASP LLM ID (LLM06 or LLM06:2025); values: a REQ ID or a list.
+  Precedence: category > group > OWASP IDs (union) > req-map default > --req. A case without a
+  requirement stops the run (exit 2) with the list of unmapped categories; nothing is written.
+  One REQ for every eval case hides thin or untested risks in the RTM.
+
 Examples:
   python ai_eval.py seed --feature "Bankacılık asistanı (sohbet botu)" --lang tr --out qa/ai/evals.jsonl
   python ai_eval.py seed --feature "RAG search over HR policies" --categories injection_indirect,hallucination \\
-      --out qa/ai/evals.jsonl --compact-out qa/design/ai-evals.src.md --req REQ-040 --tests qa/test-cases.json
+      --out qa/ai/evals.jsonl --compact-out qa/design/ai-evals.src.md --req-map qa/req-map.json --tests qa/test-cases.json
   python ai_eval.py score --cases qa/ai/evals.jsonl --outputs qa/ai/outputs.jsonl --threshold 0.9 \\
       --out qa/ai/eval-report.md --json qa/ai/eval-report.json --results qa/results.json --lang tr
 
-Exit codes: 0 ok / gate passed, 1 gate failed, 2 usage or input error.
+Exit codes: 0 ok / gate passed, 1 gate failed, 2 usage or input error (incl. unmapped categories).
 """
 from __future__ import annotations
 
@@ -72,7 +81,11 @@ import math
 import re
 import sys
 import unicodedata
+from collections import Counter
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from tr_ids import validate_tckn  # noqa: E402  (shared Turkish ID checksums, synced from shared/scripts)
 
 OWASP_LLM_2025 = {
     "LLM01:2025": "Prompt Injection",
@@ -153,11 +166,8 @@ def luhn_ok(digits: str) -> bool:
 
 
 def tckn_ok(s: str) -> bool:
-    if len(s) != 11 or not s.isdigit() or s[0] == "0":
-        return False
-    d = [int(c) for c in s]
-    d10 = ((d[0] + d[2] + d[4] + d[6] + d[8]) * 7 - (d[1] + d[3] + d[5] + d[7])) % 10
-    return d10 == d[9] and sum(d[:10]) % 10 == d[10]
+    """Checksum-valid TCKN (tr_ids.validate_tckn: 11 ASCII digits, first not 0, both check digits)."""
+    return validate_tckn(s)[0]
 
 
 PII_RES = {
@@ -546,6 +556,98 @@ def next_tc(tests_path: str | None) -> int:
     return max(nums, default=0) + 1
 
 
+# ---------------------------------------------------------------- requirement mapping (--req-map)
+REQ_MAP_KEYS = {"default", "operations", "tags", "capabilities", "categories", "areas"}
+REQ_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9_.:-]*$")
+CATEGORY_GROUPS = {"injection": {"injection_direct", "injection_indirect"}}
+
+
+def req_list(value, where: str) -> list[str]:
+    """A REQ ID, a comma-separated string or a list of them -> de-duplicated list (ValueError if malformed)."""
+    out: list[str] = []
+    for v in value if isinstance(value, list) else [value]:
+        if not isinstance(v, str):
+            raise ValueError(f"{where}: expected a REQ ID or a list of REQ IDs, got {json.dumps(v)}")
+        for x in (p.strip() for p in v.split(",")):
+            if not REQ_TOKEN.match(x):
+                raise ValueError(f"{where}: invalid requirement ID {x!r}")
+            if x not in out:
+                out.append(x)
+    if not out:
+        raise ValueError(f"{where}: no requirement ID")
+    return out
+
+
+def load_req_map(path: str | None, sections: tuple[str, ...]) -> tuple[dict, list[str]]:
+    """--req-map JSON -> ({"default": [...], section: {key: [...]}}, warnings). ValueError when unusable."""
+    rmap: dict = {"default": [], **{s: {} for s in sections}}
+    if not path:
+        return rmap, []
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as e:
+        raise ValueError(f"--req-map: cannot read {path}: {e}")
+    if not isinstance(raw, dict):
+        raise ValueError(f"--req-map {path}: must be a JSON object")
+    warnings = [f"--req-map: unknown key '{k}' ignored" for k in raw if k not in REQ_MAP_KEYS and not k.startswith(("_", "$"))]
+    if raw.get("default") not in (None, "", []):
+        rmap["default"] = req_list(raw["default"], "--req-map default")
+    for s in sections:
+        sec = raw.get(s) or {}
+        if not isinstance(sec, dict):
+            raise ValueError(f"--req-map: '{s}' must be an object of key -> REQ ID(s)")
+        rmap[s] = {str(k): req_list(v, f"--req-map {s}.{k}") for k, v in sec.items()}
+    return rmap, warnings
+
+
+def req_summary(links: list[tuple[list[str], str]]) -> str:
+    """'REQ-041 6 (neg 6), REQ-040 3 (neg 0)': generated tests per requirement."""
+    count: Counter = Counter()
+    neg: Counter = Counter()
+    for reqs, pol in links:
+        for r in reqs:
+            count[r] += 1
+            neg[r] += pol == "-"
+    return ", ".join(f"{r} {count[r]} (neg {neg[r]})" for r in count)
+
+
+def resolve_case(case: dict, cmap: dict, default: list[str], fallback: list[str]) -> list[str]:
+    """cmap: lower-cased "categories" of the req-map. Precedence: category > group ("injection") >
+    OWASP IDs (union) > req-map default > --req."""
+    if case["category"] in cmap:
+        return cmap[case["category"]]
+    for group, members in CATEGORY_GROUPS.items():
+        if case["category"] in members and group in cmap:
+            return cmap[group]
+    found: list[str] = []
+    for o in case.get("owasp") or []:
+        hit = cmap.get(o.lower()) or cmap.get(o.split(":")[0].lower()) or []
+        found += [r for r in hit if r not in found]
+    return found or default or fallback
+
+
+def assign_reqs(cases: list[dict], a) -> str | None:
+    """Sets case["_req"] for every case; returns an error message when the requirements are unusable."""
+    try:
+        fallback = req_list(a.req, "--req") if (a.req or "").strip() else []
+        rmap, warnings = load_req_map(a.req_map, ("categories",))
+    except ValueError as e:
+        return str(e)
+    cmap = {k.strip().lower(): v for k, v in rmap["categories"].items()}
+    for c in cases:
+        c["_req"] = resolve_case(c, cmap, rmap["default"], fallback)
+    unmapped = Counter(c["category"] for c in cases if not c["_req"])
+    if unmapped:
+        return ("no requirement for categories: " + ", ".join(f"{k} ({v} cases)" for k, v in unmapped.items())
+                + ". Map them in --req-map (categories or default) or pass --req.")
+    known = set(CATEGORIES) | set(CATEGORY_GROUPS) | {x.lower() for o in OWASP_LLM_2025 for x in (o, o.split(":")[0])}
+    warnings += [f"--req-map: categories key '{k}' is not a category, 'injection' or an OWASP LLM ID"
+                 for k in cmap if k not in known]
+    for w in warnings:
+        print(f"warning: {w}", file=sys.stderr)
+    return None
+
+
 def compact_lines(cases: list[dict], a) -> list[str]:
     lang = a.lang
     out = [f"language: {lang}",
@@ -565,7 +667,8 @@ def compact_lines(cases: list[dict], a) -> list[str]:
         tags = ["ai-eval", c["category"].replace("_", "-")] + [o.split(":")[0].lower() for o in c["owasp"]]
         title = c["title"].replace("|", "/").replace("=>", "->") + f" ({c['id']})"
         out.append(f"## {tid} | {title}")
-        out.append(f"req: {a.req} | pri: {pri} | pol: {'-' if adversarial else '+'} | tech: {'eg' if adversarial else 'rb'} | cat: {cat}")
+        c["_pol"] = "-" if adversarial else "+"
+        out.append(f"req: {', '.join(c['_req'])} | pri: {pri} | pol: {c['_pol']} | tech: {'eg' if adversarial else 'rb'} | cat: {cat}")
         if c.get("_pre"):
             out.append(f"pre: {c['_pre']}")
         action = L(lang, f"Değerlendirme vakasının girdisini özelliğe gönder, en az 3 koşu", f"Send the eval case input to the feature, at least 3 runs")
@@ -577,14 +680,19 @@ def compact_lines(cases: list[dict], a) -> list[str]:
 
 
 def cmd_seed(a) -> int:
-    if a.compact_out and not a.req:
-        print("error: --compact-out needs --req REQ-xxx", file=sys.stderr)
+    if a.compact_out and not (a.req or "").strip() and not a.req_map:
+        print("error: --compact-out needs --req REQ-xxx and/or --req-map FILE", file=sys.stderr)
         return 2
     try:
         cases = build_cases(a)
     except ValueError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
+    if a.compact_out:
+        err = assign_reqs(cases, a)
+        if err:
+            print(f"error: {err}", file=sys.stderr)
+            return 2
     lines = compact_lines(cases, a) if a.compact_out else None
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
     with open(a.out, "w", encoding="utf-8", newline="\n") as fh:
@@ -597,6 +705,8 @@ def cmd_seed(a) -> int:
         Path(a.compact_out).write_text("\n".join(lines), encoding="utf-8", newline="\n")
         msg += f"; {a.compact_out}: {len(cases)} compact test cases"
     print(msg)
+    if lines is not None and cases:
+        print(f"  requirements: {req_summary([(c['_req'], c['_pol']) for c in cases])}")
     print(L(a.lang,
             f"  NOT: Bu bir BAŞLANGIÇ veri setidir. [UYARLA] vakalarını, araç adlarını ve sınırları ürününüze göre düzenleyin; "
             f"kanarya '{a.canary}' dizesini test ortamındaki sistem istemine ekleyin.",
@@ -1056,7 +1166,9 @@ def main() -> int:
     sp.add_argument("--long-chars", type=int, default=20000, help="length of the unbounded-consumption input")
     sp.add_argument("--start", type=int, default=1, help="first AI-### number (to append to an existing dataset)")
     sp.add_argument("--compact-out", help="also write QA Suite compact test cases (.src.md), one per eval case")
-    sp.add_argument("--req", help="requirement ID the compact test cases trace to (needed with --compact-out)")
+    sp.add_argument("--req", help="fallback requirement ID(s), comma-separated, for categories the --req-map does not "
+                    "cover (with --compact-out: --req and/or --req-map)")
+    sp.add_argument("--req-map", dest="req_map", help="JSON map categories/OWASP IDs -> requirement ID(s) (see above)")
     sp.add_argument("--tests", help="existing qa/test-cases.json, to continue TC numbering")
     sc = sub.add_parser("score", help="score collected outputs against the deterministic checks")
     sc.add_argument("--cases", required=True)

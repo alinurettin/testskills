@@ -27,6 +27,17 @@ Türkçe ve İngilizce çıktı üretir.
   `REQ-001` → tasarım kanıtı → `TC-001` → `@TC-001` etiketli Playwright testi → koşum sonucu → izlenebilirlik matrisi → Jira/Xray.
 - **Dürüst raporlama.** Uygulanmamış bir test asla "geçti" sayılmaz. Eksik veri "0" değil "bilinmiyor" olarak raporlanır. Beklenen sonuç, testi geçirmek için asla hatalı davranışa uydurulmaz.
 
+## 10 dakikada başla
+[examples/quickstart](examples/quickstart/README.md) klasöründe 6 kabul kriterli, sentetik bir şifre sıfırlama story'si var. Tek bir istemi kopyalayıp yapıştırırsınız. Hafif modda yaklaşık 10 dakikada şunları alırsınız:
+- gereksinim listesi ve ürün sahibine gidecek sorular;
+- script'le hesaplanmış sınır değer, karar tablosu ve durum geçişi kanıtı;
+- 25 test case ve izlenebilirlik matrisi;
+- bir Excel dosyası.
+
+Beklenen çıktıların tamamı klasörde duruyor; kendi sonucunuzu onlarla karşılaştırabilirsiniz.
+
+Testleri elle koşuyorsanız: **[Manuel test rehberi](docs/MANUEL-TEST-REHBERI.md)**. Hangi 5 skill'e ihtiyacınız olduğunu anlatır; 6 hazır istem kartı, gerçek bir story'yi paylaşmadan önce anonimleştirme, maliyet beklentisi ve çıktıları Excel'de açma adımları içerir.
+
 ## Kanıt: hata yerleştirilmiş kör denemeler
 Her denemede ajana yalnızca bir test uzmanına verilecek girdiler verildi: bir story, bir OpenAPI dokümanı ya da veri extract'ları. Uygulama kodu ve cevap anahtarı hiçbir zaman gösterilmedi.
 
@@ -55,11 +66,13 @@ Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVAL
 | `reporting-test-results` | Hata raporları; çıkış kriterlerini otomatik değerlendiren tamamlama raporu |
 | `reviewing-test-cases` | Excel/TestRail CSV içe aktarımı ve test kalitesi denetimi |
 | `testing-apis` | OpenAPI 3'ten sözleşme testleri ve aynı TC ID'leriyle koşturulabilir Playwright API paketi: şema kontrolü, sınırlar, BOLA, sözleşme boşluğu soruları, istek/yanıt kanıtı |
-| `running-exploratory-tests` | Oturum bazlı keşif testi: riske göre sıralı görev kartları (charter), sezgisel yöntemler (SFDIPOT, FEW HICCUPPS, turlar), oturum notlarından özet, hata ve regresyon testi |
-| `testing-ai-features` | LLM, chatbot ve RAG testi: saldırgan eval seti (OWASP LLM Top 10 2025, TR/EN), tekrarlı koşularda deterministik puanlama, kararsızlık ve yayın kapısı |
-| `preparing-test-data` | Geçerli TCKN/VKN/IBAN'lı, ilişkisel bütünlüklü sentetik veri; üretim extract'larının deterministik maskelenmesi (KVKK/GDPR) |
-| `testing-mobile-apps` | iOS/Android kontrol listeleri (yaşam döngüsü, kesintiler, izinler, çevrimdışı, MASVS, erişilebilirlik), kullanım payından cihaz matrisi, JUnit → sonuçlar |
+| `running-exploratory-tests` **(deneysel)** | Oturum bazlı keşif testi: riske göre sıralı görev kartları (charter), sezgisel yöntemler (SFDIPOT, FEW HICCUPPS, turlar), oturum notlarından özet, hata ve regresyon testi |
+| `testing-ai-features` **(deneysel)** | LLM, chatbot ve RAG testi: saldırgan eval seti (OWASP LLM Top 10 2025, TR/EN), tekrarlı koşularda deterministik puanlama, kararsızlık ve yayın kapısı |
+| `preparing-test-data` **(deneysel)** | Geçerli TCKN/VKN/IBAN'lı, ilişkisel bütünlüklü sentetik veri; üretim extract'larının deterministik maskelenmesi (KVKK/GDPR) |
+| `testing-mobile-apps` **(deneysel)** | iOS/Android kontrol listeleri (yaşam döngüsü, kesintiler, izinler, çevrimdışı, MASVS, erişilebilirlik), kullanım payından cihaz matrisi, JUnit → sonuçlar |
 | `testing-data-migrations` | Kaynak–hedef mutabakatı (anahtarlar, alanlar, kontrol toplamları, Türkçe karakter kodlama tuzakları), SQL şablonları, imza kriterleri |
+
+**Deneysel:** Bu dört skill'in henüz kör denemesi yok. Birim testleri ve script demolarıyla doğrulandılar; 0.7 için kör denemeleri sürüyor.
 
 Ek olarak **sektör paketleri** var: fintech/bankacılık, e-ticaret, sağlık, kamu, sigorta/emeklilik ve telekom. Her birinde mevzuat kontrol listesi, sık unutulan gereksinimler, yüksek riskli kurallar ve sentetik test verisi bulunur.
 
@@ -76,7 +89,7 @@ claude plugin install qa-suite@qa-suite-marketplace
 
 **Gereksinimler:**
 - Python 3.9+ (script'ler yalnızca standart kütüphaneyi kullanır)
-- Otomasyon için Node.js 18+ ve `@playwright/test`
+- Otomasyon için Node.js 22, 24 veya 26 (Playwright'ın desteklediği sürümler) ve `@playwright/test`
 
 ## Hızlı başlangıç
 ```
@@ -95,12 +108,16 @@ Destek chatbot'umuz için eval seti hazırla: prompt injection, halüsinasyon, k
 ## Nasıl çalışır
 ```mermaid
 flowchart LR
-  A[Story / SRS / Excel] --> B[Gereksinim analizi<br/>sorular, risk]
+  A[Story / SRS / OpenAPI / Excel] --> B[Gereksinim analizi<br/>sorular, risk]
   B --> C[Test tasarımı<br/>BVA, karar tablosu,<br/>durum, pairwise]
-  C --> D[İzlenebilirlik matrisi]
-  C --> E[Xray / Zephyr / Excel]
+  B --> S[Uzman skill'ler<br/>API, mobil, AI,<br/>veri taşıma, keşif]
+  C --> D[İzlenebilirlik matrisi<br/>+ regresyon seçimi]
+  S --> D
+  C --> E[Xray / Zephyr / TestRail /<br/>Azure DevOps / Qase / Excel]
   C --> F[Playwright / BDD]
   F -->|sonuçlar| D
+  J[JUnit XML: Selenium, Cypress,<br/>pytest, REST Assured...] -->|sonuçlar| D
+  S -->|mutabakat, eval sonuçları| D
   D --> G[Tamamlama raporu<br/>çıkış kriterleri]
 ```
 
@@ -110,6 +127,13 @@ flowchart LR
 - **Erişilebilirlik ve güvenlik:** WCAG 2.2 AA, OWASP ASVS 5.0, OWASP Top 10:2025
 
 Standart metinleri kopyalanmadı; içerikler uygulanabilir kontrol listelerine dönüştürüldü.
+
+## Veri gizliliği: makinenizden ne çıkar?
+- **Script'ler makinenizde çalışır ve ağa bağlanmaz.** Hepsi yalnızca Python standart kütüphanesini kullanır. `skills/*/scripts` altında `urllib`, `http`, `socket` ya da `requests` kullanımı yoktur (kaynak kodda aranarak kontrol edildi). Dosyalarınızı okur ve sonuçları `qa/` altına yazarlar.
+- **Asistana verdiğiniz her şey model sağlayıcısına gider.** Yazdığınız istemler, asistanın okuduğu dosyaların içeriği ve ekran görüntüleri, kullandığınız planın koşullarına göre işlenir; saklama ve eğitimde kullanım bu koşullara bağlıdır. Kurumunuzun kuralını ve planınızın veri koşullarını kontrol edin.
+- **Sentetik ya da anonimleştirilmiş veri kullanın.** Gerçek müşteri verisini, üretim extract'larını, iç sistem adreslerini ve gizli iş kurallarını yapıştırmayın. Nasıl anonimleştirileceği [Manuel test rehberi](docs/MANUEL-TEST-REHBERI.md)'nin 3. bölümünde anlatılıyor. Maskeleme gerçekten gerekiyorsa `preparing-test-data`'nın `mask_data.py` script'ini kendiniz, yerelde çalıştırın ve asistana yalnızca maskeli çıktıyı verin.
+- **Koşturduğunuz testler sizin gösterdiğiniz sisteme gider.** Playwright ve k6 testleri, verdiğiniz adresteki uygulamaya istek atar. `npm install` ve tarayıcı kurulumu paket indirir; skill talimatları, asistanın bundan önce onayınızı almasını ister.
+- **Demo deneme sunucuları yereldir.** `evals/` altındaki sunucular Node'un yerleşik modülleriyle makinenizde çalışır ve dışarıya istek atmaz. Bir kısmı tüm ağ arayüzlerini dinler; bu yüzden güvenilir bir ağda çalıştırın.
 
 ## Bilinen sınırlar
 - **Gerçek araçlarda denenmedi:** Xray, Zephyr, TestRail, Azure DevOps ve Qase içe aktarımları ile Xray sonuç reporter'ı gerçek bir sunucuda denenmedi. Resmi dokümantasyona göre hazırlandı; önce 2–3 testlik deneme importu yapın.
@@ -127,7 +151,7 @@ python tools/routing_proxy.py build evals/trigger-queries*.json --out prompt.txt
 python -m unittest discover -s tests # script regresyon testleri
 python tools/package_skills.py       # claude.ai için zip'ler (dist/)
 ```
-Issue ve pull request'ler açıktır. Değişiklik geçmişi için: [CHANGELOG.md](CHANGELOG.md).
+Issue ve pull request'ler açıktır. Kontrollerin nasıl koşturulacağı, yeni skill önerisi ve issue şablonları için: [CONTRIBUTING.md](CONTRIBUTING.md). Kör denemeyi kendiniz koşmak için: [evals/README.md](evals/README.md). Değişiklik geçmişi için: [CHANGELOG.md](CHANGELOG.md).
 
 ## Lisans
 [MIT](LICENSE) © 2026 Ali Nurettin Demir

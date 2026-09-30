@@ -18,7 +18,7 @@ Bu belge, paketin nasıl test edildiğini ve hangi sonuçları verdiğini **abar
 - **Kurulum:** Bir bankacılık user story'si (FAST para transferi) ve 5 hata yerleştirilmiş bir demo web uygulaması. Ajan uygulama kodunu ve cevap anahtarını görmedi.
 - **Sonuç:** 5/5 hata bulundu, üstüne yerleştirilmemiş gerçek bir hata (binlik ayraçlı tutarın yanlış ayrıştırılması). Belirsizliklerin hepsi soru olarak raporlandı. 47 test tasarlandı (%2 kritik). Playwright koşumu 37 geçti / 9 kaldı; bağımsız yeniden koşum aynı sonucu verdi. Çıkış kriterlerinin 9'undan 4'ü karşılandığı için karar "hazır değil" oldu.
 - **Maliyet:** ~334 bin token, ~26 dakika.
-- Dosyalar: [evals/trial-fast](../evals/trial-fast/ANSWER-KEY.md) · gerçek çıktılar: [examples/fast-transfer](../examples/fast-transfer/README.md)
+- Dosyalar: [evals/trial-fast](../evals/trial-fast/) · cevap anahtarı: [evals/keys/fast.md](../evals/keys/fast.md) · gerçek çıktılar: [examples/fast-transfer](../examples/fast-transfer/README.md)
 
 ## 2. Kör API denemesi: Demo Bank API
 - **Kurulum:** OpenAPI 3 dokümanı ve yerelde çalışan bir API. İki test kullanıcısı vardı. 5 hata yerleştirildi: nesne düzeyinde yetkilendirme açığı (BOLA), uygulanmayan üst sınır, eksik alanda 500, 201 yerine 200, string dönen bakiye. Ajan uygulama kodunu ve cevap anahtarını görmedi.
@@ -35,14 +35,14 @@ Bu belge, paketin nasıl test edildiğini ve hangi sonuçları verdiğini **abar
   - raporlayıcı ve durum bütçesi uyarıları;
   - üretilen testlerde RTM'deki yanlış "REDUNDANT" uyarısının giderilmesi.
 - **Son hâliyle üretici** (aynı API, temiz sunucu): 31 test çıktı. İnsan müdahalesi olmadan 20 geçti / 9 kaldı / 2 iskelet. Kalan 9 test yerleştirilen 5 hatanın hepsini ve `Bearer` hatasını yakalıyor.
-- Dosyalar: [evals/trial-api](../evals/trial-api/ANSWER-KEY.md) · gerçek çıktılar: [examples/api-trial](../examples/api-trial/README.md)
+- Dosyalar: [evals/trial-api](../evals/trial-api/) · cevap anahtarı: [evals/keys/api.md](../evals/keys/api.md) · gerçek çıktılar: [examples/api-trial](../examples/api-trial/README.md)
 
 ## 3. Kör veri taşıma denemesi: müşteri verisi
 - **Kurulum:** Eski sistemden alınan cp1254 kodlu, `;` ayraçlı 40 satırlık extract; yeni sistemden UTF-8 kodlu 41 satır; insan dilinde yazılmış bir mapping dokümanı. 9 hata yerleştirildi; ayrıca doğru olduğu hâlde naif karşılaştırmaların hatalı sanacağı tuzaklar kondu: Türkçe büyük harf İ/I, baştaki sıfırlar, fazla boşluklar, artık gün. Ajan doğru mapping'i ve cevap anahtarını görmedi.
 - **Sonuç:** **9/9** hata bulundu ve doğru sınıflandırıldı (yükleme veya dönüşüm hatası). Tuzaklarda **yanlış alarm çıkmadı**. +335.121,21'lik kontrol toplamı farkının tamamı satır bulgularıyla açıklandı. Karar "go değil" oldu. 9 mapping sorusu çıkarıldı.
 - **Süre:** ~3 dakika. Mutabakat script'i 0,2 saniyede koştu.
 - **Skill'e geri dönenler:** "yuvarlama" ipucu hassasiyet kaybını da kapsayacak şekilde düzeltildi; boş değer oranlarındaki payda etkisi açıklandı; raporda tam dosya yolları yerine yalnızca dosya adı gösteriliyor.
-- Dosyalar: [evals/trial-migration](../evals/trial-migration/ANSWER-KEY.md) · gerçek çıktılar: [examples/migration-trial](../examples/migration-trial/README.md)
+- Dosyalar: [evals/trial-migration](../evals/trial-migration/) · cevap anahtarı: [evals/keys/migration.md](../evals/keys/migration.md) · gerçek çıktılar: [examples/migration-trial](../examples/migration-trial/README.md)
 
 ## 4. Skill'li ve skill'siz karşılaştırma (0.2.0)
 Aynı üç görev (Türkçe uçtan uca kupon, Türkçe ödeme tasarımı, İngilizce kredi gereksinim incelemesi) skill'le ve skill'siz koşturuldu. Çıktılar sabit bir kontrol listesiyle puanlandı.
@@ -81,6 +81,8 @@ Skill'ler kaliteyi artırıyor ama daha fazla zaman ve token harcıyor. 0.2.0'da
 ## Denemeyi kendiniz tekrarlayın
 ```bash
 node evals/trial-api/api/server.js      # http://127.0.0.1:4180, token-alice / token-bob
-# Ajana yalnızca evals/trial-api/api/openapi.json dosyasını verin. server.js ve ANSWER-KEY.md'yi göstermeyin.
+# Ajana yalnızca evals/trial-api/api/openapi.json dosyasını verin. server.js'i ve evals/keys/ klasörünü göstermeyin.
 ```
 Veri taşıma denemesi için ajana yalnızca `evals/trial-migration/` altındaki iki CSV'yi ve `mapping-spec.md`'yi verin.
+
+Kör denemeyi doğru kurmak (klasörü repo dışına kopyalamak, cevap anahtarını ajandan uzak tutmak) ve puanlamak için: [evals/README.md](../evals/README.md).

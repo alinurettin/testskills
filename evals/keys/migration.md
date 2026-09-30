@@ -1,7 +1,10 @@
 # Trial: customer migration reconciliation (blind, planted defects)
 
+Evaluator only. This key lives in `evals/keys/`, outside the trial folder, so that copying the
+trial folder never copies the key. How to run and grade a blind trial: `evals/README.md`.
+
 Reusable evaluation for the `testing-data-migrations` skill. Give an agent `mapping-spec.md`,
-`legacy_customers.csv` and `new_customers.csv`, and ask it to test the migration and say whether
+`legacy_customers.csv` and `new_customers.csv` from `evals/trial-migration/`, and ask it to test the migration and say whether
 it can be signed off. **Do not show this file, or `tests/fixtures/testing-data-migrations/`,
 to the agent.** The regression test `tests/test_testing_data_migrations.py` runs `reconcile.py`
 with a correct mapping on these files and asserts that exactly the defects below are found.

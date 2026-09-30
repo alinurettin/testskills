@@ -1,6 +1,6 @@
 ---
 name: testing-ai-features
-description: Tests products that contain LLM and generative-AI features - chatbots, assistants, RAG search, summarisation, classification and tool-using agents. It seeds a starter eval dataset in Turkish or English (functional plus adversarial cases mapped to the OWASP Top 10 for LLM Applications 2025: prompt injection, system prompt leakage, PII disclosure, excessive agency, unbounded consumption, misinformation) and scores repeated runs with deterministic checks, pass rates, flakiness detection, latency and token budgets and a release gate. Rubric checks go to calibrated model or human grading, never silently passed. It also guides golden sets, RAG quality, bias probes, regression on model changes, monitoring and numeric thresholds. Use this whenever someone wants to test or evaluate an AI feature, chatbot, RAG, agent, prompt, hallucination, jailbreak, prompt injection or LLM evals, including Turkish requests such as "yapay zekâ testi", "chatbot testi", "LLM değerlendirme", "prompt injection testi", "RAG testi".
+description: Tests LLM and generative-AI features (chatbots, RAG, agents) with a TR/EN eval dataset of functional and OWASP LLM Top 10 cases (prompt injection, excessive agency), scoring repeated runs for pass rate, flakiness, latency and cost with a release gate. Use when an AI feature must be evaluated. Triggers include LLM evals, chatbot testing, RAG evaluation, hallucination, jailbreak; Turkish "yapay zekâ testi", "chatbot testi", "prompt injection testi".
 license: MIT
 metadata:
   suite: qa-suite
@@ -8,6 +8,8 @@ metadata:
 ---
 
 # Testing AI features
+
+**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
 
 An LLM feature gives a different answer to the same question on different runs. It can be talked out of its instructions by a user or by a document it reads, and it fails in fluent, confident sentences. Classic "expected result equals actual result" testing is not enough. This skill makes AI features testable the same way as the rest of the product:
 - explicit, numeric acceptance thresholds;
@@ -35,7 +37,7 @@ Match the user's language (`--lang tr|en`). Check types, OWASP IDs, JSON keys an
 
 ```
 - [ ] 1. Requirements: behaviours, risks, numeric acceptance thresholds
-- [ ] 2. Eval dataset: seed, adapt, add golden cases (versioned, stratified)
+- [ ] 2. Eval dataset: seed, adapt, add golden cases (versioned, stratified); map categories to requirements (one REQ for everything hides gaps)
 - [ ] 3. Harness: repeated runs → outputs.jsonl (latency, tokens, tool calls, versions)
 - [ ] 4. Score: deterministic checks, pass rates, flaky cases, gate
 - [ ] 5. Grade judgement checks with a calibrated rubric; sample human review
@@ -59,7 +61,7 @@ Vague goals ("it should be accurate", "no hallucinations") are not testable. Use
 ### 2. Build the eval dataset
 ```bash
 python scripts/ai_eval.py seed --feature "Bankacılık asistanı (sohbet botu)" --lang tr \
-    --out qa/ai/evals.jsonl --compact-out qa/design/ai-evals.src.md --req REQ-040 --tests qa/test-cases.json
+    --out qa/ai/evals.jsonl --compact-out qa/design/ai-evals.src.md --req-map qa/req-map.json --tests qa/test-cases.json
 ```
 The seed writes about 34 **starter** cases, all with status `draft`, in these categories:
 - functional and over-refusal cases;
@@ -82,7 +84,13 @@ Adapt the dataset before you trust any number:
 3. Add **golden cases**: realistic, anonymised requests per intent, with an expert-approved `reference` answer. Stratify them by intent, language (TR/EN, with and without Turkish characters), difficulty and user type.
 4. Set `status` to `ready` when a case has been reviewed.
 
-Keep `evals.jsonl` in version control next to the code, and change it through review. When `--compact-out` is given, each case also becomes a compact test case (`tc` field) traced to the requirement. Append it to `qa/test-cases.src.md` and run `qa_compact.py`.
+Keep `evals.jsonl` in version control next to the code, and change it through review. When `--compact-out` is given, each case also becomes a compact test case (`tc` field) traced to its requirement. Append it to `qa/test-cases.src.md` and run `qa_compact.py`.
+
+**Map categories to requirements; one REQ for everything hides gaps.** With a single `--req`, all ~34 cases hang off one REQ: coverage looks complete and the RTM cannot show that, say, the "no unconfirmed transfer" requirement has a single case. Put a `categories` section into `qa/req-map.json`:
+```json
+{"default": "REQ-040", "categories": {"injection": "REQ-041", "pii": ["REQ-042", "REQ-043"], "LLM06": "REQ-044"}}
+```
+Keys are a category (`injection_direct`), the group `injection` (direct + indirect), or an OWASP LLM ID (`LLM06` or `LLM06:2025`). Precedence: category > group > OWASP ID > `default` > `--req`. A case without a requirement stops the seed (exit 2) with the unmapped categories, before anything is written; `--req` still works as the fallback.
 
 ### 3. Collect outputs with a harness
 Run every case **several times** (3 minimum, 5–10 for critical categories) under production settings. Write one JSON line per run:
@@ -140,7 +148,7 @@ Follow `references/ai-testing.md`:
   File defects for failed critical cases with the input, context, all run outputs and the versions. Run the RTM with `tracing-requirements`.
 
 ## Files
-- `scripts/ai_eval.py`: `seed` writes a starter TR/EN dataset (JSONL, optional compact test cases). `score` evaluates repeated runs with deterministic checks and reports pass rates, flaky cases, per-category rates, latency p50/p95 and tokens. It gates the release (exit 1), and writes a Markdown/JSON report and `results.json`.
+- `scripts/ai_eval.py`: `seed` writes a starter TR/EN dataset (JSONL, optional compact test cases linked to REQs per category via `--req-map`). `score` evaluates repeated runs with deterministic checks and reports pass rates, flaky cases, per-category rates, latency p50/p95 and tokens. It gates the release (exit 1), and writes a Markdown/JSON report and `results.json`.
 - `scripts/qa_compact.py`: compact ⇄ JSON.
 - `assets/rubric-template.md`: model-graded and human rubric template, with judge prompt, calibration procedure and log.
 - `references/ai-testing.md`: non-determinism and statistics, datasets, the assertion ladder, LLM-as-judge, RAG, OWASP LLM Top 10 (2025), agents, bias, privacy, cost and latency, regression, monitoring, EU AI Act awareness, reporting.

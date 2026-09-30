@@ -1,6 +1,6 @@
 # Örnek: kör API denemesi (Demo Bank API)
 
-`testing-apis` skill'iyle yapılan kör denemenin **gerçek, düzenlenmemiş çıktıları**. Ajana yalnızca OpenAPI dokümanı, çalışan API ve iki test kullanıcısı verildi. Uygulama kodu ve cevap anahtarı ([evals/trial-api/ANSWER-KEY.md](../../evals/trial-api/ANSWER-KEY.md)) gösterilmedi.
+`testing-apis` skill'iyle yapılan kör denemenin **gerçek, düzenlenmemiş çıktıları**. Ajana yalnızca OpenAPI dokümanı, çalışan API ve iki test kullanıcısı verildi. Uygulama kodu ve cevap anahtarı ([evals/keys/api.md](../../evals/keys/api.md)) gösterilmedi.
 
 | | Sonuç |
 |---|---|

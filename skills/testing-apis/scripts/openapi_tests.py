@@ -16,10 +16,22 @@ Everything the contract does not specify is emitted as a question comment, never
 
 Input: OpenAPI 3.0/3.1 JSON (YAML works if PyYAML is installed). Local $refs are resolved.
 Usage:
-  python openapi_tests.py api/openapi.json --req REQ-020 --tests qa/test-cases.json --lang tr \
-      --out qa/design/api-tests.src.md --spec automation/tests/api-contract.spec.ts [--only-tag Transfers]
+  python openapi_tests.py api/openapi.json --req-map qa/req-map.json --tests qa/test-cases.json --lang tr \
+      --out qa/design/api-tests.src.md --spec-out automation/tests/api-contract.spec.ts [--only-tag Transfers]
+  python openapi_tests.py api/openapi.json --req REQ-020 --out qa/design/api-tests.src.md   # one REQ for all
 The spec imports ./api-helpers (copy assets/api-helpers.ts next to it) and reads API_BASE_URL,
 API_TOKEN (and optional API_TOKEN_OTHER) from the environment.
+
+Requirement links: every test of an operation traces to that operation's requirement(s).
+  --req-map FILE  {"default": "REQ-020", "operations": {"createTransfer": "REQ-022",
+                   "GET /accounts": ["REQ-021", "REQ-025"]}, "tags": {"Accounts": "REQ-021"}}
+                  (values: a REQ ID or a list; other scripts' keys such as "capabilities" are ignored)
+  x-req           on an operation in the OpenAPI document: "REQ-021" or ["REQ-021", "REQ-022"]
+  Precedence: x-req > operations[operationId] > operations["METHOD /path"] > tags[first tag]
+              > req-map default > --req.
+  An operation without a requirement stops the run (exit 2) with the list of unmapped operations.
+  One REQ for everything makes coverage look complete and hides thin or negative-free requirements.
+Exit codes: 0 ok, 2 usage error, unreadable input or unmapped operations.
 """
 from __future__ import annotations
 
@@ -28,9 +40,11 @@ import copy
 import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 METHODS = ("get", "post", "put", "patch", "delete")
+HTTP_METHODS = METHODS + ("head", "options", "trace")
 T = {
     "tr": {"happy": "{m} {p} geçerli istekle {code} döner ve yanıt şemaya uyar", "noauth": "{m} {p} kimlik bilgisi olmadan 401 döner",
            "missing": "{m} {p} zorunlu '{f}' eksikken {code} döner", "valid_b": "{m} {p} '{f}' = {v} (sınır, geçerli) kabul edilir",
@@ -223,10 +237,90 @@ def short(v) -> str:
     return s if len(s) <= 24 else f"{s[:10]}…({len(v) if isinstance(v, str) else '?'} chars)\""
 
 
+# ---------------------------------------------------------------- requirement mapping (--req-map, x-req)
+REQ_MAP_KEYS = {"default", "operations", "tags", "capabilities", "categories", "areas"}
+REQ_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9_.:-]*$")
+
+
+def req_list(value, where: str) -> list[str]:
+    """A REQ ID, a comma-separated string or a list of them -> de-duplicated list (ValueError if malformed)."""
+    out: list[str] = []
+    for v in value if isinstance(value, list) else [value]:
+        if not isinstance(v, str):
+            raise ValueError(f"{where}: expected a REQ ID or a list of REQ IDs, got {json.dumps(v)}")
+        for x in (p.strip() for p in v.split(",")):
+            if not REQ_TOKEN.match(x):
+                raise ValueError(f"{where}: invalid requirement ID {x!r}")
+            if x not in out:
+                out.append(x)
+    if not out:
+        raise ValueError(f"{where}: no requirement ID")
+    return out
+
+
+def load_req_map(path: str | None, sections: tuple[str, ...]) -> tuple[dict, list[str]]:
+    """--req-map JSON -> ({"default": [...], section: {key: [...]}}, warnings). ValueError when unusable."""
+    rmap: dict = {"default": [], **{s: {} for s in sections}}
+    if not path:
+        return rmap, []
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as e:
+        raise ValueError(f"--req-map: cannot read {path}: {e}")
+    if not isinstance(raw, dict):
+        raise ValueError(f"--req-map {path}: must be a JSON object")
+    warnings = [f"--req-map: unknown key '{k}' ignored" for k in raw if k not in REQ_MAP_KEYS and not k.startswith(("_", "$"))]
+    if raw.get("default") not in (None, "", []):
+        rmap["default"] = req_list(raw["default"], "--req-map default")
+    for s in sections:
+        sec = raw.get(s) or {}
+        if not isinstance(sec, dict):
+            raise ValueError(f"--req-map: '{s}' must be an object of key -> REQ ID(s)")
+        rmap[s] = {str(k): req_list(v, f"--req-map {s}.{k}") for k, v in sec.items()}
+    return rmap, warnings
+
+
+def req_summary(links: list[tuple[list[str], str]]) -> str:
+    """'REQ-021 12 (neg 3), REQ-022 5 (neg 0)': generated tests per requirement."""
+    count: Counter = Counter()
+    neg: Counter = Counter()
+    for reqs, pol in links:
+        for r in reqs:
+            count[r] += 1
+            neg[r] += pol == "-"
+    return ", ".join(f"{r} {count[r]} (neg {neg[r]})" for r in count)
+
+
+def op_key(key: str) -> str:
+    """'post  /transfers' -> 'POST /transfers' (other keys unchanged)."""
+    m = re.match(r"^\s*([A-Za-z]+)\s+(/\S*)\s*$", key)
+    return f"{m.group(1).upper()} {m.group(2)}" if m and m.group(1).lower() in HTTP_METHODS else key
+
+
+def resolve_op(op: dict, method: str, path: str, rmap: dict, fallback: list[str]) -> tuple[list[str], str]:
+    """REQ IDs of one operation and their source. Precedence: x-req > operations[operationId] >
+    operations["METHOD /path"] > tags[first tag] > req-map default > --req."""
+    if op.get("x-req") not in (None, "", []):
+        return req_list(op["x-req"], f"{method} {path}: x-req"), "x-req"
+    ops = rmap["operations"]
+    if op.get("operationId") in ops:
+        return ops[op["operationId"]], "operationId"
+    if f"{method} {path}" in ops:
+        return ops[f"{method} {path}"], "operations"
+    tags = op.get("tags") or []
+    if tags and tags[0] in rmap["tags"]:
+        return rmap["tags"][tags[0]], f"tag {tags[0]}"
+    if rmap["default"]:
+        return rmap["default"], "default"
+    return fallback, "--req"
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("spec")
-    ap.add_argument("--req", required=True, help="requirement ID(s) the contract tests trace to (comma-separated)")
+    ap.add_argument("--req", default="", help="fallback requirement ID(s), comma-separated, for operations the "
+                    "--req-map and x-req do not cover (optional when they cover everything)")
+    ap.add_argument("--req-map", dest="req_map", help="JSON map operations/tags -> requirement ID(s) (see above)")
     ap.add_argument("--tests", help="existing test-cases.json to continue TC numbering")
     ap.add_argument("--start", type=int)
     ap.add_argument("--lang", choices=["tr", "en"], default="en")
@@ -241,6 +335,38 @@ def main() -> int:
         return 2
     R = Resolver(doc)
     t = T[a.lang]
+    try:
+        fallback = req_list(a.req, "--req") if a.req.strip() else []
+        rmap, map_warnings = load_req_map(a.req_map, ("operations", "tags"))
+        rmap["operations"] = {op_key(k): v for k, v in rmap["operations"].items()}
+        op_reqs: dict[tuple[str, str], tuple[list[str], str]] = {}
+        seen_keys, seen_tags, unmapped = set(), set(), []
+        for path, item in (doc.get("paths") or {}).items():
+            item = R(item)
+            for m in METHODS:
+                op = item.get(m)
+                if not isinstance(op, dict) or not op:
+                    continue
+                seen_keys |= {f"{m.upper()} {path}", op.get("operationId")}
+                seen_tags |= set(op.get("tags") or [])
+                if a.only_tag and a.only_tag not in op.get("tags", []):
+                    continue
+                reqs, source = resolve_op(op, m.upper(), path, rmap, fallback)
+                op_reqs[(m.upper(), path)] = (reqs, source)
+                if not reqs:
+                    unmapped.append(f"{m.upper()} {path}" + (f" ({op['operationId']})" if op.get("operationId") else ""))
+    except ValueError as e:
+        print(f"error: {e}", file=sys.stderr)
+        return 2
+    if unmapped:
+        more = f"; ... and {len(unmapped) - 20} more" if len(unmapped) > 20 else ""
+        print(f"error: no requirement for {len(unmapped)} operation(s): {'; '.join(unmapped[:20])}{more}. Map them in "
+              "--req-map (operations, tags or default), add x-req to the operation, or pass --req.", file=sys.stderr)
+        return 2
+    map_warnings += [f"--req-map: operations key '{k}' matches no operation" for k in rmap["operations"] if k not in seen_keys]
+    map_warnings += [f"--req-map: tags key '{k}' matches no operation tag" for k in rmap["tags"] if k not in seen_tags]
+    for w in map_warnings:
+        print(f"warning: {w}", file=sys.stderr)
     n = a.start or 1
     if not a.start and a.tests and Path(a.tests).exists():
         data = json.loads(Path(a.tests).read_text(encoding="utf-8-sig"))
@@ -252,6 +378,8 @@ def main() -> int:
     scheme_done = False
     compact = [f"# Contract tests derived by openapi_tests.py from {Path(a.spec).name} "
                f"({doc.get('info', {}).get('title', '')} {doc.get('info', {}).get('version', '')}). Review, then append to qa/test-cases.src.md."]
+    if a.req_map or any(src == "x-req" for _, src in op_reqs.values()):
+        compact += [f"# req-map: {k[0]} {k[1]} -> {', '.join(v[0])} ({v[1]})" for k, v in op_reqs.items()]
     spec = ["// Generated by QA Suite (testing-apis/openapi_tests.py). Same TC IDs as the compact test cases.",
             "// Env: API_BASE_URL, API_TOKEN, API_TOKEN_OTHER (optional). Test accounts only.",
             "import { test, expect } from '@playwright/test';",
@@ -270,11 +398,15 @@ def main() -> int:
         if cresp and "id" in (cresp.get("properties") or {}) and cbody_s is not None:
             creators[cpath] = cex if cex is not None else sample(cbody_s)
 
+    cur_reqs: list[str] = []  # requirement(s) of the operation being generated (see op_reqs)
+    links: list[tuple[list[str], str]] = []
+
     def add(title, pri, pol, tech, steps, tags, auto="yes, contract test", pre=None):
         nonlocal n
         tid = f"TC-{n:03d}"
         n += 1
-        compact.extend(["", f"## {tid} | {title}", f"req: {a.req} | pri: {pri} | pol: {pol} | tech: {tech} | cat: api"])
+        links.append((cur_reqs, pol))
+        compact.extend(["", f"## {tid} | {title}", f"req: {', '.join(cur_reqs)} | pri: {pri} | pol: {pol} | tech: {tech} | cat: api"])
         for p in pre or []:
             compact.append(f"pre: {p}")
         for i, (act, data, exp) in enumerate(steps, 1):
@@ -295,6 +427,7 @@ def main() -> int:
                 continue
             counts["ops"] += 1
             M = m.upper()
+            cur_reqs = op_reqs[(M, path)][0]
             params = common_params + op.get("parameters", [])
             codes = list(op.get("responses", {}).keys())
             ok_code = next((c for c in sorted(codes) if c.startswith("2")), None)
@@ -487,13 +620,18 @@ def main() -> int:
         compact.append("")
         compact += [f"# QUESTION: {q}" for q in questions]
     Path(a.out).parent.mkdir(parents=True, exist_ok=True)
-    Path(a.out).write_text("\n".join(compact) + "\n", encoding="utf-8")
+    Path(a.out).write_text("\n".join(compact) + "\n", encoding="utf-8", newline="\n")
     msg = f"wrote {a.out}: {counts['tests']} test cases from {counts['ops']} operations"
     if a.spec_out:
         Path(a.spec_out).parent.mkdir(parents=True, exist_ok=True)
         Path(a.spec_out).write_text("\n".join(spec) + "\n", encoding="utf-8", newline="\n")
         msg += f"; {a.spec_out}: {counts['exec']} executable + {counts['skeleton']} skeleton tests"
     print(msg)
+    if links:
+        print(f"  requirements: {req_summary(links)}")
+        if len({r for reqs, _ in links for r in reqs}) == 1 and counts["ops"] > 1:
+            print(f"  note: all {counts['tests']} tests trace to {links[0][0][0]}; map operations to their requirements "
+                  "with --req-map (or x-req) so the RTM can show thin or negative-free requirements")
     for q in questions:
         print(f"  question: {q}")
     return 0

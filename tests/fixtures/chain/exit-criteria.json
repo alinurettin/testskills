@@ -1,0 +1,7 @@
+{
+  "min_requirement_coverage_pct": 100,
+  "min_pass_rate_pct": 95,
+  "all_critical_requirements_passed": true,
+  "min_automation_pct": 90,
+  "max_open_defects": {"critical": 0}
+}

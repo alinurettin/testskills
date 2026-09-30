@@ -68,7 +68,7 @@ Ask each question. When the specification does not answer it, record a question 
   - the 10th digit = ((sum of digits 1, 3, 5, 7, 9) × 7 − (sum of digits 2, 4, 6, 8)) mod 10;
   - the 11th digit = (sum of the first 10 digits) mod 10.
 
-  Test valid, wrong length, first digit 0, wrong 10th digit, wrong 11th digit, non-numeric, and empty. Take valid synthetic values from the test environment's designated data, not from the internet.
+  Test valid, wrong length, first digit 0, wrong 10th digit, wrong 11th digit, non-numeric, and empty. Take valid values from a generator (`check_ids.py --generate` in designing-test-cases, `gen_data.py` in preparing-test-data) or from the test environment's designated data, never from the internet or production. Checksum-valid values can belong to real people, so use them in test environments only, never in production or shared systems.
 - **IBAN (TR):**
   - 26 characters: `TR` + 2 check digits + 5-digit bank code + 1 reserve digit + 16-character account;
   - checked with mod-97;

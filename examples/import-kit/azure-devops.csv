@@ -1,0 +1,20 @@
+ID,Work Item Type,Title,Test Step,Step Action,Step Expected,Area Path,Assigned To,State,Priority
+,Test Case,"TC-001 Kupon 100,00 TL sınırında uygulanır",1,"Ön koşullar: Kullanıcı 'ayse.test@example.com' ile giriş yapmış; 'YAZ10' kuponu aktif
+Test verisi: sepet: 100,00 TL; kupon: YAZ10
+Sepete 100,00 TL tutarında ürün ekle [Ürün A x1]","Sepet toplamı 100,00 TL",QASuiteKit,,Design,2
+,Test Case,"TC-001 Kupon 100,00 TL sınırında uygulanır",2,Kupon alanına kodu yaz ve 'Uygula'ya tıkla [YAZ10],"'Kupon uygulandı' mesajı; indirim -10,00 TL; toplam 90,00 TL",QASuiteKit,,Design,2
+,Test Case,"TC-002 Kupon 99,99 TL sepette reddedilir",1,"Ön koşullar: Kullanıcı giriş yapmış; 'YAZ10' kuponu aktif
+Test verisi: sepet: 99,99 TL; kupon: YAZ10
+Sepete 99,99 TL tutarında ürün ekle","Sepet toplamı 99,99 TL",QASuiteKit,,Design,2
+,Test Case,"TC-002 Kupon 99,99 TL sepette reddedilir",2,Kupon alanına kodu yaz ve 'Uygula'ya tıkla [YAZ10],"'Asgari sepet tutarı 100 TL' mesajı; toplam 99,99 TL kalır",QASuiteKit,,Design,2
+,Test Case,TC-003 Süresi dolmuş kupon reddedilir,1,"Ön koşullar: Sepet toplamı 150,00 TL; 'BAHAR5' kuponu 01.04.2026'da sona ermiş
+Kupon alanına 'BAHAR5' yaz, 'Uygula'ya tıkla","'Bu kuponun süresi dolmuştur' mesajı; toplam 150,00 TL",QASuiteKit,,Design,2
+,Test Case,TC-004 Kupon kodu küçük harfle girilince kabul edilir,1,"Ön koşullar: Sepet toplamı 150,00 TL
+Kupon alanına 'yaz10' yaz, 'Uygula'ya tıkla","'Kupon uygulandı'; toplam 135,00 TL",QASuiteKit,,Design,3
+,Test Case,TC-005 Aynı kupon ikinci kez kullanılamaz,1,"Ön koşullar: Kullanıcı 'YAZ10' ile daha önce sipariş tamamlamış
+150,00 TL'lik sepette 'YAZ10' uygula",'Bu kuponu daha önce kullandınız' mesajı; indirim uygulanmaz,QASuiteKit,,Design,1
+,Test Case,TC-007 Sahipsiz test örneği,1,Ana sayfayı aç,Sayfa yüklenir,QASuiteKit,,Design,4
+,Test Case,"TC-008 Kupon 100,00 TL sınırında uygulanır - kopya",1,"Ön koşullar: Kullanıcı 'ayse.test@example.com' ile giriş yapmış; 'YAZ10' kuponu aktif
+Test verisi: sepet: 100,00 TL; kupon: YAZ10
+Sepete 100,00 TL tutarında ürün ekle [Ürün A x1]","Sepet toplamı 100,00 TL",QASuiteKit,,Design,2
+,Test Case,"TC-008 Kupon 100,00 TL sınırında uygulanır - kopya",2,Kupon alanına kodu yaz ve 'Uygula'ya tıkla [YAZ10],"'Kupon uygulandı' mesajı; indirim -10,00 TL; toplam 90,00 TL",QASuiteKit,,Design,2

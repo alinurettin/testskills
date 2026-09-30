@@ -1,6 +1,6 @@
 ---
 name: automating-with-playwright
-description: Turns QA Suite test cases into maintainable Playwright TypeScript automation that keeps full traceability. It scaffolds the project (config, fixtures, page objects, auth setup, CI) and generates spec skeletons in which every test keeps its manual TC ID as a tag and its steps as test.step. It then implements them with role-based locators and web-first assertions, and feeds the Playwright results back into the requirements traceability matrix. It also supports Xray result import. Use this whenever someone wants to automate test cases, write Playwright or end-to-end/UI/API tests, turn manual tests into automation, set up a Playwright project or CI, or connect automated results to requirements. Also use it for Turkish requests such as "otomasyon yaz", "Playwright testleri", "test case'leri otomatize et", "e2e test", "regresyonu otomatikleştir".
+description: Turns QA Suite test cases into Playwright TypeScript automation that keeps each TC ID as a tag and each step as test.step, scaffolds config, page objects, auth and CI, and feeds results back by TC ID. Use when designed tests should become UI automation. Triggers include Playwright, test automation, e2e UI tests, automate manual tests; Turkish "otomasyon yaz", "Playwright testleri", "test case'leri otomatize et".
 license: MIT
 metadata:
   suite: qa-suite
@@ -25,7 +25,7 @@ Three rules matter more than any pattern:
 - Read `references/ci-and-reporting.md` for CI, Xray and the results loop.
 
 ## Prerequisites
-- Node.js 18+ (`node --version`).
+- Node.js 22, 24 or 26 (the versions Playwright currently supports; `node --version`).
 - The application URL for a test environment.
 - A test account if login is needed.
 - `qa/test-cases.json`, produced by `designing-test-cases`. When it does not exist, design the tests first: automating undesigned tests produces fragile click-scripts with no oracle.
@@ -70,7 +70,7 @@ python scripts/generate_specs.py --tests ../qa/test-cases.json --requirements ..
 - **Output:** one spec file per requirement. Each test has:
   - title `TC-### …`,
   - tags `@TC-###`, `@REQ-###`, `@<priority>` and the test's own tags,
-  - annotations `qa_id`, `requirements` (Jira keys) and `test_key` (when the test case has `ext:`),
+  - annotations `qa_id`, `requirements` (Jira keys only; omitted when a requirement has no `external_id`, because Xray cannot resolve internal IDs), `qa_requirements` (REQ IDs) and `test_key` (when the test case has `ext:`),
   - one `test.step` per manual step, with the data and expected result as comments,
   - the `test.fixme` marker.
 - **Data-driven groups:** BVA/EP variants whose steps differ only in values become a `for (const c of casesN)` block, with one test and one TC tag per case.

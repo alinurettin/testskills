@@ -1,0 +1,62 @@
+kayit_no;musteri_no;tarih;kanal;konu;aciklama;temsilci_notu;islem_tutari;durum
+DK-2024-001107;MS-100411;08.01.2024;Çaðrý Merkezi;Kart aidatý iadesi;Yýllýk kart aidatý iadesi talebi;Müþteri 0551 960 07 12 numarasýndan aradý, kart aidatýnýn iadesini istedi.;450,00;Kapandý
+DK-2024-001114;MS-100436;15.01.2024;E-posta;Hesap dökümü talebi;Son 6 aylýk hesap dökümü talebi;Hesap dökümü SEBNEM.OGUZHANOGLU@POSTA.EXAMPLE.TEST adresine gönderildi.;;Kapandý
+DK-2024-001121;MS-100422;22.01.2024;Mobil Uygulama;Þifre sýfýrlama;Mobil uygulama þifre sýfýrlama;Müþteri SMS doðrulama kodunun gelmediðini belirtti, kod yeniden gönderildi.;;Kapandý
+DK-2024-001128;MS-100439;05.02.2024;Þube;Yetkili kiþi deðiþikliði;Firma yetkili listesi güncellemesi;Firma muhasebe yetkilisi Hasan Yürekli (hasan.yurekli@karacamtekstil.example.test) ile görüþüldü, imza sirküleri teslim alýndý.;;Kapandý
+DK-2024-001135;MS-100442;12.02.2024;Çaðrý Merkezi;Kart aidatý iadesi;Kart aidatý iadesinin TR75 0099 2000 0012 3456 7890 12 numaralý IBAN'a yapýlmasý talep edildi.;Müþteri aidatýn yanlýþ yansýdýðýný düþünüyor, itiraz birimine iletildi.;600,00;Ýletildi
+DK-2024-001142;MS-100445;19.02.2024;Çaðrý Merkezi;Ýletiþim bilgisi güncelleme;Alternatif iletiþim numarasý eklendi;Geri dönüþ için alternatif numara verdi: +90 (505) 318 44 12. Akþam 18:00 sonrasý aranmak istiyor.;;Kapandý
+DK-2024-001149;MS-100497;29.02.2024;Mobil Uygulama;Kart teslimatý;Kartýn teslim edilmemesi;Kargo takip no 20240227114 ile kart teslim edildi görünüyor, müþteri kartý almadýðýný söylüyor.;;Beklemede
+DK-2024-001156;MS-100485;04.03.2024;Çaðrý Merkezi;Ek kart talebi;Ek kart baþvurusu;Eþi Nurten Akbulut'un numarasý 5427781203, ek kart onun adýna çýkarýlsýn mý diye sordu.;;Beklemede
+DK-2024-001163;MS-100512;11.03.2024;Þube;Hesap dökümü talebi;Þubeden hesap dökümü teslimi;Kimlik doðrulama TCKN 27075526846 ile yapýldý, döküm elden teslim edildi.;;Kapandý
+DK-2024-001170;MS-100545;18.03.2024;Çaðrý Merkezi;Limit artýþý talebi;Kredi kartý limit artýþý;Müþteriye 0 555 902 11 36'dan ulaþýlabilir, mesai saatlerinde meþgul.;;Beklemede
+DK-2024-001177;MS-100477;25.03.2024;Ýnternet Þubesi;Þifre sýfýrlama;Ýnternet þubesi þifre blokesi;Üç hatalý giriþten sonra þifre bloke oldu, müþteri bilgilendirildi.;;Kapandý
+DK-2024-001184;MS-100574;02.04.2024;Þube;Vekaletname iþlemi;Vekaletname ile hesap iþlemi;Vekaleten iþlem: vekil Av. Tuðrul Baþaran, TCKN: 27060945126. Vekaletname sisteme yüklendi.;;Kapandý
+DK-2024-001191;MS-100583;09.04.2024;Çaðrý Merkezi;Ýþlem itirazý;Ýade IBAN: TR850099300000098765432101;Müþteri çift çekim olduðunu belirtti, dekont istendi.;1.250,00;Ýletildi
+DK-2024-001198;ms-100606;16.04.2024;Mobil Uygulama;Adres güncelleme;Adres güncelleme talebi;Yeni adres sisteme iþlendi, ekstre gönderim adresi de güncellendi.;;Kapandý
+DK-2024-001205;MS-100647;23.04.2024;Çaðrý Merkezi;Ýletiþim bilgisi güncelleme;Cep telefonu deðiþikliði;"Müþterinin eski hattý 0505-771-20-93 kapatýldýðý için SMS alamýyor; yeni numara sisteme iþlendi.";;Kapandý
+DK-2024-001212;MS-100677;30.04.2024;Þube;Kart aidatý iadesi;Aidat iadesi sorgusu;Annesi Saadet Kýlýnçarslan adýna (TC63202010420) aidat iadesi soruldu, vekaletname olmadýðý için bilgi verilmedi.;;Kapandý
+DK-2024-001219;MS-100728;07.05.2024;Çaðrý Merkezi;Limit artýþý talebi;Ticari kart limit artýþý;Ýþ yeri telefonu 0 (216) 455 70 81, dahili 214. Gelir belgesi istendi.;;Beklemede
+DK-2024-001226;MS-100422;14.05.2024;E-posta;Ýletiþim bilgisi güncelleme;E-posta adresi güncelleme;Müþteri özel adresini verdi (tunc.egilmez.1979@example.test), kurumsal adresine e-posta atýlmasýn.;;Kapandý
+DK-2024-001233;MS-100485;21.05.2024;Çaðrý Merkezi;Hesap dökümü talebi;Aylýk döküm talebi;Kýzý Özlem Taþ'ýn ozlem.tas1987@example.test adresine de bilgi verilmesini istedi, onay formu bekleniyor.;;Beklemede
+DK-2024-001240;MS-100788;28.05.2024;Mobil Uygulama;Ýþlem itirazý;Kartlý iþlem itirazý;WhatsApp üzerinden +905366102284 numarasýyla ekran görüntüsü gönderdi.;349,90;Ýletildi
+DK-2024-001247; MS-100683;04.06.2024;Ýnternet Þubesi;Þifre sýfýrlama;Þifre sýfýrlama;Müþteri yurt dýþýnda olduðu için SMS alamýyor, e-posta ile doðrulama yapýldý.;;Kapandý
+DK-2024-001254;MS-100741;11.06.2024;Çaðrý Merkezi;Kart aidatý iadesi;Müþteri iade için tr17 0099 1000 0045 6712 3398 22 hesabýný bildirdi;Aidat iadesi onaylandý, 3 iþ günü içinde yansýyacak.;300,00;Kapandý
+DK-2024-001261;MS-100779 ;18.06.2024;Þube;Hesap kapama;Vadesiz hesap kapama talebi;Müþteri hesabýný kapatmak istiyor, bakiye sýfýrlandýktan sonra iþlem yapýlacak.;;Beklemede
+DK-2024-001268;MS-100411;25.06.2024;Mobil Uygulama;Þifre sýfýrlama;Mobil þifre yenileme;Sayýn Gülizar Karakoçan ile görüþüldü, yeni þifre SMS ile iletildi.;;Kapandý
+DK-2024-001275;MS-100536;02.07.2024;Çaðrý Merkezi;Kart aidatý iadesi;Aidat iadesi talebi;Müþteriye 0850 455 12 12 çaðrý merkezi numarasý ve destek@yelkovan.example.test adresi hatýrlatýldý.;450,00;Kapandý
+DK-2024-001282;MS-100623;09.07.2024;E-posta;Yetkili kiþi deðiþikliði;Firma yetkilisi deðiþikliði;Yeni imza sirküleri bekleniyor, eski yetkilinin yetkileri kaldýrýldý.;;Beklemede
+DK-2024-001289;MS-100559;16.07.2024;Þube;Hesap dökümü talebi;Yýllýk hesap özeti;Dekont no 71004583216 ile iþlem teyit edildi.;;Kapandý
+DK-2024-001296;MS-100634;23.07.2024;Çaðrý Merkezi;Ýþlem itirazý;Yurt dýþý kart iþlemi itirazý;"Müþteri iþlemi kendisinin yapmadýðýný belirtti.
+Kart bloke edildi, yeni kart basýmý baþlatýldý.";2.400,00;Ýletildi
+DK-2024-001303;MS-100827;30.07.2024;Mobil Uygulama;Limit artýþý talebi;Limit artýþý talebi;"Müþteri ""acil"" notu düþülmesini istedi, talep öncelikli kuyruða alýndý.";;Beklemede
+DK-2024-001310;MS-100594;03.08.2024;Çaðrý Merkezi;Kart aidatý iadesi;Aidat iadesi talebi;Aidat iadesi onaylandý, tutar bir sonraki ekstreye yansýyacak.;450,00;Kapandý
+DK-2024-001317;MS-100606;07.09.2024;Mobil Uygulama;Þifre sýfýrlama;Þifre yenileme;Kimlik doðrulamasýndan sonra yeni þifre SMS ile iletildi.;;Kapandý
+DK-2024-001324;MS-100662;12.10.2024;Ýnternet Þubesi;Hesap dökümü talebi;Dönem sonu hesap dökümü;Sayýn Emre Çobanoðlu ile görüþüldü. Hesap dökümü PDF olarak mobil uygulamaya yüklendi.;;Beklemede
+DK-2024-001331;MS-100460;16.11.2024;Þube;Adres güncelleme;Adres deðiþikliði bildirimi;Adres teyidi yapýldý, ekstre gönderim adresi güncellendi.;;Ýletildi
+DK-2024-001338;MS-100688;21.12.2024;E-posta;Limit artýþý talebi;Limit artýþý baþvurusu;Talep kredi birimine iletildi, beþ iþ günü içinde dönüþ yapýlacak.;;Açýk
+DK-2025-001345;MS-100703;26.01.2025;Çaðrý Merkezi;Ýþlem itirazý;Harcama itirazý;Sayýn Pýnar Gökçeli ile görüþüldü. Harcama itirazý kayda alýndý, üye iþyerinden belge istendi.;89,90;Kapandý
+DK-2025-001352;MS-100683;03.02.2025;Mobil Uygulama;Kart teslimatý;Yeni kart gönderimi;Kart kurye firmasýna teslim edildi, müþteri bilgilendirildi.;;Kapandý
+DK-2025-001359;MS-100762;07.03.2025;Ýnternet Þubesi;Hesap kapama;Hesap kapama bilgi talebi;Sayýn Zeynep Aðýrbaþ ile görüþüldü. Hesap kapama koþullarý hakkýnda bilgi verildi.;;Beklemede
+DK-2025-001366;MS-100528;12.04.2025;Þube;Kart aidatý iadesi;Aidat iadesi talebi (firma);Müþteri aidat iadesi koþullarýný sordu, kampanya kapsamýnda olmadýðý bildirildi.;450,00;Ýletildi
+DK-2025-001373;MS-100617;16.05.2025;E-posta;Þifre sýfýrlama;Þifre yenileme;Þifre blokesi kaldýrýldý, müþteri bilgilendirildi.;;Açýk
+DK-2025-001380;MS-100757;21.06.2025;Çaðrý Merkezi;Hesap dökümü talebi;Dönem sonu hesap dökümü;Dönem sonu dökümü þubeden teslim edilecek, müþteri bilgilendirildi.;;Kapandý
+DK-2025-001387;MS-100779;26.07.2025;Mobil Uygulama;Adres güncelleme;Adres deðiþikliði bildirimi;Yeni adres belgesi istendi, belge gelince güncelleme yapýlacak.;;Kapandý
+DK-2025-001394;MS-100805;03.08.2025;Ýnternet Þubesi;Limit artýþý talebi;Limit artýþý baþvurusu;Gelir belgesi eksik olduðu için talep beklemeye alýndý.;;Beklemede
+DK-2025-001401;MS-100717;07.09.2025;Þube;Ýþlem itirazý;Harcama itirazý (firma);Müþteri iþlemi tanýmadýðýný belirtti, kart geçici olarak bloke edildi.;89,90;Ýletildi
+DK-2025-001408;MS-100836;12.10.2025;E-posta;Kart teslimatý;Yeni kart gönderimi;Adres teyidi yapýldý, kart yeniden gönderildi.;;Açýk
+DK-2025-001415;MS-100847;16.11.2025;Çaðrý Merkezi;Hesap kapama;Hesap kapama bilgi talebi;Bakiye sýfýrlandýktan sonra hesap kapatýlacak, müþteri onay verdi.;;Kapandý
+DK-2025-001422;MS-100821;21.12.2025;Mobil Uygulama;Kart aidatý iadesi;Aidat iadesi talebi (firma);Aidat iadesi onaylandý, tutar bir sonraki ekstreye yansýyacak.;450,00;Kapandý
+DK-2026-001429;MS-100445;26.01.2026;Ýnternet Þubesi;Þifre sýfýrlama;Þifre yenileme;Kimlik doðrulamasýndan sonra yeni þifre SMS ile iletildi.;;Beklemede
+DK-2026-001436;MS-100545;03.02.2026;Þube;Hesap dökümü talebi;Dönem sonu hesap dökümü;Hesap dökümü PDF olarak mobil uygulamaya yüklendi.;;Ýletildi
+DK-2026-001443;MS-100436;07.03.2026;E-posta;Adres güncelleme;Adres deðiþikliði bildirimi;Adres teyidi yapýldý, ekstre gönderim adresi güncellendi.;;Açýk
+DK-2026-001450;MS-100647;12.04.2026;Çaðrý Merkezi;Limit artýþý talebi;Limit artýþý baþvurusu;Talep kredi birimine iletildi, beþ iþ günü içinde dönüþ yapýlacak.;;Kapandý
+DK-2026-001457;MS-100741;16.05.2026;Mobil Uygulama;Ýþlem itirazý;Harcama itirazý;Harcama itirazý kayda alýndý, üye iþyerinden belge istendi.;89,90;Kapandý
+DK-2026-001464;MS-100497;21.06.2026;Ýnternet Þubesi;Kart teslimatý;Yeni kart gönderimi;Kart kurye firmasýna teslim edildi, müþteri bilgilendirildi.;;Beklemede
+DK-2026-001471;MS-100574;26.07.2026;Þube;Hesap kapama;Hesap kapama bilgi talebi;Hesap kapama koþullarý hakkýnda bilgi verildi.;;Ýletildi
+DK-2026-001478;MS-100662;03.08.2026;E-posta;Kart aidatý iadesi;Aidat iadesi talebi;Müþteri aidat iadesi koþullarýný sordu, kampanya kapsamýnda olmadýðý bildirildi.;450,00;Açýk
+DK-2026-001485;MS-100703;04.09.2026;Çaðrý Merkezi;Þifre sýfýrlama;Þifre yenileme;Þifre blokesi kaldýrýldý, müþteri bilgilendirildi.;;Kapandý
+DK-2026-001492;MS-100762;10.09.2026;Mobil Uygulama;Hesap dökümü talebi;Dönem sonu hesap dökümü;Dönem sonu dökümü þubeden teslim edilecek, müþteri bilgilendirildi.;;Kapandý
+DK-2026-001499;MS-100477;15.09.2026;Ýnternet Þubesi;Adres güncelleme;Adres deðiþikliði bildirimi;Yeni adres belgesi istendi, belge gelince güncelleme yapýlacak.;;Beklemede
+DK-2026-001506;MS-100411;20.09.2026;Þube;Limit artýþý talebi;Limit artýþý baþvurusu;Gelir belgesi eksik olduðu için talep beklemeye alýndý.;;Ýletildi
+DK-2026-001513;MS-100439;25.09.2026;E-posta;Ýþlem itirazý;Harcama itirazý (firma);Müþteri iþlemi tanýmadýðýný belirtti, kart geçici olarak bloke edildi.;89,90;Açýk
+DK-2026-001520;MS-100583;28.09.2026;Çaðrý Merkezi;Kart teslimatý;Yeni kart gönderimi;Adres teyidi yapýldý, kart yeniden gönderildi.;;Kapandý

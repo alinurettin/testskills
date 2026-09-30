@@ -136,6 +136,9 @@ More checks:
 Example frameworks teams use for these metrics are RAGAS, DeepEval, promptfoo and TruLens. They are not required; ask before installing anything.
 
 ## 7. Security: OWASP Top 10 for LLM Applications 2025
+
+**A 2026 edition exists (published August 2026, verified 2026-09-30).** It keeps the same themes but re-ranks them, so the IDs change: LLM01 Prompt Injection and LLM02 Sensitive Information Disclosure stay; Excessive Agency is now LLM03 (was LLM06), Supply Chain LLM04 (was LLM03), Data and Model Poisoning LLM05 (was LLM04), Unbounded Consumption LLM06 (was LLM10), Misinformation LLM07 (was LLM09), **Hidden Context Exposure** LLM08 (System Prompt Leakage, was LLM07, renamed and broadened), Vector and Embedding Weaknesses LLM09 (was LLM08), Improper Output Handling LLM10 (was LLM05). The seed and `ai_eval.py` still tag cases with the 2025 IDs below; when a report must cite the 2026 list, translate with this mapping and say which edition you cite.
+
 | ID | Risk | What to test | Where |
 |---|---|---|---|
 | LLM01:2025 | Prompt Injection | Direct (user text), indirect (documents, web pages, e-mails, tool results), encoded (Base64), multilingual and role-play variants. Check effects, not only words: markers, links, tool calls | seed: `injection_direct`, `injection_indirect`, `jailbreak`, `multilingual` |
@@ -210,7 +213,7 @@ Testers do not classify systems legally. They raise the question early and keep 
   - **transparency obligations** apply, for example telling users that they are interacting with an AI system and marking AI-generated content;
   - **minimal-risk systems** have no specific obligations.
 
-  Providers of general-purpose AI models have their own obligations. The obligations apply in phases, and the dates have been the subject of amendment proposals. **Check the current status and whether the use case is in scope with the compliance or legal team.** The test evidence in this skill (datasets, rates, versions, human review records) is the kind of documentation such assessments ask for.
+  Providers of general-purpose AI models have their own obligations. The obligations apply in phases. As amended by the Digital Omnibus on AI (Regulation (EU) 2026/1744, in force since 27 July 2026; verified 2026-09-30): prohibitions and AI literacy since 2 February 2025; general-purpose AI model obligations since 2 August 2025; transparency obligations (Article 50) since 2 August 2026, with a grace period until 2 December 2026 for marking AI-generated content of systems already on the market; high-risk obligations for Annex III use cases from 2 December 2027 and for AI in Annex I regulated products from 2 August 2028. **Check the current status and whether the use case is in scope with the compliance or legal team.** The test evidence in this skill (datasets, rates, versions, human review records) is the kind of documentation such assessments ask for.
 - **KVKK / GDPR** apply to personal data in prompts, logs and training data, whatever the AI Act classification. Check AI-specific national rules with compliance as well.
 
 ## 15. Reporting

@@ -1,6 +1,6 @@
 ---
 name: reporting-test-results
-description: Produces professional test reporting from QA Suite artifacts. It writes clear, reproducible defect reports (ISTQB fields, severity vs priority, automation evidence) and generates test status and test completion reports that compute coverage, execution, pass rate, per-requirement verdicts by risk, open defects by severity and residual risks. It evaluates the plan's exit criteria automatically as met, not met or unknown. Use this whenever someone asks for a bug or defect report, a test summary, status or completion report, release readiness, "can we release", exit criteria evaluation, or a QA sign-off, including Turkish requests such as "hata raporu yaz", "bug kaydı", "test özet raporu", "test tamamlama raporu", "yayına hazır mıyız", "çıkış kriterleri sağlandı mı".
+description: Writes defect reports (severity vs priority, evidence) and computes test status and completion reports with pass rate, per-requirement verdicts, open defects, residual risks and exit-criteria verdicts. Use when results must become a bug report or a release decision. Triggers include bug report, defect report, test summary report, release readiness, QA sign-off; Turkish "hata raporu yaz", "test özet raporu", "yayına hazır mıyız".
 license: MIT
 metadata:
   suite: qa-suite

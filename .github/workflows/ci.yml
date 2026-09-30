@@ -20,5 +20,7 @@ jobs:
         run: python tools/sync_shared.py --check
       - name: Skills follow the Agent Skills spec and suite rules
         run: python tools/validate_skills.py
+      - name: Volatile facts registry (warns when a fact was verified more than 180 days ago)
+        run: python tools/check_facts.py
       - name: Script regression tests
         run: python -m unittest discover -s tests -v

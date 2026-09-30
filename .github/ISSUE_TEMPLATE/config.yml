@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Manuel test rehberi / Manual tester guide
+    url: https://github.com/alinurettin/testskills/blob/main/docs/MANUEL-TEST-REHBERI.md
+    about: Hangi skill'ler, hazır istemler, anonimleştirme, Excel. / Which skills, ready-made prompts, anonymisation, Excel.
+  - name: 10 dakikada başla / Start in 10 minutes
+    url: https://github.com/alinurettin/testskills/blob/main/examples/quickstart/README.md
+    about: Küçük bir story ve beklenen çıktılar. / A small story and its expected outputs.
+  - name: Değerlendirme raporu / Evaluation report
+    url: https://github.com/alinurettin/testskills/blob/main/docs/EVALUATION.md
+    about: Ne ölçüldü, ne ölçülmedi. / What was measured and what was not.

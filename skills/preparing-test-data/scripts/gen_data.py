@@ -43,10 +43,13 @@ Edge values: min/max numbers and dates, 29 Feb, max-length and min-length string
 (only with allow_empty), Turkish characters and i/I casing traps, leading/trailing spaces,
 alternate phone/IBAN notations, leading-zero postcodes. --mark-edges adds an _edge column.
 
-SAFETY: TCKN, VKN, IBAN and phone values are valid by algorithm only. They can coincide with
-real people, companies, accounts or subscribers (Turkey has no reserved fictional ranges), so
-keep generated data inside test systems and never send SMS, calls or payments to it. E-mails
-always use the reserved example.com / example.test domains (RFC 2606).
+SAFETY (the suite's ID policy): TCKN, VKN, IBAN and phone values are valid by algorithm only
+(checksums from tr_ids.py). They can coincide with real people, companies, accounts or
+subscribers (Turkey has no reserved fictional ranges). Synthetic checksum-valid values are
+allowed in TEST environments and must come from a generator like this one; never load them into
+production or systems shared outside the test boundary, and never send SMS, calls or payments to
+them. data_needs.py reports such values in test cases as "verify synthetic origin" warnings.
+E-mails always use the reserved example.com / example.test domains (RFC 2606).
 
 Usage:
   python gen_data.py --schema customers.json --rows 200 --seed 42 --out data/customers.csv
@@ -70,53 +73,12 @@ from decimal import Decimal, InvalidOperation
 from pathlib import Path
 
 # ----------------------------------------------------------------------------------------------
-# Checksums (importable; tests validate them against independent implementations)
+# Checksums: one implementation in tr_ids.py (synced from shared/scripts/). Re-exported here so
+# `gen_data.is_valid_tckn` etc. keep working; tests validate them against independent code.
 # ----------------------------------------------------------------------------------------------
-
-
-def tckn_check_digits(first9: str) -> str:
-    """The 10th and 11th digit of a T.C. kimlik no for the given first nine digits."""
-    d = [int(c) for c in first9]
-    d10 = ((d[0] + d[2] + d[4] + d[6] + d[8]) * 7 - (d[1] + d[3] + d[5] + d[7])) % 10
-    d11 = (sum(d) + d10) % 10
-    return f"{d10}{d11}"
-
-
-def is_valid_tckn(value: str) -> bool:
-    s = str(value).strip()
-    return len(s) == 11 and s.isascii() and s.isdigit() and s[0] != "0" and tckn_check_digits(s[:9]) == s[9:]
-
-
-def vkn_check_digit(first9: str) -> str:
-    """The 10th digit of a Turkish vergi kimlik no (VKN) for the given first nine digits."""
-    total = 0
-    for i, c in enumerate(first9):
-        tmp = (int(c) + 9 - i) % 10
-        if tmp == 9:
-            total += 9
-        elif tmp:
-            total += (tmp * 2 ** (9 - i)) % 9
-    return str((10 - total % 10) % 10)
-
-
-def is_valid_vkn(value: str) -> bool:
-    s = str(value).strip()
-    return len(s) == 10 and s.isascii() and s.isdigit() and vkn_check_digit(s[:9]) == s[9]
-
-
-def iban_check_digits(country: str, bban: str) -> str:
-    """ISO 13616 / ISO 7064 mod 97-10 check digits."""
-    num = "".join(str(int(ch, 36)) for ch in (bban + country + "00").upper())
-    return f"{98 - int(num) % 97:02d}"
-
-
-def is_valid_iban(value: str) -> bool:
-    s = re.sub(r"\s+", "", str(value)).upper()
-    if not re.fullmatch(r"[A-Z]{2}\d{2}[A-Z0-9]{8,30}", s):
-        return False
-    if s.startswith("TR") and not re.fullmatch(r"TR\d{24}", s):
-        return False
-    return int("".join(str(int(ch, 36)) for ch in s[4:] + s[:4])) % 97 == 1
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from tr_ids import (DEFAULT_BANK_CODES, gen_tckn, gen_tr_iban, gen_vkn, iban_check_digits,  # noqa: E402,F401
+                    iban_display, is_valid_iban, is_valid_tckn, is_valid_vkn, tckn_check_digits, vkn_check_digit)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -153,7 +115,7 @@ EDGE_CITIES = ["İstanbul", "İzmir", "Iğdır", "Şanlıurfa", "Çanakkale", "K
                "Uşak", "Muş"]
 MOBILE_PREFIXES = ["501", "505", "506", "507"] + [f"53{i}" for i in range(10)] + [f"54{i}" for i in range(10)] \
     + [f"55{i}" for i in range(1, 10)]
-BANK_CODES = ["00010", "00012", "00015", "00046", "00062", "00064", "00067"]
+BANK_CODES = list(DEFAULT_BANK_CODES)  # default bank codes for iban_tr (a list: schemas may override it)
 WORDS = {"tr": ["kalem", "masa", "deniz", "güneş", "çiçek", "kitap", "yol", "şehir", "ağaç", "ışık", "göl", "dağ",
                 "öğrenci", "üzüm", "çay", "kahve", "pencere", "İzmir", "ılık", "söğüt"],
          "en": ["alpha", "river", "stone", "paper", "green", "light", "table", "cloud", "music", "ocean", "maple",
@@ -185,10 +147,13 @@ NO_EDGE = {"seq", "bool", "ref"}
 
 MSG = {"en": {"done": "Generated {rows} rows -> {out} (seed {seed}, edge rows {edge})",
               "valid": "Schema is valid: {tables} table(s), {fields} field(s)",
-              "safety": "Note: TCKN/VKN/IBAN/phone values are valid by algorithm only; keep them in test systems."},
+              "safety": "Note: TCKN/VKN/IBAN/phone values are valid by algorithm only and may belong to real "
+                        "people; use them only in test environments, never in production or shared systems."},
        "tr": {"done": "{rows} satır üretildi -> {out} (seed {seed}, uç değerli satır {edge})",
               "valid": "Şema geçerli: {tables} tablo, {fields} alan",
-              "safety": "Not: TCKN/VKN/IBAN/telefon değerleri yalnızca algoritmik olarak geçerlidir; test sistemlerinde tutun."}}
+              "safety": "Not: TCKN/VKN/IBAN/telefon değerleri yalnızca algoritmik olarak geçerlidir ve gerçek "
+                        "kişilere ait olabilir; yalnızca test ortamlarında kullanın, canlıda veya paylaşılan "
+                        "sistemlerde asla."}}
 
 
 class SchemaError(Exception):
@@ -400,23 +365,8 @@ def _fit(s: str, max_len: int | None) -> str:
     return s if not max_len or len(s) <= max_len else s[:max_len].rstrip()
 
 
-def gen_tckn(rng) -> str:
-    first9 = str(rng.randint(1, 9)) + "".join(str(rng.randint(0, 9)) for _ in range(8))
-    return first9 + tckn_check_digits(first9)
-
-
-def gen_vkn(rng) -> str:
-    first9 = "".join(str(rng.randint(0, 9)) for _ in range(9))
-    return first9 + vkn_check_digit(first9)
-
-
 def gen_iban_tr(rng, codes=None) -> str:
-    bban = str(rng.choice(codes or BANK_CODES)) + "0" + "".join(str(rng.randint(0, 9)) for _ in range(16))
-    return "TR" + iban_check_digits("TR", bban) + bban
-
-
-def iban_display(iban: str) -> str:
-    return " ".join(iban[i:i + 4] for i in range(0, len(iban), 4))
+    return gen_tr_iban(rng, codes or BANK_CODES)
 
 
 def gen_phone_digits(rng) -> str:

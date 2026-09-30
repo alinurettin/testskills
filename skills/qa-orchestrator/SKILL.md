@@ -1,6 +1,6 @@
 ---
 name: qa-orchestrator
-description: Entry point of the QA Suite. Runs the end-to-end testing workflow from raw requirements to import-ready and executable test artifacts - requirements analysis with clarification questions, risk-based ISTQB test design, traceability matrix, Xray/Zephyr/Excel export, and Playwright/BDD automation feeding results back - with one set of stable IDs, plus API, exploratory, mobile, AI-feature, test-data and data-migration testing. Use this whenever someone hands over a feature, user story, PRD/SRS, ticket or spec and wants it "tested", wants "all test cases", a test analysis or a QA package, or asks how to test something end to end, for manual testing or as groundwork for automation. Also use it for Turkish requests such as "bu gereksinimleri test et", "baştan sona test analizi", "tüm test senaryolarını çıkar", "QA paketi hazırla", "test sürecini yürüt". Prefer the specialised QA Suite skills when only one stage or one kind of testing is requested.
+description: Runs the whole QA Suite chain from requirements through analysis, risk-based test design and gap checks to tool export and automation, with one set of stable IDs. Use only when someone wants a complete end-to-end QA package, not a single stage or test type. Triggers include end-to-end test analysis, full QA package, whole QA workflow; Turkish "baştan sona test analizi", "QA paketi hazırla", "test sürecini yürüt".
 license: MIT
 metadata:
   suite: qa-suite
@@ -49,7 +49,7 @@ A QA package is only useful if people read it. Its cost also scales with every f
 | 1 | Requirements analysis | `analyzing-requirements` | `qa/requirements.src.md` → `.json`, `qa/clarifications.md`, in full mode also `qa/analysis-report.md` | Blocking questions surfaced. The user chooses: wait for answers, or proceed on the documented defaults. |
 | 2 | Test design | `designing-test-cases` | `qa/design/DS-*.json/.md`, `qa/test-cases.src.md` → `.json` | Calibration passed: no PRIORITY_SKEW; REDUNDANT items resolved or justified |
 | 2b | Non-functional (when NFRs exist) | `testing-nonfunctional` | k6 scripts, WCAG 2.2 / ASVS 5.0 test drafts merged into `qa/test-cases.src.md` | Every NFR has a measurable target or an open question |
-| 2c | Specialised design (when the product needs it) | `testing-apis`, `testing-mobile-apps`, `testing-ai-features`, `testing-data-migrations` | Contract tests and API spec; mobile checklist and device matrix; AI eval dataset and score gate; reconciliation report | Tests trace to REQs like every other test; thresholds are explicit numbers |
+| 2c | Specialised design (when the product needs it) | `testing-apis`, `testing-mobile-apps`, `testing-ai-features`, `testing-data-migrations` | Contract tests and API spec; mobile checklist and device matrix; AI eval dataset and score gate; reconciliation report | Tests trace to REQs like every other test: operations, capabilities, areas and categories mapped with `--req-map` (one REQ for everything hides gaps); thresholds are explicit numbers |
 | 2d | Test data (when tests need it) | `preparing-test-data` | Synthetic data files, masking rules and report | No real personal data in test environments without an approved decision |
 | 3 | Traceability | `tracing-requirements` | `qa/rtm.md`, `qa/rtm.csv` | No validation errors. Every gap is fixed or justified. |
 | 4 | Export | `exporting-test-cases` | `qa/exports/*` | The user has picked the target tool |
@@ -113,9 +113,17 @@ Tests: T (positive P / negative N) · by priority C/H/M/L (%) · by technique �
 Coverage: requirements R/N (%), functional reqs with negative tests F/G
 Design evidence: DS-001 EP/BVA 3-value (x boundary values), DS-002 decision table (y columns, 1 gap → Q-004), …
 Not covered / risks: …
+Non-functional (if 2b ran): performance P tests (k6 thresholds from REQ-…) · WCAG W tests on <pages> · ASVS S tests (level L2) · NFRs without a target: …
+API (if 2c ran): O operations → T contract tests (E executable, K skeletons) mapped to R REQs · contract questions Q · last run passed/failed
+Mobile (if 2c ran): T tests (core + <capabilities>) mapped to R REQs · device matrix D devices = X% Android / Y% iOS share · failed on: …
+AI (if 2c ran): E eval cases × N runs · gate passed/failed (overall X%, critical failures C, flaky F) · pending grading G
+Migration (if 2c ran): reconciliation of R rows: mismatches M (by class) · sign-off criteria met / not met · rehearsal timing …
+Test data (if 2d ran): datasets … (fixture / synthetic / masked) · masking report … · real personal data: none (or approved decision …)
+Exploratory (if 5c ran): S sessions on C charters · defects D · new regression tests N · debrief held (yes/no)
 Automation (if stage 5 ran): A of K candidates automated · last run passed P / failed F (product defects: …) · skeletons left S
 Next steps: answer Q-001..; trial import into Xray; …
 ```
+Include a stage line only when that stage ran; leave out the lines of stages that did not.
 
 ## Workspace
 

@@ -1,6 +1,6 @@
 ---
 name: tracing-requirements
-description: Builds and maintains a bidirectional Requirements Traceability Matrix (RTM) linking requirements to test cases, execution results and defects. It validates the QA artifacts (IDs, required fields, broken links), measures coverage, and produces a risk-ordered gap report covering uncovered requirements, missing negative tests, thinly covered high-risk items, orphan and duplicate tests, unconfirmed derived requirements and failed tests. It also answers change-impact questions. Use this whenever the user asks about test coverage, traceability, an RTM or "izlenebilirlik matrisi", which requirements are untested, what to re-test after a requirement changed, which regression tests to run for a release or a change (risk-based regression selection within a time budget), release readiness from a coverage view, or wants to check a test suite for gaps, duplicates or orphans. Use it after designing test cases, before exporting them, and whenever execution results arrive.
+description: Builds a requirements traceability matrix (RTM) from QA artifacts, measures coverage, reports risk-ordered gaps (uncovered, no negatives, orphans) and change impact, and does risk-based regression selection within a time budget. Use when someone asks about coverage or what to re-test. Triggers include RTM, test coverage, traceability, change impact, regression selection; Turkish "izlenebilirlik matrisi", "test kapsamı", "regresyon seçimi".
 license: MIT
 metadata:
   suite: qa-suite
@@ -19,7 +19,7 @@ The RTM is only trustworthy if it is **generated from the artifacts**, not maint
 ## Inputs
 
 - `qa/requirements.json` and `qa/test-cases.json` (schema in `references/data-model.md`)
-- Optional `qa/results.json`: execution results and defect keys per test
+- Optional `qa/results.json`: execution results and defect keys per test, entered by hand or converted from automated test reports (see "Automated results" below)
 
 If the user only has a spreadsheet or a list, convert it into these files first. If the links between tests and requirements are missing, propose them and let the user confirm. Never invent links silently.
 
@@ -80,6 +80,21 @@ If the user only has a spreadsheet or a list, convert it into these files first.
    - The execution status, when results are available.
    - A clear statement of the limits. Coverage here is **requirements coverage**. It says nothing about code coverage, or about requirements nobody wrote down; the analysis step targets those.
 
+## Automated results
+
+Automated tests reach the RTM through their TC IDs. Read `references/test-framework-results.md` for the recipe per framework (JUnit 5 with Selenium or REST Assured, TestNG, pytest, Cypress, Karate, Postman/Newman, Robot Framework, SpecFlow/Reqnroll): how to put the ID where the report keeps it, and how to make the runner write JUnit XML.
+
+1. Check that the automated tests carry TC IDs **in their names**. Most JUnit XML writers drop tags, groups and categories, so a tag alone is not enough.
+2. Convert the reports. Files, folders and quoted globs work, once per environment:
+   ```bash
+   python scripts/junit_results.py "target/surefire-reports/TEST-*.xml" --source ci --project api --out qa/results.json
+   python scripts/junit_results.py reports/junit --source ci --project chrome --out qa/results.json [--retries]
+   ```
+   The script reads JUnit XML from Maven Surefire/Failsafe, Gradle, TestNG, pytest, Cypress, Newman, Karate, Robot Framework (`--xunit`, or `output.xml` for `[Tags]`) and .NET. A TC is failed if any of its tests failed, in any environment. Reruns that passed are marked `flaky`. Manual results and defect keys already in the file are kept. Tests without a TC ID are listed as untraceable: report that number to the user.
+3. Run `build_rtm.py` with `--results qa/results.json`. An `unknown test` warning means an automated test carries an ID that is not in `test-cases.json`.
+
+Playwright uses `pw_results.py` from the automating-with-playwright skill instead.
+
 ## Notes
 
 - `deferred` and `deprecated` requirements are listed but excluded from the coverage denominator.
@@ -95,4 +110,6 @@ If the user only has a spreadsheet or a list, convert it into these files first.
 
 - `scripts/build_rtm.py`: validation, RTM, gap report, change impact. Outputs md, csv and optionally json. Standard library only.
 - `scripts/select_regression.py`: risk-based regression selection (must/should/could tiers with reasons), time or count budget with residual risk, Playwright `--grep` command.
+- `scripts/junit_results.py`: JUnit XML from any framework (and Robot Framework `output.xml`) → `qa/results.json` by TC ID, per environment, with flaky reruns.
+- `references/test-framework-results.md`: tagging tests with TC IDs and producing JUnit XML per framework, converter options, troubleshooting.
 - `references/data-model.md`: shared JSON schema.

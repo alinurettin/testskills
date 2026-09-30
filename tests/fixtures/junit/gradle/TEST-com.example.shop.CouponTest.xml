@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.shop.CouponTest" tests="7" skipped="1" failures="2" errors="0" timestamp="2026-09-28T07:15:02" hostname="ci-runner-7" time="1.734">
+  <properties/>
+  <testcase name="TC-201 valid coupon gives 10 percent off" classname="com.example.shop.CouponTest" time="0.214"/>
+  <testcase name="tc202_couponCodeIsCaseInsensitive()" classname="com.example.shop.CouponTest" time="0.052"/>
+  <!-- @ParameterizedTest(name = "TC-203 basket {0} -> discount {1}") -->
+  <testcase name="TC-203 basket 100.00 -&gt; discount 10.00" classname="com.example.shop.CouponTest" time="0.031"/>
+  <testcase name="TC-203 basket 99.99 -&gt; discount 0.00" classname="com.example.shop.CouponTest" time="0.029">
+    <failure message="org.opentest4j.AssertionFailedError: expected: &lt;0.00&gt; but was: &lt;9.99&gt;" type="org.opentest4j.AssertionFailedError">org.opentest4j.AssertionFailedError: expected: &lt;0.00&gt; but was: &lt;9.99&gt;
+	at app//org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at app//com.example.shop.CouponTest.minimumBasket(CouponTest.java:77)
+</failure>
+  </testcase>
+  <!-- test-retry plugin without mergeReruns: every attempt is its own testcase element -->
+  <testcase name="TC-204 coupon survives a page reload" classname="com.example.shop.CouponTest" time="0.611">
+    <failure message="org.openqa.selenium.StaleElementReferenceException: stale element reference: stale element not found" type="org.openqa.selenium.StaleElementReferenceException">org.openqa.selenium.StaleElementReferenceException: stale element reference: stale element not found
+	at app//com.example.shop.CouponTest.couponSurvivesReload(CouponTest.java:92)
+</failure>
+  </testcase>
+  <testcase name="TC-204 coupon survives a page reload" classname="com.example.shop.CouponTest" time="0.598"/>
+  <testcase name="tc205_stackedCouponsAreRejected()" classname="com.example.shop.CouponTest" time="0.0">
+    <skipped/>
+  </testcase>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -36,8 +36,8 @@ The mobile risks that web testing does not cover: the app can be **killed and re
 **Use data, not guesses.** Take the device and OS mix from your own analytics: Firebase/Google Analytics, Play Console (Android vitals, device catalogue), App Store Connect (App Analytics), or the crash reporter. Public market statistics (for example StatCounter for Türkiye) are only a starting point for a new app. They describe the market, not your users.
 
 **Decide the minimum supported OS explicitly.** Base it on user share, the cost of keeping old APIs, and the security support of old OS versions. Write the decision down (it becomes a requirement), then test the oldest supported version on purpose. Store constraints:
-- Google Play requires new apps and updates to target a recent API level (about one year behind the newest Android release; for example API 35 from 31 August 2025). Check the current deadline. The *target* API affects behaviour; the *min* SDK decides who can install.
-- Apple requires uploads to be built with a recent Xcode/SDK; the deadline is announced each year.
+- Google Play requires new apps and updates to target a recent API level (about one year behind the newest Android release). Since 31 August 2026: API 36 (Android 16) for phones and tablets, API 35 for Wear OS and Automotive, API 34 for Android TV and XR; existing apps must target at least API 35 to stay available to new users on newer Android versions (verified 2026-09-30). The deadline moves every year, so check the current one. The *target* API affects behaviour; the *min* SDK decides who can install.
+- Apple requires uploads to be built with a recent Xcode/SDK; the deadline is announced each year. Since 28 April 2026: Xcode 26 or later with the iOS 26 (iPadOS, tvOS, visionOS, watchOS 26) SDK (verified 2026-09-30).
 
 **Cover the physical variety that breaks layouts:**
 - screen sizes and logical widths (small phones around 360 dp / 375 pt, large phones, tablets);

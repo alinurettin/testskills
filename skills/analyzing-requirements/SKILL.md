@@ -1,6 +1,6 @@
 ---
 name: analyzing-requirements
-description: Professional requirements analysis for software testing. Normalizes user stories, SRS documents, tickets, mockups or meeting notes into atomic, traceable requirements (REQ IDs); reviews them against ISO/IEC/IEEE 29148 quality characteristics; detects ambiguity, contradictions and missing (implicit and non-functional, ISO 25010) requirements; scores calibrated risk; and produces an actionable clarification-question log. Use this whenever someone shares requirements, a user story, acceptance criteria, a PRD/BRD/SRS, a Jira ticket or a spec and wants it reviewed, clarified, made testable, or turned into tests. Also use it for Turkish requests such as "gereksinim analizi", "gereksinimleri incele", "user story'yi değerlendir", "kabul kriteri yaz", "eksik gereksinimleri bul", or "test edilebilir mi". Use it before designing test cases whenever the requirements have not been analysed yet.
+description: Turns user stories, PRD/SRS documents or tickets into atomic, testable requirements with REQ IDs, ISO 29148 quality review, contradiction and gap detection, risk scores and clarification questions. Use when requirements need review before test design. Triggers include requirements analysis, user story review, acceptance criteria, missing requirements; Turkish "gereksinim analizi", "gereksinimleri incele", "kabul kriteri yaz".
 license: MIT
 metadata:
   suite: qa-suite

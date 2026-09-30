@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<robot generator="Robot 7.1.1 (Python 3.12.6 on linux)" generated="2026-09-28T08:05:44.101325" rpa="false" schemaversion="5">
+<suite id="s1" name="Acceptance" source="/builds/shop/acceptance">
+<suite id="s1-s1" name="Cart" source="/builds/shop/acceptance/cart.robot">
+<test id="s1-s1-t1" name="Add Product To Cart" line="12">
+<kw name="Open Shop" owner="common">
+<status status="PASS" start="2026-09-28T08:05:44.203114" elapsed="0.402311"/>
+</kw>
+<kw name="Add To Cart" owner="cart">
+<arg>Ürün A</arg>
+<status status="PASS" start="2026-09-28T08:05:44.605425" elapsed="0.798023"/>
+</kw>
+<tag>smoke</tag>
+<tag>TC-751</tag>
+<status status="PASS" start="2026-09-28T08:05:44.202311" elapsed="1.201337"/>
+</test>
+<test id="s1-s1-t2" name="Remove Product From Cart" line="20">
+<kw name="Wait Until Element Is Visible" owner="SeleniumLibrary">
+<arg>css:[data-test=cart-empty]</arg>
+<msg time="2026-09-28T08:05:46.210000" level="FAIL">Element 'css:[data-test=cart-empty]' not visible after 5 seconds.</msg>
+<status status="FAIL" start="2026-09-28T08:05:41.203000" elapsed="5.007000"/>
+</kw>
+<tag>TC-752</tag>
+<status status="FAIL" start="2026-09-28T08:05:41.200000" elapsed="5.012000">Element 'css:[data-test=cart-empty]' not visible after 5 seconds.</status>
+</test>
+<test id="s1-s1-t3" name="Cart Survives Logout" line="30">
+<tag>TC-753</tag>
+<tag>wip</tag>
+<status status="SKIP" start="2026-09-28T08:05:46.300000" elapsed="0.000100">Test skipped using 'wip' tag.</status>
+</test>
+<test id="s1-s1-t4" name="Cart Badge Shows Count" line="40">
+<tag>ui</tag>
+<status status="PASS" start="2026-09-28T08:05:46.310000" elapsed="0.310000"/>
+</test>
+<status status="FAIL" start="2026-09-28T08:05:44.150000" elapsed="6.470000"/>
+</suite>
+<status status="FAIL" start="2026-09-28T08:05:44.120000" elapsed="6.520000"/>
+</suite>
+<statistics>
+<total>
+<stat pass="2" fail="1" skip="1">All Tests</stat>
+</total>
+<tag>
+<stat pass="1" fail="0" skip="0">TC-751</stat>
+</tag>
+<suite>
+<stat pass="2" fail="1" skip="1" id="s1" name="Acceptance">Acceptance</stat>
+</suite>
+</statistics>
+<errors>
+</errors>
+</robot>

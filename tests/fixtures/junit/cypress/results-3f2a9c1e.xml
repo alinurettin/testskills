@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="Mocha Tests" time="4.8210" tests="3" failures="1" skipped="1">
+  <testsuite name="Root Suite" timestamp="2026-09-28T07:31:05" tests="0" file="cypress/e2e/login.cy.ts" time="0.0000" failures="0">
+  </testsuite>
+  <testsuite name="Login" timestamp="2026-09-28T07:31:05" tests="3" time="4.8210" failures="1">
+    <testcase name="Login TC-401 accepts valid credentials" time="1.9020" classname="TC-401 accepts valid credentials">
+    </testcase>
+    <testcase name="Login TC-402 shows an error for a wrong password" time="2.9190" classname="TC-402 shows an error for a wrong password">
+      <failure message="Timed out retrying after 4000ms: Expected to find content: &apos;Hatalı şifre&apos; within the element: &lt;div.alert&gt; but never did." type="AssertionError"><![CDATA[AssertionError: Timed out retrying after 4000ms: Expected to find content: 'Hatalı şifre' within the element: <div.alert> but never did.
+    at Context.eval (webpack://shop/./cypress/e2e/login.cy.ts:21:37)]]></failure>
+    </testcase>
+    <testcase name="Login TC-403 locks the account after 5 attempts" time="0.0000" classname="TC-403 locks the account after 5 attempts">
+      <skipped/>
+    </testcase>
+  </testsuite>
+</testsuites>

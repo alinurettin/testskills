@@ -132,13 +132,19 @@ Tests that share mutable data become order-dependent and flaky, and they fail wh
 - **Time zone.** Turkey uses UTC+3 all year (no daylight saving since 2016). Servers in UTC and clients in Europe/Istanbul still shift dates near midnight. Include 00:00–03:00 local times in date tests.
 
 ## 8. Turkish specifics
-**Identifiers** (valid by algorithm only; they can coincide with real people or accounts, so keep them in test systems):
+**ID policy.** A checksum-valid TCKN, VKN or IBAN is valid by algorithm only. There is no reserved fictional range, so a generated value can coincide with a real person, company or account.
+- **Allowed:** synthetic checksum-valid values in test environments, produced by a generator (`gen_data.py`, `mask_data.py` `fake`, `check_ids.py --generate` in designing-test-cases). Record the schema and seed in the data catalog (§9); that record is the proof of synthetic origin.
+- **Not allowed:** values copied from the internet, documents or production; generated values in production or in systems shared outside the test boundary (real registries such as MERNIS/KPS, payment networks, SMS and e-mail gateways, partners' systems).
+- **Checks:** `data_needs.py` reports checksum-valid IDs and mobile numbers in test cases as warnings ("verify synthetic origin") and fails (exit 1) only for data that clearly looks real, such as e-mails outside the reserved example domains.
+- **Invalid values** for negative tests are single-fault variants of a valid synthetic value (`check_ids.py --variants` in designing-test-cases), one fault per row.
+
+**Identifiers:**
 - **TCKN** (T.C. kimlik no): 11 digits, first digit not 0.
   - d10 = ((d1+d3+d5+d7+d9)×7 − (d2+d4+d6+d8)) mod 10
   - d11 = (d1+…+d10) mod 10
   - Foreign residents receive a number of the same format (typically starting with 99).
-- **VKN** (vergi kimlik no): 10 digits, check digit computed from the first nine with weights of powers of two mod 9 (see `vkn_check_digit` in `scripts/gen_data.py`). Individuals are identified by their TCKN for tax purposes.
-- **IBAN (TR):** 26 characters: `TR` + 2 check digits (ISO 7064 mod 97-10) + 5-digit bank code + 1 reserve digit (`0`) + 16-digit account number. The printed form is in groups of four. Accept both forms, and store the compact one.
+- **VKN** (vergi kimlik no): 10 digits, check digit computed from the first nine with weights of powers of two mod 9 (see `vkn_check_digit` in `scripts/tr_ids.py`, which also cites the published VKNs it was verified against). Individuals are identified by their TCKN for tax purposes.
+- **IBAN (TR):** 26 characters: `TR` + 2 check digits (ISO 7064 mod 97-10) + 5-digit bank code + 1 reserve digit (`0`) + 16-character account number (digits in practice). The printed form is in groups of four. Accept both forms, and store the compact one.
 - **Mobile numbers:** +90 5xx xxx xx xx. There is, as far as we know, **no reserved fictional range** in Turkey (unlike, for example, the UK's drama numbers). A generated number may belong to a real subscriber, so route every test SMS and call to a sandbox gateway. Because of number portability, the prefix no longer identifies the operator.
 - **Postcodes:** 5 digits; the first two are the province plate code (01–81), so leading zeros matter (`06100` Ankara).
 
@@ -181,4 +187,4 @@ Keep one catalog (a Markdown table or a sheet) next to the test plan:
   - `fake` replaces each column independently: a row's fake e-mail does not match its fake name.
   - Fake values can collide; the report counts collisions for identifier types.
   - It does not measure re-identification risk (k-anonymity); review quasi-identifiers yourself.
-- **`data_needs.py`** infers types from the few values in the test cases. The starter schema's ranges are the observed values, not the real domain; widen them.
+- **`data_needs.py`** infers types from the few values in the test cases. The starter schema's ranges are the observed values, not the real domain; widen them. Its ID warnings cannot tell a generated TCKN or IBAN from a real one; only the recorded origin (generator, schema, seed) can.

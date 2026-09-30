@@ -22,13 +22,22 @@ devices.json: a list (or {"devices": [...]}) of objects with
   name, os ("android" | "ios"), version ("14", "17.5"), share (number), form_factor
   ("phone" | "tablet" | "foldable"), optional width_dp (logical width in dp/pt, for "smallest screen").
 
+Requirement links (--out): each check traces to the requirement(s) of its capability.
+  --req-map FILE  {"default": "REQ-030", "capabilities": {"core": "REQ-030", "push": "REQ-031",
+                   "payments": ["REQ-032", "REQ-033"], "core-upgrade": "REQ-034"}}
+                  keys: a capability, "core" (the always-on set) or a check id from
+                  assets/mobile-checks.json (most specific); values: a REQ ID or a list.
+  Precedence: check id > capability (union when a check belongs to several selected
+  capabilities) > req-map default > --req. A check without a requirement stops the run (exit 2)
+  with the list of unmapped capabilities. One REQ for everything hides thin or untested areas.
+
 Usage:
   python mobile_checklist.py --platform both --capabilities push,payments,deeplinks,auth \\
-      --req REQ-030 --tests qa/test-cases.json --lang tr --out qa/design/mobile.src.md
+      --req-map qa/req-map.json --tests qa/test-cases.json --lang tr --out qa/design/mobile.src.md
   python mobile_checklist.py --platform android --devices devices.json --target-share 80 \\
       --matrix-out qa/design/device-matrix.md
   python mobile_checklist.py --list-capabilities
-Exit codes: 0 ok, 1 invalid devices file content, 2 usage error or unreadable input.
+Exit codes: 0 ok, 1 invalid devices file content, 2 usage error, unreadable input or unmapped checks.
 """
 from __future__ import annotations
 
@@ -36,6 +45,7 @@ import argparse
 import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 ASSETS = Path(__file__).resolve().parent.parent / "assets"
@@ -107,6 +117,76 @@ def next_id(tests_path: str | None, start: int | None) -> int:
     return 1
 
 
+# ---------------------------------------------------------------- requirement mapping (--req-map)
+REQ_MAP_KEYS = {"default", "operations", "tags", "capabilities", "categories", "areas"}
+REQ_TOKEN = re.compile(r"^[A-Za-z][A-Za-z0-9_.:-]*$")
+
+
+def req_list(value, where: str) -> list[str]:
+    """A REQ ID, a comma-separated string or a list of them -> de-duplicated list (ValueError if malformed)."""
+    out: list[str] = []
+    for v in value if isinstance(value, list) else [value]:
+        if not isinstance(v, str):
+            raise ValueError(f"{where}: expected a REQ ID or a list of REQ IDs, got {json.dumps(v)}")
+        for x in (p.strip() for p in v.split(",")):
+            if not REQ_TOKEN.match(x):
+                raise ValueError(f"{where}: invalid requirement ID {x!r}")
+            if x not in out:
+                out.append(x)
+    if not out:
+        raise ValueError(f"{where}: no requirement ID")
+    return out
+
+
+def load_req_map(path: str | None, sections: tuple[str, ...]) -> tuple[dict, list[str]]:
+    """--req-map JSON -> ({"default": [...], section: {key: [...]}}, warnings). ValueError when unusable."""
+    rmap: dict = {"default": [], **{s: {} for s in sections}}
+    if not path:
+        return rmap, []
+    try:
+        raw = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as e:
+        raise ValueError(f"--req-map: cannot read {path}: {e}")
+    if not isinstance(raw, dict):
+        raise ValueError(f"--req-map {path}: must be a JSON object")
+    warnings = [f"--req-map: unknown key '{k}' ignored" for k in raw if k not in REQ_MAP_KEYS and not k.startswith(("_", "$"))]
+    if raw.get("default") not in (None, "", []):
+        rmap["default"] = req_list(raw["default"], "--req-map default")
+    for s in sections:
+        sec = raw.get(s) or {}
+        if not isinstance(sec, dict):
+            raise ValueError(f"--req-map: '{s}' must be an object of key -> REQ ID(s)")
+        rmap[s] = {str(k): req_list(v, f"--req-map {s}.{k}") for k, v in sec.items()}
+    return rmap, warnings
+
+
+def req_summary(links: list[tuple[list[str], str]]) -> str:
+    """'REQ-031 5 (neg 2), REQ-030 25 (neg 9)': generated tests per requirement."""
+    count: Counter = Counter()
+    neg: Counter = Counter()
+    for reqs, pol in links:
+        for r in reqs:
+            count[r] += 1
+            neg[r] += pol == "-"
+    return ", ".join(f"{r} {count[r]} (neg {neg[r]})" for r in count)
+
+
+def check_caps(c: dict, caps: set[str]) -> list[str]:
+    """The selected capabilities a check belongs to ('core' for the always-on set)."""
+    return ["core"] if "core" in c["caps"] else [x for x in c["caps"] if x in caps]
+
+
+def resolve_check(c: dict, caps: set[str], rmap: dict, fallback: list[str]) -> list[str]:
+    """Precedence: capabilities[check id] > capabilities[capability] (union) > default > --req."""
+    capm = rmap["capabilities"]
+    if c["id"] in capm:
+        return capm[c["id"]]
+    found: list[str] = []
+    for k in check_caps(c, caps):
+        found += [r for r in capm.get(k, []) if r not in found]
+    return found or rmap["default"] or fallback
+
+
 def select_checks(cat: dict, platforms: list[str], caps: set[str]) -> list[dict]:
     out = []
     for c in cat["checks"]:
@@ -125,8 +205,9 @@ def via_text(check: dict, platforms: list[str], lang: str) -> str:
     return "; ".join(f"{PLAT_NAME[p]}: {via[p]}" for p in plats)
 
 
-def render_checks(cat: dict, checks: list[dict], platforms: list[str], caps: set[str], req: str,
+def render_checks(cat: dict, checks: list[dict], platforms: list[str], caps: set[str], reqs: dict[str, list[str]],
                   lang: str, first: int) -> tuple[list[str], int]:
+    """reqs: check id -> requirement IDs (see resolve_check)."""
     t = T[lang]
     lines = [t["head"].format(plat="+".join(platforms), caps=", ".join(["core"] + sorted(caps))), t["head2"]]
     n = first
@@ -142,7 +223,7 @@ def render_checks(cat: dict, checks: list[dict], platforms: list[str], caps: set
                 tags.append(tag)
         auto = cat["auto"][c["auto"]]
         lines += ["", f"## {tid} | {loc['title']}",
-                  f"req: {req} | pri: {c['pri']} | pol: {c['pol']} | tech: {c['tech']} | cat: {c['cat']}"]
+                  f"req: {', '.join(reqs[c['id']])} | pri: {c['pri']} | pol: {c['pol']} | tech: {c['tech']} | cat: {c['cat']}"]
         for p in loc.get("pre", []):
             lines.append(f"pre: {p}")
         via = via_text(c, platforms, lang)
@@ -295,7 +376,9 @@ def main() -> int:
     ap.add_argument("--platform", choices=["ios", "android", "both"], default="both")
     ap.add_argument("--capabilities", default="", help="comma-separated capabilities (see --list-capabilities), or 'all'; core checks are always included")
     ap.add_argument("--list-capabilities", action="store_true")
-    ap.add_argument("--req", default="", help="requirement ID(s) the generated tests trace to (required with --out)")
+    ap.add_argument("--req", default="", help="fallback requirement ID(s), comma-separated, for checks the --req-map "
+                    "does not cover (with --out: --req and/or --req-map)")
+    ap.add_argument("--req-map", dest="req_map", help="JSON map capabilities/check ids -> requirement ID(s) (see above)")
     ap.add_argument("--tests", help="existing test-cases.json to continue TC numbering")
     ap.add_argument("--start", type=int, help="first TC number (overrides --tests)")
     ap.add_argument("--lang", choices=["tr", "en"], default="en")
@@ -327,14 +410,34 @@ def main() -> int:
         print(f"error: unknown capabilities {sorted(unknown)}; use --list-capabilities", file=sys.stderr)
         return 2
     if a.out:
-        if not a.req:
-            print("error: --req is required with --out so the generated tests are traceable", file=sys.stderr)
+        try:
+            fallback = req_list(a.req, "--req") if a.req.strip() else []
+            rmap, map_warnings = load_req_map(a.req_map, ("capabilities",))
+        except ValueError as e:
+            print(f"error: {e}", file=sys.stderr)
             return 2
         checks = select_checks(cat, platforms, caps)
-        lines, count = render_checks(cat, checks, platforms, caps, a.req, a.lang, next_id(a.tests, a.start))
+        reqs = {c["id"]: resolve_check(c, caps, rmap, fallback) for c in checks}
+        unmapped = Counter(k for c in checks if not reqs[c["id"]] for k in check_caps(c, caps))
+        if unmapped:
+            print("error: no requirement for capabilities: " + ", ".join(f"{k} ({v} checks)" for k, v in unmapped.items())
+                  + ". Map them in --req-map (capabilities or default) or pass --req, so the generated tests are traceable.",
+                  file=sys.stderr)
+            return 2
+        known = set(cat["capabilities"]) | {"core"} | {c["id"] for c in cat["checks"]}
+        map_warnings += [f"--req-map: capabilities key '{k}' is not a capability, 'core' or a check id"
+                         for k in rmap["capabilities"] if k not in known]
+        for w in map_warnings:
+            print(f"warning: {w}", file=sys.stderr)
+        lines, count = render_checks(cat, checks, platforms, caps, reqs, a.lang, next_id(a.tests, a.start))
         Path(a.out).parent.mkdir(parents=True, exist_ok=True)
         Path(a.out).write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
         print(f"wrote {a.out}: {count} test cases ({'+'.join(platforms)}; core + {', '.join(sorted(caps)) or 'no capabilities'})")
+        links = [(reqs[c["id"]], c["pol"]) for c in checks]
+        print(f"  requirements: {req_summary(links)}")
+        if len({r for rs, _ in links for r in rs}) == 1 and caps:
+            print(f"  note: all {count} tests trace to {links[0][0][0]}; map capabilities to their requirements with "
+                  "--req-map so the RTM can show thin or negative-free requirements")
     if a.matrix_out:
         try:
             raw = json.loads(Path(a.devices).read_text(encoding="utf-8-sig"))

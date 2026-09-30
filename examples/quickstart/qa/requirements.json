@@ -1,0 +1,329 @@
+{
+ "project": "Demo Mağaza – Şifre sıfırlama (US-128)",
+ "language": "tr",
+ "version": 1,
+ "requirements": [
+  {
+   "id": "REQ-001",
+   "title": "\"Şifremi unuttum\" ile e-postaya sıfırlama bağlantısı istenir",
+   "type": "functional",
+   "priority": "high",
+   "risk": {
+    "likelihood": 2,
+    "impact": 4,
+    "rationale": "Kurtarma yolu çalışmazsa kullanıcı hesabına giremez; mantık basit"
+   },
+   "source": "US-128 AK-1",
+   "external_id": "SHOP-128",
+   "status": "ready",
+   "text": "Giriş sayfasındaki \"Şifremi unuttum\" bağlantısından e-posta adresi girilerek sıfırlama bağlantısı istenir.",
+   "acceptance_criteria": [
+    "Diyelim ki 'ayse.test@example.com' kayıtlı, Eğer ki bu adresle sıfırlama istenirse, O zaman adrese sıfırlama bağlantısı içeren bir e-posta gönderilir"
+   ],
+   "questions": [
+    "Q-006"
+   ],
+   "derived": false
+  },
+  {
+   "id": "REQ-002",
+   "title": "Kayıtlı ve kayıtsız adres için aynı ekran mesajı",
+   "type": "business-rule",
+   "priority": "high",
+   "risk": {
+    "likelihood": 3,
+    "impact": 4,
+    "rationale": "Farklı mesaj ya da farklı davranış, bir e-postanın müşteri olup olmadığını sızdırır (hesap numaralandırma)"
+   },
+   "source": "US-128 AK-1",
+   "external_id": "SHOP-128",
+   "status": "ready",
+   "text": "Adres kayıtlı olsun ya da olmasın ekranda aynı mesaj gösterilir: \"E-posta adresiniz kayıtlıysa şifre sıfırlama bağlantısı gönderdik.\"",
+   "acceptance_criteria": [
+    "Diyelim ki 'yok.test@example.com' kayıtlı değil, Eğer ki bu adresle sıfırlama istenirse, O zaman kayıtlı adresle birebir aynı mesaj gösterilir ve e-posta gönderilmez"
+   ],
+   "questions": [
+    "Q-002"
+   ],
+   "derived": false,
+   "quality_characteristic": "security"
+  },
+  {
+   "id": "REQ-003",
+   "title": "Sıfırlama bağlantısı 30 dakika geçerlidir",
+   "type": "business-rule",
+   "priority": "high",
+   "risk": {
+    "likelihood": 3,
+    "impact": 4,
+    "rationale": "Süresi dolmuş bağlantının kabul edilmesi hesap ele geçirme penceresini uzatır; sınır (dahil/hariç) belirsiz"
+   },
+   "source": "US-128 AK-2",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Sıfırlama bağlantısı 30 dakika geçerlidir.",
+   "acceptance_criteria": [
+    "Diyelim ki bağlantı 30 dakika önce istendi, Eğer ki bağlantı açılırsa, O zaman şifre formu açılmaz ve bağlantının geçersiz olduğu mesajı gösterilir"
+   ],
+   "questions": [
+    "Q-001"
+   ],
+   "derived": false,
+   "quality_characteristic": "security",
+   "notes": "Varsayım (Q-001): süre isteğin alındığı andan başlar; 29:59'da geçerli, 30:00 ve sonrası geçersiz; kontrol 'Şifreyi kaydet' anında da yapılır."
+  },
+  {
+   "id": "REQ-004",
+   "title": "Sıfırlama bağlantısı yalnızca bir kez kullanılabilir",
+   "type": "business-rule",
+   "priority": "high",
+   "risk": {
+    "likelihood": 2,
+    "impact": 5,
+    "rationale": "Tekrar kullanılabilen bağlantı, e-postası ele geçen hesabın yeniden devralınmasına izin verir"
+   },
+   "source": "US-128 AK-2",
+   "external_id": "SHOP-128",
+   "status": "ready",
+   "text": "Sıfırlama bağlantısı yalnızca bir kez kullanılabilir.",
+   "acceptance_criteria": [
+    "Diyelim ki bağlantıyla şifre değiştirildi, Eğer ki aynı bağlantı yeniden açılırsa, O zaman şifre formu açılmaz ve bağlantının geçersiz olduğu mesajı gösterilir"
+   ],
+   "questions": [
+    "Q-005"
+   ],
+   "derived": false,
+   "quality_characteristic": "security"
+  },
+  {
+   "id": "REQ-005",
+   "title": "Aynı e-posta için 1 saatte en fazla 3 sıfırlama isteği",
+   "type": "business-rule",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 3,
+    "impact": 3,
+    "rationale": "Pencere türü ve 4. istekteki davranış belirsiz; aşım e-posta bombardımanına ve maliyete yol açar"
+   },
+   "source": "US-128 AK-3",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Aynı e-posta adresi için 1 saat içinde en fazla 3 sıfırlama isteği gönderilir.",
+   "acceptance_criteria": [
+    "Diyelim ki son 60 dakikada aynı adres için 3 istek gönderildi, Eğer ki 4. istek yapılırsa, O zaman e-posta gönderilmez ve ekranda yine aynı genel mesaj görünür"
+   ],
+   "questions": [
+    "Q-002"
+   ],
+   "derived": false,
+   "quality_characteristic": "security",
+   "notes": "Varsayım (Q-002): kayan 60 dakika; sayaç kayıtlı olsun olmasın her adres için tutulur."
+  },
+  {
+   "id": "REQ-006",
+   "title": "Yeni şifre uzunluğu 8–20 karakter",
+   "type": "business-rule",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 2,
+    "impact": 3,
+    "rationale": "Basit uzunluk kontrolü; sınır hatası kullanıcıyı engeller ya da zayıf şifreye izin verir"
+   },
+   "source": "US-128 AK-4",
+   "external_id": "SHOP-128",
+   "status": "ready",
+   "text": "Yeni şifre 8–20 karakter olmalıdır.",
+   "acceptance_criteria": [
+    "Diyelim ki diğer kurallara uyan 7 karakterlik şifre girildi, Eğer ki 'Şifreyi kaydet'e basılırsa, O zaman şifre değişmez ve kural mesajı gösterilir"
+   ],
+   "questions": [
+    "Q-005"
+   ],
+   "derived": false
+  },
+  {
+   "id": "REQ-007",
+   "title": "Yeni şifre büyük harf, küçük harf ve rakam içerir",
+   "type": "business-rule",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 3,
+    "impact": 3,
+    "rationale": "Türkçe harflerin (Ş, ı, İ) büyük/küçük harf sayılıp sayılmadığı belirsiz"
+   },
+   "source": "US-128 AK-4",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Yeni şifre en az bir büyük harf, bir küçük harf ve bir rakam içermelidir.",
+   "acceptance_criteria": [
+    "Diyelim ki rakam içermeyen 'Guvenli-Sifre' girildi, Eğer ki 'Şifreyi kaydet'e basılırsa, O zaman şifre değişmez ve kural mesajı gösterilir"
+   ],
+   "questions": [
+    "Q-003",
+    "Q-005",
+    "Q-011"
+   ],
+   "derived": false
+  },
+  {
+   "id": "REQ-008",
+   "title": "Yeni şifre son 3 şifreden biri olamaz",
+   "type": "business-rule",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 3,
+    "impact": 3,
+    "rationale": "\"Son 3\"ün mevcut şifreyi içerip içermediği belirsiz"
+   },
+   "source": "US-128 AK-5",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Yeni şifre son 3 şifreden biri olamaz.",
+   "acceptance_criteria": [
+    "Diyelim ki kullanıcının mevcut şifresi 'Mevcut2026', Eğer ki yeni şifre olarak 'Mevcut2026' girilirse, O zaman şifre değişmez ve eski şifre mesajı gösterilir"
+   ],
+   "questions": [
+    "Q-004",
+    "Q-005",
+    "Q-011"
+   ],
+   "derived": false
+  },
+  {
+   "id": "REQ-009",
+   "title": "Şifre değişince bilgilendirme e-postası gönderilir",
+   "type": "functional",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 2,
+    "impact": 3,
+    "rationale": "E-posta gitmezse kullanıcı yetkisiz bir değişikliği fark edemez"
+   },
+   "source": "US-128 AK-6",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Şifre değiştiğinde kullanıcıya bilgilendirme e-postası gönderilir.",
+   "acceptance_criteria": [
+    "Diyelim ki şifre bağlantıyla değiştirildi, O zaman kullanıcıya 'Şifreniz değiştirildi' konulu e-posta gönderilir ve e-postada şifre yer almaz"
+   ],
+   "questions": [
+    "Q-006",
+    "Q-008"
+   ],
+   "derived": false,
+   "quality_characteristic": "security"
+  },
+  {
+   "id": "REQ-010",
+   "title": "Şifre değişince açık oturumların tümü kapatılır",
+   "type": "business-rule",
+   "priority": "high",
+   "risk": {
+    "likelihood": 3,
+    "impact": 4,
+    "rationale": "Açık kalan oturum, şifresi sıfırlanan hesapta saldırganın kalmasına izin verir"
+   },
+   "source": "US-128 AK-6",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Şifre değiştiğinde açık oturumların tümü kapatılır.",
+   "acceptance_criteria": [
+    "Diyelim ki kullanıcı başka bir tarayıcıda oturum açık, Eğer ki şifre sıfırlanırsa, O zaman o tarayıcıdaki sonraki istek giriş sayfasına yönlendirilir"
+   ],
+   "questions": [
+    "Q-007"
+   ],
+   "derived": false,
+   "quality_characteristic": "security"
+  },
+  {
+   "id": "REQ-011",
+   "title": "Hatalı durumlarda kullanıcıya mesaj gösterilir",
+   "type": "functional",
+   "priority": "low",
+   "risk": {
+    "likelihood": 2,
+    "impact": 2,
+    "rationale": "Mesaj metni kozmetik; işlemin kendisini etkilemez"
+   },
+   "source": "US-128 AK-6",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Hatalı durumlarda kullanıcıya uygun bir mesaj gösterilir.",
+   "acceptance_criteria": [
+    "Diyelim ki 'ayse.test@' girildi, Eğer ki 'Bağlantı gönder'e basılırsa, O zaman 'Geçerli bir e-posta adresi girin.' mesajı gösterilir ve istek gönderilmez"
+   ],
+   "questions": [
+    "Q-005"
+   ],
+   "derived": false,
+   "notes": "\"Uygun\" ölçülebilir değil; önerilen mesaj metinleri Q-005'te onaya sunuldu."
+  },
+  {
+   "id": "REQ-012",
+   "title": "Sayfalar hızlı açılmalı",
+   "type": "non-functional",
+   "priority": "low",
+   "risk": {
+    "likelihood": 2,
+    "impact": 2,
+    "rationale": "Ölçülebilir hedef yok; etki kullanıcı deneyimiyle sınırlı"
+   },
+   "source": "US-128 Notlar",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Sayfalar hızlı açılmalı.",
+   "questions": [
+    "Q-006"
+   ],
+   "derived": false,
+   "quality_characteristic": "performance-efficiency",
+   "notes": "Varsayım (Q-006): sayfalar p95 ≤ 2 sn (test ortamı, tekil kullanıcı); sıfırlama e-postası 1 dakika içinde gelen kutusunda."
+  },
+  {
+   "id": "REQ-013",
+   "title": "Yeni istek önceki sıfırlama bağlantılarını geçersiz kılar",
+   "type": "business-rule",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 2,
+    "impact": 4,
+    "rationale": "Aynı anda birden çok geçerli bağlantı, eski bir e-postanın kötüye kullanılmasına izin verir"
+   },
+   "source": "US-128 AK-2 (türetilmiş)",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Aynı adres için yeni bir sıfırlama bağlantısı istendiğinde, daha önce gönderilmiş ve kullanılmamış bağlantılar geçersiz olur.",
+   "acceptance_criteria": [
+    "Diyelim ki 1. bağlantı henüz kullanılmadı, Eğer ki 2. bağlantı istenip 1. bağlantı açılırsa, O zaman bağlantının geçersiz olduğu mesajı gösterilir"
+   ],
+   "questions": [
+    "Q-009"
+   ],
+   "derived": true,
+   "quality_characteristic": "security"
+  },
+  {
+   "id": "REQ-014",
+   "title": "E-posta adresi büyük/küçük harf ve boşluktan bağımsız eşleştirilir",
+   "type": "business-rule",
+   "priority": "medium",
+   "risk": {
+    "likelihood": 3,
+    "impact": 3,
+    "rationale": "Türkçe yerel ayarla küçük harfe çevirmede 'I' → 'ı' olur ve kayıtlı adres bulunamaz; kullanıcı sıfırlama e-postası alamaz"
+   },
+   "source": "US-128 AK-1 (türetilmiş)",
+   "external_id": "SHOP-128",
+   "status": "clarification-needed",
+   "text": "Sıfırlama isteğinde e-posta adresi büyük/küçük harf farkı ve baştaki/sondaki boşluklar yok sayılarak kayıtlı adresle eşleştirilir.",
+   "acceptance_criteria": [
+    "Diyelim ki 'irem.test@example.com' kayıtlı, Eğer ki ' IREM.TEST@EXAMPLE.COM ' girilirse, O zaman 'irem.test@example.com' adresine sıfırlama e-postası gönderilir"
+   ],
+   "questions": [
+    "Q-010"
+   ],
+   "derived": true
+  }
+ ]
+}

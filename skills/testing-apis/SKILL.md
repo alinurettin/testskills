@@ -1,6 +1,6 @@
 ---
 name: testing-apis
-description: Tests REST APIs professionally from their OpenAPI 3.x contract. It derives traceable test cases and an executable Playwright API suite with the same TC IDs. The suite covers the happy path with response-schema validation, 401 without credentials, missing required fields, boundary values and invalid enums or types from the schema, and 404. It adds skeletons for object-level authorization (BOLA), then guides business-rule, idempotency, state, pagination and error-model tests and root-cause grouping of failures. Use this whenever someone wants to test an API, REST endpoints, Swagger/OpenAPI, contract tests, status codes, JSON schema validation, API security or authorization (IDOR/BOLA), or backend integration, including Turkish requests such as "API testi", "servis testleri", "Swagger'dan test çıkar", "endpoint'leri test et", "sözleşme testi".
+description: Tests REST APIs from their OpenAPI 3.x contract. Generates traceable test cases and an executable API suite with the same TC IDs (happy path, schema, 401, required fields, boundaries, enums, 404), then guides business-rule and idempotency tests. Use when endpoints or a Swagger document need testing. Triggers include API testing, REST endpoints, contract tests, IDOR/BOLA authorization; Turkish "API testi", "Swagger'dan test çıkar", "endpoint'leri test et".
 license: MIT
 metadata:
   suite: qa-suite
@@ -28,7 +28,7 @@ Match the user's language (`--lang tr|en`). HTTP methods, paths, field names and
 ## Workflow
 
 ```
-- [ ] 1. Contract review (gaps → questions)
+- [ ] 1. Contract review (gaps → questions); map operations to requirements (one REQ for everything hides gaps)
 - [ ] 2. Generate contract tests (compact + executable spec)
 - [ ] 3. Add business-rule, authorization and state tests the contract cannot express
 - [ ] 4. Run with clean test data; group failures by root cause
@@ -43,14 +43,22 @@ Read the OpenAPI document as a requirement. Record a question or finding for eac
 - undocumented authorisation rules;
 - inconsistent error bodies.
 
-Contract defects are real defects: consumers build against the document. If requirements exist (`qa/requirements.json`), map each operation to its REQ. If they do not, create API requirements with `analyzing-requirements`, or trace the tests to one REQ for "API contract of <service>".
+Contract defects are real defects: consumers build against the document.
+
+**Map operations to requirements; one REQ for everything hides gaps.** With a single `--req`, 30–80 tests hang off one REQ: coverage looks 100% and the RTM can never report a THIN or NO_NEGATIVE requirement. If `qa/requirements.json` does not exist yet, create the API requirements with `analyzing-requirements` first. Then either:
+- copy `assets/req-map-example.json` to `qa/req-map.json` and map each operation (by `operationId` or `"METHOD /path"`) or each tag to the REQ(s) it implements; or
+- add `"x-req": "REQ-021"` (or a list) to the operation in the OpenAPI document.
+
+Precedence: `x-req` > `operations[operationId]` > `operations["METHOD /path"]` > `tags[first tag]` > `default` > `--req`. An operation without a requirement stops the generator (exit 2) with the list of unmapped operations. The same map file can carry the mobile, non-functional and AI sections; each script reads only its own keys.
 
 ### 2. Generate contract tests
 ```bash
-python scripts/openapi_tests.py api/openapi.json --req REQ-020 --tests qa/test-cases.json --lang tr \
+python scripts/openapi_tests.py api/openapi.json --req-map qa/req-map.json --tests qa/test-cases.json --lang tr \
     --out qa/design/api-contract.src.md --spec-out automation/tests/api-contract.spec.ts
 cp assets/api-helpers.ts automation/tests/api-helpers.ts
 ```
+`--req REQ-020` still works, as the fallback for operations the map does not cover. The script prints how many tests, and how many negative ones, each requirement received; check that list before merging.
+
 The script produces, per operation:
 - the happy path (2xx plus a response-schema check);
 - 401 without credentials when the operation is secured, plus one malformed-header test per API (the token without the `Bearer` scheme);
@@ -102,7 +110,8 @@ When `@playwright/test` is installed in another folder, run `npx playwright test
 `automating-with-playwright/scripts/pw_results.py` maps the Playwright JSON report to `qa/results.json` by TC tag. Then run the RTM (`tracing-requirements`) and write defect reports (`reporting-test-results`), with the request, the response and the contract excerpt as evidence.
 
 ## Files
-- `scripts/openapi_tests.py`: OpenAPI 3.x → compact test cases plus an executable Playwright API spec with the same TC IDs. Resolves `$ref` and `allOf`; outputs TR/EN.
+- `scripts/openapi_tests.py`: OpenAPI 3.x → compact test cases plus an executable Playwright API spec with the same TC IDs. Links each operation's tests to its REQ(s) (`--req-map`, `x-req`). Resolves `$ref` and `allOf`; outputs TR/EN.
 - `scripts/qa_compact.py`: compact ⇄ JSON.
+- `assets/req-map-example.json`: operation and tag → requirement map for `--req-map`.
 - `assets/api-helpers.ts`: request helper (path/query parameters, bearer token from the environment) and a dependency-free response-schema checker.
 - `references/api-testing.md`: layers, generator limits, authorisation, state and idempotency, error model, pagination, versioning, GraphQL and async APIs, reporting.

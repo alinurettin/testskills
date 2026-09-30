@@ -3,7 +3,7 @@
 
 Every generated test keeps the manual test's identity:
   - title "TC-001 <title>", tags ["@TC-001", "@REQ-001", "@<priority>", "@smoke" ...]
-  - annotations qa_id, requirements (Jira keys when known) and test_key (the
+  - annotations qa_id, requirements (Jira keys only, for Xray), qa_requirements (REQ IDs) and test_key (the
     test's external_id, e.g. its Xray key) for the Xray JUnit reporter
   - one test.step per manual step, with data and expected result as comments
   - test.fixme(...) marker, so an unimplemented skeleton is reported as
@@ -81,7 +81,11 @@ def tags_for(t: dict) -> list[str]:
 def annotations_for(t: dict, ext: dict) -> list[tuple[str, str]]:
     ann = [("qa_id", t["id"])]
     keys = list(dict.fromkeys(ext[r] for r in t.get("requirement_ids", []) if ext.get(r)))
-    ann.append(("requirements", ",".join(keys) if keys else ",".join(t.get("requirement_ids", []))))
+    # Xray reads "requirements" as Jira issue keys, so internal REQ-### IDs go into their own annotation
+    if keys:
+        ann.append(("requirements", ",".join(keys)))
+    if t.get("requirement_ids"):
+        ann.append(("qa_requirements", ",".join(t["requirement_ids"])))
     if t.get("external_id"):
         ann.append(("test_key", t["external_id"]))
     return ann

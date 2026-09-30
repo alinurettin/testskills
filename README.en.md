@@ -27,6 +27,17 @@ Output is in Turkish or English.
   `REQ-001` → design evidence → `TC-001` → a Playwright test tagged `@TC-001` → its result → the traceability matrix → Jira/Xray.
 - **Honest by design.** An unimplemented test never counts as passed. Missing data is reported as "unknown", not as zero. An expected result is never bent to match buggy behaviour.
 
+## Start in 10 minutes
+[examples/quickstart](examples/quickstart/README.en.md) has a small, synthetic password-reset story with 6 acceptance criteria. You copy and paste one prompt. In light mode, in about 10 minutes, you get:
+- a requirements list and the questions for the product owner;
+- boundary-value, decision-table and state-transition evidence computed by scripts;
+- 25 test cases and a traceability matrix;
+- an Excel file.
+
+All the expected outputs are in the folder, so you can compare your own run with them. The story and outputs are in Turkish; an English prompt gives English artifacts.
+
+If you run tests by hand, read the **[manual tester guide](docs/MANUEL-TEST-REHBERI.md)** (in Turkish). It covers the 5 skills you need, 6 ready-made prompt cards, how to anonymise a real story before sharing it, cost expectations and how to open the outputs in Excel.
+
 ## Evidence: blind trials with planted defects
 In each trial the agent got only what a tester would get (a story, an OpenAPI document or data extracts), never the code or the answer key.
 
@@ -55,11 +66,13 @@ Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/E
 | `reporting-test-results` | Defect reports, and a completion report that evaluates the exit criteria automatically |
 | `reviewing-test-cases` | Imports Excel or TestRail CSV exports and audits the tests' quality |
 | `testing-apis` | OpenAPI 3 → contract tests and an executable Playwright API suite with the same TC IDs: schema checks, boundaries, BOLA, contract-gap questions, request/response evidence |
-| `running-exploratory-tests` | Session-based exploratory testing: risk-ranked charters, heuristics (SFDIPOT, FEW HICCUPPS, tours), session sheets → summary, defects and regression tests |
-| `testing-ai-features` | LLM, chatbot and RAG testing: an adversarial eval set (OWASP LLM Top 10 2025, TR/EN), deterministic scoring over repeated runs, flakiness and a release gate |
-| `preparing-test-data` | Synthetic data with valid TCKN/VKN/IBAN and referential integrity; deterministic masking of production extracts (KVKK/GDPR) |
-| `testing-mobile-apps` | iOS/Android checklists (lifecycle, interruptions, permissions, offline, MASVS, accessibility), a device matrix from usage share, JUnit → results |
+| `running-exploratory-tests` **(experimental)** | Session-based exploratory testing: risk-ranked charters, heuristics (SFDIPOT, FEW HICCUPPS, tours), session sheets → summary, defects and regression tests |
+| `testing-ai-features` **(experimental)** | LLM, chatbot and RAG testing: an adversarial eval set (OWASP LLM Top 10 2025, TR/EN), deterministic scoring over repeated runs, flakiness and a release gate |
+| `preparing-test-data` **(experimental)** | Synthetic data with valid TCKN/VKN/IBAN and referential integrity; deterministic masking of production extracts (KVKK/GDPR) |
+| `testing-mobile-apps` **(experimental)** | iOS/Android checklists (lifecycle, interruptions, permissions, offline, MASVS, accessibility), a device matrix from usage share, JUnit → results |
 | `testing-data-migrations` | Source–target reconciliation (keys, fields, control totals, Turkish encoding traps), SQL templates, sign-off criteria |
+
+**Experimental:** these four skills have no blind trial yet. They are covered by unit tests and script demos; their blind trials are running for 0.7.
 
 There are also **domain packs** for fintech/banking, e-commerce, health, the public sector, insurance/pensions and telecom. Each contains a regulations checklist, the requirements people often forget, high-risk rules, and synthetic test data.
 
@@ -76,7 +89,7 @@ claude plugin install qa-suite@qa-suite-marketplace
 
 **Requirements:**
 - Python 3.9+ (the scripts use only the standard library)
-- For automation: Node.js 18+ and `@playwright/test`
+- For automation: Node.js 22, 24 or 26 (the versions Playwright supports) and `@playwright/test`
 
 ## Quick start
 ```
@@ -92,12 +105,35 @@ Build an eval set for our support chatbot: prompt injection, hallucination, PII 
 ```
 Outputs go to `qa/` in your project: requirements, questions, design evidence, test cases, the traceability matrix, export files and reports. Automation goes to `automation/`.
 
+## How it works
+```mermaid
+flowchart LR
+  A[Story / SRS / OpenAPI / Excel] --> B[Requirements analysis<br/>questions, risk]
+  B --> C[Test design<br/>BVA, decision table,<br/>state, pairwise]
+  B --> S[Specialist skills<br/>API, mobile, AI,<br/>migration, exploratory]
+  C --> D[Traceability matrix<br/>+ regression selection]
+  S --> D
+  C --> E[Xray / Zephyr / TestRail /<br/>Azure DevOps / Qase / Excel]
+  C --> F[Playwright / BDD]
+  F -->|results| D
+  J[JUnit XML: Selenium, Cypress,<br/>pytest, REST Assured...] -->|results| D
+  S -->|reconciliation, eval results| D
+  D --> G[Completion report<br/>exit criteria]
+```
+
 ## Standards
 - **Test design:** ISTQB CTFL v4.0 and CTAL-TA v4.0, ISO/IEC/IEEE 29119-3/-4
 - **Requirements and quality:** ISO/IEC/IEEE 29148, EARS, INVEST, ISO/IEC 25010:2023
 - **Accessibility and security:** WCAG 2.2 AA, OWASP ASVS 5.0, OWASP Top 10:2025
 
 No standard text is reproduced; the content is paraphrased into actionable checklists.
+
+## Privacy: what leaves your machine
+- **The scripts run on your machine and make no network calls.** They use only the Python standard library. Nothing under `skills/*/scripts` uses `urllib`, `http`, `socket` or `requests` (checked by searching the source). They read your files and write their results to `qa/`.
+- **Everything you give the assistant goes to the model provider.** Your prompts, the contents of files the assistant reads, and screenshots are processed under your plan's terms, which govern retention and training use. Check your organisation's rules and your plan's data terms.
+- **Use synthetic or anonymised data.** Do not paste real customer data, production extracts, internal system addresses or confidential business rules. Section 3 of the [manual tester guide](docs/MANUEL-TEST-REHBERI.md) (in Turkish) shows how to anonymise a story. If masking is really needed, run `mask_data.py` from `preparing-test-data` yourself, locally, and give the assistant only the masked output.
+- **The tests you run go to the system you point them at.** Playwright and k6 tests send requests to the application at the address you give. `npm install` and the browser install download packages; the skill instructions tell the assistant to ask for your approval first.
+- **The demo trial servers are local.** The servers under `evals/` run on your machine with Node's built-in modules and make no outbound requests. Some of them listen on all network interfaces, so run them on a trusted network.
 
 ## Known limits
 - **Not yet tested against real tools:** the Xray, Zephyr, TestRail, Azure DevOps and Qase imports and the Xray results reporter follow the official documentation but have not been run against a live server. Do a 2–3 test trial import first.
@@ -113,7 +149,7 @@ python tools/sync_shared.py && python tools/validate_skills.py && python -m unit
 python tools/package_skills.py       # zips for claude.ai (dist/)
 python tools/routing_proxy.py build evals/trigger-queries*.json --out prompt.txt   # proxy routing eval
 ```
-Issues and pull requests are welcome. See [CHANGELOG.md](CHANGELOG.md) for the history.
+Issues and pull requests are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) explains how to run the checks, how to propose a skill, and the issue templates. To run a blind trial yourself, see [evals/README.md](evals/README.md). See [CHANGELOG.md](CHANGELOG.md) for the history.
 
 ## License
 [MIT](LICENSE) © 2026 Ali Nurettin Demir

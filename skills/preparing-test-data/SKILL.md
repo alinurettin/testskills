@@ -1,6 +1,6 @@
 ---
 name: preparing-test-data
-description: Prepares test data professionally. It derives the data each test case needs from test-cases.json (exact boundary and partition values for fixtures vs any-valid records to generate). It generates deterministic synthetic CSV/JSON with referential integrity, uniqueness, edge values, and valid Turkish identifiers (TCKN, VKN, TR IBAN, +90 5xx phones). It masks a production extract with keyed hashing, deterministic fakes and generalisation under KVKK/GDPR, with a PII report. It also covers per-test isolation, seeding, refresh strategy and a data catalog. Use this whenever someone needs test data, seed or fixture data, fake customers, bulk or volume data, data for boundary values, masking or anonymising production data, KVKK/GDPR questions about test environments, flaky tests caused by shared data, or Turkish data traps (i/İ casing, sorting, dd.MM.yyyy, decimal comma), including Turkish requests such as "test verisi hazırla", "sahte veri üret", "TCKN üret", "veri maskeleme", "KVKK test ortamı".
+description: Prepares test data by deriving each test case's needs, generating deterministic synthetic CSV/JSON with referential integrity, edge values and valid Turkish IDs (TCKN, VKN, TR IBAN, +90 phones), and masking production extracts under KVKK/GDPR. Use when tests need seed, fixture or bulk data. Triggers include test data, synthetic data, fake customers, data masking; Turkish "test verisi hazırla", "sahte veri üret", "veri maskeleme".
 license: MIT
 metadata:
   suite: qa-suite
@@ -8,6 +8,8 @@ metadata:
 ---
 
 # Preparing test data
+
+**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
 
 Most "flaky" tests and many blocked test cycles are really data problems: the record was used up, another test changed it, the value missed the boundary, or nobody knew what the environment contained. This skill treats test data as a versioned test asset. **Synthetic data comes first.** It derives exactly what each test needs, generates it reproducibly from a seed, and uses masked production data only when the data owner has approved it.
 
@@ -26,7 +28,7 @@ Match the user's language (`--lang tr|en` for reports and messages). Field names
 
 ## Prerequisites and safety
 - **Use synthetic data by default.** Use production data only when a defect class truly needs it. Even then, whether to use it is a **compliance decision** (data owner, DPO, legal), not a tester decision. State the need and propose the minimum columns and rows; do not extract data yourself.
-- Generated TCKN, VKN, IBAN and phone numbers are valid by algorithm only. They can belong to real people, companies, accounts or subscribers, so keep them inside test systems. Route test SMS, e-mail and payments to sandboxes. Generated e-mails always use `example.com` or `example.test`.
+- **ID policy.** Generated TCKN, VKN, IBAN and phone numbers are valid by algorithm only. Türkiye has no reserved fictional ranges, so they can belong to real people, companies, accounts or subscribers. Checksum-valid synthetic values are allowed in **test environments** and must come from a generator (`gen_data.py`, `mask_data.py` `fake`, or `check_ids.py --generate` in designing-test-cases). Never copy them from the internet or production, and never load them into production or into systems shared outside the test boundary. Route test SMS, e-mail and payments to sandboxes. Generated e-mails always use `example.com` or `example.test`.
 - **Pseudonymised data is still personal data.** Masking with `hash` or `fake` needs a secret in an environment variable (never in a file or the repository). Keep the secret outside the test environment.
 - Mask inside the production security zone, and move only the masked output.
 - Python 3.10+ standard library; no installs.
@@ -51,7 +53,11 @@ The script groups `test_data` and step data per test case and classifies each ne
 - **exact**: from boundary-value, partition, decision-table, state or pairwise techniques. The value *is* the test, so it goes in a reviewed fixture, never a random generator.
 - **any valid**: the test needs *a* record of that shape, which can be generated.
 
-It lists test cases that document no data. Exit code 1 means it found test data that looks like real personal data: e-mails outside the reserved domains, checksum-valid TCKNs or IBANs, or mobile numbers. Ask whether those values are synthetic. The starter schema infers types from the observed values; widen its ranges to the real domain.
+It lists test cases that document no data, and applies the ID policy to the values:
+- **ERROR** (exit code 1): data that looks real, such as e-mails outside the reserved example domains (`example.com`, `example.org`, `*.test`). Replace it.
+- **WARNING "verify synthetic origin"**: checksum-valid TCKNs or IBANs and mobile numbers. They are fine in test environments when a generator produced them. Confirm where each one came from, and replace any value that did not come from a generator.
+
+The starter schema infers types from the observed values; widen its ranges to the real domain.
 
 Also check what the test cases do not say, using §2 of the reference: cross-field rules, dates relative to "today", reference data versions, and consumable data (balances, stock, coupons).
 
@@ -115,6 +121,7 @@ Add every dataset to the data catalog (template in §9 of the reference). For ea
 - `scripts/data_needs.py`: test-cases.json → data-needs report (exact vs any-valid per TC, PII-looking test data, TCs without data) and a starter schema.
 - `scripts/gen_data.py`: schema + seed → deterministic CSV/JSON (single table or related tables), with checksum-valid TCKN/VKN/IBAN, `ref` integrity, `unique`, edge rows, run tags and Excel-friendly output.
 - `scripts/mask_data.py`: CSV extract + rules → masked CSV and a Markdown report (keyed hash, deterministic fake, generalise, redact, drop; default drop; PII warnings; refuses to run without the secret).
+- `scripts/tr_ids.py`: the suite's single TCKN/VKN/IBAN implementation (validation, synthetic generation, single-fault invalid variants), used by the scripts above.
 - `assets/schema-example.json`: customers + accounts with a reference, uniqueness and edge fields.
 - `assets/mask-rules-example.json`: masking rules for a Turkish customer extract.
 - `references/test-data-management.md`: data needs, source choice, KVKK/GDPR masking and re-identification, isolation and seeding, refresh, Turkish specifics, data catalog, and the scripts' limits.

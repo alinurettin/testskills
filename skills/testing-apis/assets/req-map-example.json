@@ -1,0 +1,11 @@
+{
+  "_about": "Example --req-map for scripts/openapi_tests.py. Map each operation (by operationId or 'METHOD /path') or each tag to the requirement it implements; a value is a REQ ID or a list of REQ IDs. Precedence: x-req on the operation > operations[operationId] > operations['METHOD /path'] > tags[first tag] > default > --req. Keys starting with '_' are comments. The same file may also carry 'capabilities' (mobile_checklist.py), 'areas' (nfr_checklist.py) and 'categories' (ai_eval.py seed); each script reads only its own keys.",
+  "default": "REQ-020",
+  "operations": {
+    "createTransfer": ["REQ-022", "REQ-023"],
+    "GET /transfers/{transferId}": "REQ-024"
+  },
+  "tags": {
+    "Accounts": "REQ-021"
+  }
+}

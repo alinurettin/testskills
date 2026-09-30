@@ -1,8 +1,11 @@
 # Trial: Demo Bank API (contract + authorisation, black box)
 
-Reusable evaluation for the `testing-apis` skill: give an agent `api/openapi.json`, the running API
-(`node api/server.js`, http://127.0.0.1:4180, test tokens `token-alice` and `token-bob`) and ask it
-to test the API. **Do not show this file or `api/server.js` to the agent.**
+Evaluator only. This key lives in `evals/keys/`, outside the trial folder, so that copying the
+trial folder never copies the key. How to run and grade a blind trial: `evals/README.md`.
+
+Reusable evaluation for the `testing-apis` skill: give an agent `evals/trial-api/api/openapi.json`, the
+running API (`node evals/trial-api/api/server.js`, http://127.0.0.1:4180, test tokens `token-alice` and
+`token-bob`) and ask it to test the API. **Do not show this file or `api/server.js` to the agent.**
 
 Test data: alice owns `A-100` (TRY, balance 150.000) and `A-101` (EUR); bob owns `B-200` (TRY).
 Transfers change balances, so restart the server for a clean state.

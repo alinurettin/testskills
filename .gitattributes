@@ -1,3 +1,7 @@
 * text=auto eol=lf
 *.xlsx binary
 *.png binary
+# Blind-trial inputs are fixtures: keep their bytes exactly as authored (planted cp1254 + CRLF file in
+# trial-testdata, SHA-256 values recorded in trial-mobile/RUN.md). Line-ending normalisation would change them.
+evals/trial-testdata/girdi/** -text
+evals/trial-mobile/girdiler/** -text

@@ -1,0 +1,13 @@
+{
+  "project": "Demo Bank – uçtan uca izlenebilirlik zinciri",
+  "language": "tr",
+  "version": 1,
+  "requirements": [
+    {"id": "REQ-001", "external_id": "BANK-101", "title": "Hesap listeleme ve hesap detayı", "text": "Kimliği doğrulanmış müşteri kendi hesaplarını listeleyebilmeli ve tek bir hesabın detayını görebilmelidir; kimlik bilgisi olmayan istekler 401 ile reddedilmelidir.", "type": "functional", "source": "US-101 AK-1", "priority": "high", "risk": {"likelihood": 3, "impact": 4, "rationale": "Müşteri verisi, yetkilendirme"}, "status": "ready", "derived": false},
+    {"id": "REQ-002", "external_id": "BANK-102", "title": "Para transferi doğrulama kuralları", "text": "Transfer tutarı 1,00 ile 50.000,00 arasında olmalıdır; zorunlu alanlardan biri eksik ya da geçersizse istek 400 ile reddedilmeli ve para hareketi oluşmamalıdır.", "type": "business-rule", "source": "US-102 AK-1..AK-4", "priority": "critical", "risk": {"likelihood": 4, "impact": 5, "rationale": "Parasal kayıp"}, "status": "ready", "derived": false},
+    {"id": "REQ-003", "external_id": "BANK-103", "title": "Transfer durumunu sorgulama", "text": "Müşteri, oluşturduğu bir transferin durumunu transfer kimliği ile sorgulayabilmelidir; bilinmeyen kimlik 404 döndürmelidir.", "type": "functional", "source": "US-103 AK-1", "priority": "medium", "risk": {"likelihood": 2, "impact": 3}, "status": "ready", "derived": false},
+    {"id": "REQ-004", "external_id": "MIG-10", "title": "Müşteri göçü eksiksiz ve tekil", "text": "Her kaynak müşteri hedefe tam bir kez taşınmalıdır: kayıt sayıları şube bazında eşit, anahtar kümesi eksiksiz ve tekil, bakiye kontrol toplamı kuruşu kuruşuna aynı olmalıdır.", "type": "data", "source": "Eşleme spesifikasyonu v3 §2", "priority": "critical", "risk": {"likelihood": 4, "impact": 5, "rationale": "Geri dönüşü olmayan veri kaybı"}, "status": "ready", "derived": false},
+    {"id": "REQ-005", "external_id": "MIG-11", "title": "Müşteri alanları eşleme kurallarına göre dönüştürülür", "text": "Ad-soyad, doğum tarihi, şube, bakiye, durum ve e-posta alanları eşleme spesifikasyonundaki dönüşüm kurallarına birebir uymalıdır.", "type": "data", "source": "Eşleme spesifikasyonu v3 §3", "priority": "high", "risk": {"likelihood": 3, "impact": 4}, "status": "ready", "derived": false},
+    {"id": "REQ-006", "external_id": "BANK-106", "title": "Transfer dekontu e-postası", "text": "Başarılı bir transferden sonra müşteriye 5 dakika içinde transfer dekontu e-postası gönderilmelidir.", "type": "functional", "source": "US-106 AK-1", "priority": "high", "risk": {"likelihood": 3, "impact": 4, "rationale": "Mevzuat gereği bilgilendirme"}, "status": "ready", "derived": false}
+  ]
+}

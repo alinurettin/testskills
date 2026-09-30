@@ -5,7 +5,8 @@ Reads from --qa (default qa/): requirements.json, test-cases.json, results.json 
 when present, defects.json, exit-criteria.json and clarifications.md. Computes:
   - requirement coverage, execution %, pass rate, per-requirement verdicts by risk
   - defects by severity/status (defects.json, else defect keys found in results.json)
-  - automation share of executed tests (results with source "playwright")
+  - automation share of executed tests (results written by a tool: any "source" except "manual",
+    e.g. playwright, junit/maestro, ai_eval, reconcile)
   - evaluation of every exit criterion: met / not met / unknown (data missing)
   - residual risks: in-scope requirements not passed, highest risk first, with reasons
 The go/no-go decision stays with the stakeholders; the report states facts.
@@ -124,7 +125,7 @@ def main() -> int:
     executed = [k for k, s in status.items() if s in ("passed", "failed", "blocked")]
     passed = [k for k, s in status.items() if s == "passed"]
     failed = [k for k, s in status.items() if s == "failed"]
-    auto_exec = [k for k in executed if results.get(k, {}).get("source") == "playwright"]
+    auto_exec = [k for k in executed if results.get(k, {}).get("source") not in (None, "", "manual")]
 
     by_req = defaultdict(list)
     for tc in tests:

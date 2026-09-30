@@ -1,0 +1,38 @@
+v2.id,title,description,preconditions,postconditions,tags,priority,severity,type,behavior,automation,status,is_flaky,layer,steps_type,steps_actions,steps_result,steps_data,milestone_id,milestone,suite_id,suite_parent_id,suite,suite_without_cases,parameters
+,,,,,,,,,,,,,,,,,,,,1,,QA Suite,1,
+,,,,,,,,,,,,,,,,,,,,2,1,Kupon,1,
+,"TC-001 Kupon 100,00 TL sınırında uygulanır","DS-001 C-02: tam sınır değerinde indirim
+Gereksinimler: REQ-001, SHOP-101","- Kullanıcı 'ayse.test@example.com' ile giriş yapmış
+- 'YAZ10' kuponu aktif
+
+Test verisi:
+sepet: 100,00 TL
+kupon: YAZ10",,"regression,smoke,REQ-001",high,major,functional,positive,to-be-automated,actual,no,e2e,classic,"1. ""Sepete 100,00 TL tutarında ürün ekle""
+2. ""Kupon alanına kodu yaz ve 'Uygula'ya tıkla""","1. ""Sepet toplamı 100,00 TL""
+2. ""'Kupon uygulandı' mesajı; indirim -10,00 TL; toplam 90,00 TL""","1. ""Ürün A x1""
+2. ""YAZ10""",,,2,1,Kupon,,
+,"TC-002 Kupon 99,99 TL sepette reddedilir","DS-001 C-26: sınırın hemen altı
+Gereksinimler: REQ-001, SHOP-101","- Kullanıcı giriş yapmış
+- 'YAZ10' kuponu aktif
+
+Test verisi:
+sepet: 99,99 TL
+kupon: YAZ10",,"regression,REQ-001",high,major,functional,negative,to-be-automated,actual,no,e2e,classic,"1. ""Sepete 99,99 TL tutarında ürün ekle""
+2. ""Kupon alanına kodu yaz ve 'Uygula'ya tıkla""","1. ""Sepet toplamı 99,99 TL""
+2. ""'Asgari sepet tutarı 100 TL' mesajı; toplam 99,99 TL kalır""","1. """"
+2. ""YAZ10""",,,2,1,Kupon,,
+,TC-003 Süresi dolmuş kupon reddedilir,"Gereksinimler: REQ-002, SHOP-102","- Sepet toplamı 150,00 TL
+- 'BAHAR5' kuponu 01.04.2026'da sona ermiş",,"regression,REQ-002",high,major,functional,negative,to-be-automated,actual,no,e2e,classic,"1. ""Kupon alanına 'BAHAR5' yaz, 'Uygula'ya tıkla""","1. ""'Bu kuponun süresi dolmuştur' mesajı; toplam 150,00 TL""","1. """"",,,2,1,Kupon,,
+,TC-004 Kupon kodu küçük harfle girilince kabul edilir,"Varsayım (Q-001): kod harf duyarsız
+Gereksinimler: REQ-003","- Sepet toplamı 150,00 TL",,REQ-003,medium,normal,functional,positive,to-be-automated,draft,no,e2e,classic,"1. ""Kupon alanına 'yaz10' yaz, 'Uygula'ya tıkla""","1. ""'Kupon uygulandı'; toplam 135,00 TL""","1. """"",,,2,1,Kupon,,
+,TC-005 Aynı kupon ikinci kez kullanılamaz,"Gereksinimler: REQ-005, SHOP-105",- Kullanıcı 'YAZ10' ile daha önce sipariş tamamlamış,,"regression,REQ-005",high,critical,functional,negative,to-be-automated,actual,no,e2e,classic,"1. ""150,00 TL'lik sepette 'YAZ10' uygula""","1. ""'Bu kuponu daha önce kullandınız' mesajı; indirim uygulanmaz""","1. """"",,,2,1,Kupon,,
+,TC-007 Sahipsiz test örneği,,,,,low,minor,functional,positive,is-not-automated,actual,no,e2e,classic,"1. ""Ana sayfayı aç""","1. ""Sayfa yüklenir""","1. """"",,,2,1,Kupon,,
+,"TC-008 Kupon 100,00 TL sınırında uygulanır - kopya","Gereksinimler: REQ-001, REQ-099, SHOP-101","- Kullanıcı 'ayse.test@example.com' ile giriş yapmış
+- 'YAZ10' kuponu aktif
+
+Test verisi:
+sepet: 100,00 TL
+kupon: YAZ10",,"REQ-001,REQ-099",high,major,functional,positive,is-not-automated,actual,no,e2e,classic,"1. ""Sepete 100,00 TL tutarında ürün ekle""
+2. ""Kupon alanına kodu yaz ve 'Uygula'ya tıkla""","1. ""Sepet toplamı 100,00 TL""
+2. ""'Kupon uygulandı' mesajı; indirim -10,00 TL; toplam 90,00 TL""","1. ""Ürün A x1""
+2. ""YAZ10""",,,2,1,Kupon,,
