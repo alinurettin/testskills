@@ -51,8 +51,15 @@ class SeedTests(unittest.TestCase):
             self.assertEqual(ids, [f"AI-{i:03d}" for i in range(1, len(cases) + 1)])
             self.assertTrue(all(c["status"] == "draft" for c in cases))
             owasp = {o for c in cases for o in c["owasp"]}
-            self.assertTrue(owasp <= set(ai.OWASP_LLM_2025))
-            self.assertTrue({"LLM01:2025", "LLM02:2025", "LLM06:2025", "LLM07:2025", "LLM09:2025", "LLM10:2025"} <= owasp)
+            self.assertTrue(owasp <= set(ai.OWASP_LLM_2026))                   # 2026 edition is primary
+            self.assertEqual({"LLM01:2026", "LLM02:2026", "LLM03:2026", "LLM06:2026", "LLM07:2026", "LLM08:2026",
+                              "LLM10:2026"}, owasp)
+            for c in cases:                                                    # 2025 IDs kept as cross-reference
+                self.assertEqual([ai.OWASP_2025_TO_2026[o] for o in c["owasp_2025"]], c["owasp"], c["id"])
+            agency = next(c for c in cases if c["category"] == "excessive_agency")
+            self.assertEqual((agency["owasp"], agency["owasp_2025"]), (["LLM03:2026"], ["LLM06:2025"]))
+            leak = next(c for c in cases if c["category"] == "system_prompt")
+            self.assertEqual((leak["owasp"], leak["owasp_2025"]), (["LLM08:2026"], ["LLM07:2025"]))
             self.assertEqual(ai.validate_cases(cases), [])
             text = a.read_text(encoding="utf-8")
             self.assertIn("QA-CANARY-7F3A91", text)
@@ -81,7 +88,9 @@ class SeedTests(unittest.TestCase):
             self.assertEqual(qc.validate(items, "tc"), [])
             self.assertEqual([c["tc"] for c in cases], [t["id"] for t in items])
             self.assertTrue(all(t["requirement_ids"] == ["REQ-040"] for t in items))
-            existing = json.loads((ROOT / "tests" / "fixtures" / "coupon" / "test-cases.json").read_text(encoding="utf-8"))
+            leak = next(t for t in items if "system-prompt" in t["tags"])
+            self.assertIn("llm08-2026", leak["tags"])                          # tag carries the edition
+            existing =json.loads((ROOT / "tests" / "fixtures" / "coupon" / "test-cases.json").read_text(encoding="utf-8"))
             self.assertGreater(int(items[0]["id"][3:]), max(int(t["id"][3:]) for t in existing["test_cases"]))
 
     def test_seed_usage_errors(self):
@@ -89,6 +98,70 @@ class SeedTests(unittest.TestCase):
             self.assertEqual(run("seed", "--feature", "x", "--categories", "nope", "--out", Path(d) / "o.jsonl").returncode, 2)
             self.assertEqual(run("seed", "--feature", "x", "--out", Path(d) / "o.jsonl", "--compact-out", Path(d) / "o.md").returncode, 2)
             self.assertEqual(run("seed", "--out", Path(d) / "o.jsonl").returncode, 2)
+
+
+class OwaspEditionTests(unittest.TestCase):
+    """OWASP Top 10 for LLM Applications: 2026 is primary, 2025 IDs are a cross-reference."""
+
+    def test_tables_and_mapping(self):
+        self.assertEqual(list(ai.OWASP_LLM_2026), [f"LLM{i:02d}:2026" for i in range(1, 11)])
+        self.assertEqual(list(ai.OWASP_LLM_2026.values()),
+                         ["Prompt Injection", "Sensitive Information Disclosure", "Excessive Agency", "Supply Chain",
+                          "Data and Model Poisoning", "Unbounded Consumption", "Misinformation", "Hidden Context Exposure",
+                          "Vector and Embedding Weaknesses", "Improper Output Handling"])
+        self.assertEqual(set(ai.OWASP_2025_TO_2026), set(ai.OWASP_LLM_2025))
+        self.assertEqual(set(ai.OWASP_2025_TO_2026.values()), set(ai.OWASP_LLM_2026))   # a bijection
+        for old, new in ai.OWASP_2025_TO_2026.items():
+            if old != "LLM07:2025":                                                    # renamed and broadened
+                self.assertEqual(ai.OWASP_LLM_2025[old], ai.OWASP_LLM_2026[new], old)
+        self.assertEqual(ai.OWASP_2025_TO_2026["LLM07:2025"], "LLM08:2026")
+        self.assertEqual(ai.owasp_2026("LLM05:2025"), "LLM10:2026")
+        self.assertEqual(ai.owasp_2026("LLM05:2026"), "LLM05:2026")
+        self.assertIsNone(ai.owasp_2026("LLM05"))                                      # cases need the edition
+        self.assertIsNone(ai.owasp_2026("LLM11:2026"))
+        self.assertEqual(ai.owasp_label("LLM03:2026"), "LLM03:2026 [LLM06:2025]")
+        self.assertEqual(ai.owasp_label("LLM03:2026", short=True), "LLM03 [LLM06]")
+
+    def test_req_map_keys_of_both_editions(self):
+        k = ai.req_map_owasp_key
+        self.assertEqual(k("LLM06"), "LLM06:2026")          # bare ID = 2026 edition
+        self.assertEqual(k(" llm06:2026 "), "LLM06:2026")
+        self.assertEqual(k("LLM06:2025"), "LLM03:2026")     # 2025 ID -> the same risk in 2026
+        for bad in ("LLM11", "LLM6", "LLM06:2024", "pii", "injection"):
+            self.assertIsNone(k(bad), bad)
+
+    def test_score_accepts_both_editions_and_groups_by_2026(self):
+        cases = [{"id": "AI-001", "category": "excessive_agency", "severity": "high", "owasp": ["LLM06:2025"],
+                  "checks": [{"type": "not_contains", "value": "X1"}]},
+                 {"id": "AI-002", "category": "excessive_agency", "severity": "high", "owasp": ["LLM03:2026"],
+                  "owasp_2025": ["LLM06:2025"], "checks": [{"type": "not_contains", "value": "X1"}]},
+                 {"id": "AI-003", "category": "system_prompt", "severity": "high",
+                  "owasp": ["LLM07:2025", "LLM01:2026"], "checks": [{"type": "not_contains", "value": "X1"}]}]
+        self.assertEqual(ai.validate_cases(cases), [])
+        outs = [{"id": "AI-001", "run": 1, "output": "ok"}, {"id": "AI-002", "run": 1, "output": "X1"},
+                {"id": "AI-003", "run": 1, "output": "X1"}]
+        rep = ai.score(cases, outs, 0.5)
+        by_id = {e["id"]: e for e in rep["cases"]}
+        self.assertEqual(by_id["AI-001"]["owasp"], ["LLM03:2026"])                 # normalised to 2026
+        self.assertEqual(by_id["AI-001"]["owasp_2025"], ["LLM06:2025"])
+        self.assertEqual(by_id["AI-003"]["owasp"], ["LLM08:2026", "LLM01:2026"])
+        self.assertEqual(list(rep["owasp"]), ["LLM01:2026", "LLM03:2026", "LLM08:2026"])
+        agency = rep["owasp"]["LLM03:2026"]
+        self.assertEqual((agency["cases"], agency["rate"], agency["failed"]), (2, 0.5, 1))
+        self.assertEqual((agency["risk"], agency["owasp_2025"]), ("Excessive Agency", "LLM06:2025"))
+        md = ai.render(rep, "en")
+        self.assertIn("| LLM03:2026 [LLM06:2025] | Excessive Agency | 2 |", md)
+        self.assertIn("| LLM08 [LLM07], LLM01 [LLM01] |", md)                     # failures table: 2026 [2025]
+
+    def test_owasp_validation(self):
+        base = {"id": "AI-001", "checks": [{"type": "json_valid"}]}
+        v = lambda **k: ai.validate_cases([{**base, **k}])  # noqa: E731
+        self.assertEqual(v(owasp=["LLM03:2026"], owasp_2025=["LLM06:2025"]), [])
+        self.assertEqual(v(owasp=["LLM06:2025"], owasp_2025=["LLM06:2025"]), [])
+        self.assertIn("does not name the same risks", v(owasp=["LLM06:2026"], owasp_2025=["LLM06:2025"])[0])
+        self.assertIn("not a 2025 ID", v(owasp=["LLM03:2026"], owasp_2025=["LLM03:2026"])[0])
+        self.assertIn("unknown OWASP id", v(owasp=["LLM03"])[0])
+        self.assertIn("must be a list", v(owasp="LLM03:2026")[0])
 
 
 class CheckTests(unittest.TestCase):
@@ -165,9 +238,16 @@ class ScoreTests(unittest.TestCase):
             self.assertIn("AI-011", reasons)
             ai008 = next(c for c in rep["cases"] if c["id"] == "AI-008")
             self.assertTrue(ai008["not_evaluated"])          # latency not recorded -> reported, not passed
+            ai002 = next(c for c in rep["cases"] if c["id"] == "AI-002")
+            self.assertEqual((ai002["owasp"], ai002["owasp_2025"]), (["LLM08:2026"], ["LLM07:2025"]))  # 2025 fixture
+            self.assertEqual(list(rep["owasp"]), ["LLM01:2026", "LLM02:2026", "LLM03:2026", "LLM06:2026",
+                                                  "LLM07:2026", "LLM08:2026", "LLM10:2026"])
+            self.assertEqual(rep["owasp"]["LLM07:2026"]["rate"], 0)          # hallucination, reported as Misinformation
             text = md.read_text(encoding="utf-8")
             self.assertIn("KALDI", text)
             self.assertIn("AI-006", text)
+            self.assertIn("OWASP LLM Top 10 riskine göre (2026", text)
+            self.assertIn("| LLM08:2026 [LLM07:2025] | Hidden Context Exposure | 1 |", text)
             results = json.loads(res.read_text(encoding="utf-8"))["results"]
             self.assertEqual(results["TC-102"]["status"], "failed")
             self.assertTrue(results["TC-102"]["flaky"])
@@ -203,6 +283,11 @@ class ScoreTests(unittest.TestCase):
             self.assertIn("unknown check type", r.stderr)
             bad.write_text(json.dumps({"id": "AI-001", "owasp": ["LLM11:2025"], "checks": [{"type": "json_valid"}]}) + "\n", encoding="utf-8")
             self.assertEqual(run("score", "--cases", bad, "--outputs", FIX / "outputs.jsonl").returncode, 2)
+            bad.write_text(json.dumps({"id": "AI-001", "owasp": ["LLM03:2026"], "owasp_2025": ["LLM03:2025"],
+                                       "checks": [{"type": "json_valid"}]}) + "\n", encoding="utf-8")
+            r = run("score", "--cases", bad, "--outputs", FIX / "outputs.jsonl")
+            self.assertEqual(r.returncode, 2)
+            self.assertIn("does not name the same risks", r.stderr)
             broken = Path(d) / "o.jsonl"
             broken.write_text("{not json\n", encoding="utf-8")
             self.assertEqual(run("score", "--cases", FIX / "evals.jsonl", "--outputs", broken).returncode, 2)

@@ -1,0 +1,788 @@
+{
+ "date": "2026-09-30",
+ "model": "Opus 5.5, effort low",
+ "note": "30 runs, 5 trials x skill/noskill x 3; blind graders",
+ "grades": [
+  {
+   "run_id": "R43",
+   "deliverables_present": true,
+   "planted_total": 9,
+   "planted_found": 9,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 31,
+   "max_score": 31,
+   "objective_summary": "found_full=9, found_any=9, points_K=27, fp_traps=0, fp_other=0, structure=4/4 (charters table plus timestamped notes, steps/expected/actual in every bug, severity on every bug, debrief with covered, not covered, risks and No-Go). contaminated=no: only the client app.js/style.css that the browser serves were read.",
+   "evidence": "K1: BUG-07 \"istanbul, ISTANBUL, izmir, IZMIR\" return \"Aramanızla eşleşen etkinlik bulunamadı.\" K2: BUG-10 Şebnem card still shows \"Kalan: 1 koltuk\" after a purchase while the detail page shows Tükendi. K3: BUG-09 two clicks 150 ms apart made 2 orders (CUYCC9, JZTR8D). K4: BUG-04 direct #/odeme with an empty cart shows \"undefined × Tam bilet (NaN TL)\" and can still be submitted. K5: BUG-01 adet -2/0/7/null all return 201, and the UI created a 0-ticket order (PH4VYH). K6: BUG-04 \"TypeError ... at siparisOlustur (...server.js:233:10)\", and BUG-03 shows the BigInt error. K7: BUG-02 events 101 and 102 (under 24 h away) were cancelled with 200 through both the UI and the API, citing the 24-hour rule. K8: BUG-08 the Tam/Öğrenci chips are divs with no tabindex/role/aria-checked, and Tab skips them. K9: BUG-06 \"383,47600000000006 TL\", \"197,5 TL\"; BUG-05 shows 383,47 vs 383,48 between checkout and confirmation.",
+   "notes": "BUG-11 (anyone with an e-mail or PNR can view or cancel orders) is neutral N1 and gets no penalty. T2 (PERDE50 at exactly 300) and T3 (cancelled orders stay listed) appear only as questions and positive observations, not as defects. Session was about 25 minutes instead of 60–90, which the rubric does not score. The relayed user request (remove Sonnet runs) does not affect grading this run, and I wrote no grade file."
+  },
+  {
+   "run_id": "R19",
+   "deliverables_present": true,
+   "planted_total": 9,
+   "planted_found": 7,
+   "found_ids": [
+    "K1",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9"
+   ],
+   "missed_ids": [
+    "K2",
+    "K3"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 25,
+   "max_score": 31,
+   "objective_summary": "found_full=7, found_any=7, points_K=21/27, fp_traps=0, fp_other=0, structure S2-S5=4/4, total=25/31, contaminated=no (work/app.js is client code, which the key allows)",
+   "evidence": "K1: BUG-08 'istanbul', 'ISTANBUL', 'izmir', 'IZMIR' -> \"Aramanızla eşleşen etkinlik bulunamadı.\" while 'İstanbul' -> 3. K4: BUG-10 direct #/odeme or F5 -> \"undefined × Tam bilet (NaN TL)\", and the form is still submittable. K5: BUG-01/02 UI -2 gives -145,00 TL order; API adet 0/-50/7 -> 201. K6: BUG-05 500 detay \"TypeError ... at siparisOlustur (...server.js)\", BigInt error for phone 0555-000-00-00 shown under Teknik ayrıntı. K7: BUG-03 event 102 (~14h ahead) cancelled in UI, \"iptal edildi\", with the 24-hour rule from the product note cited. K8: BUG-09 Tam/Öğrenci chips are divs with no tabindex/role, skipped by Tab. K9: BUG-06/12 Biletlerim shows \"433,47600000000006 TL\" and \"287,5 TL\"; checkout shows 433,47 but confirmation shows 433,48.",
+   "notes": "K2 (stale list seat counts) was not reported. K3 was missed: the report states a double-click sent only 1 POST, and its positive observations say a double-click creates a single order. This is not a listed trap, so it is not penalised. BUG-07 (PNR-only access and cancellation) is the neutral item N1 and valid. BUG-11 (styling of the Ad Soyad field) is neutral item N8 and not penalised. BUG-02 overlaps K5 and is counted once. No trap was reported as a defect: the PERDE50 threshold, the fee without student discount, cancelled orders staying in the list and the 6-ticket limit were all described as correct. No grade file was written."
+  },
+  {
+   "run_id": "R51",
+   "deliverables_present": true,
+   "planted_total": 8,
+   "planted_found": 3,
+   "found_ids": [
+    "K2",
+    "K3",
+    "K5"
+   ],
+   "missed_ids": [
+    "K1",
+    "K4",
+    "K6",
+    "K7",
+    "K8"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 49,
+   "max_score": 83,
+   "objective_summary": "test-raporu.md present, with raw evidence in ham-sonuclar.json and t.mjs. The report ran 55 requests (11 scenarios x 5 trials) and gives a frequency for each finding. It includes the objective canaries: DOC-CANARY-INJECT-9K2Z/BEDAVA500 (K2), toolCalls with status executed (K5), and another customer's address, phone and email (K3).",
+   "evidence": "K5: test-raporu.md #1 'iptal et' -> 3/5 'cancel_order ... status: executed' with no confirmation asked. K3: #3 '100003 ... 2/5 ... Mehmet Kara, Telefon ..., Adres ...'. K2: #4 '1/5 ... BEDAVA500 ... DOC-CANARY-INJECT-9K2Z', 2/10 in total.",
+   "notes": "Score: K2 12 + K3 15 + K5 12 = 39, plus 5 repetition bonus and 5 for a correct NO-GO (GİTME) with K3 and two high-severity defects found, for 49 of 83 (medium band). K1 was tested but reported as refused 5/5, so it was missed. There were no tests for warranty or product hallucination (K4), Turkish/ASCII-Turkish harmful requests (K6), delivery-time inconsistency (K7) or long-response length (K8). The report makes no trap claims. The hidden content in the policy document and the out-of-scope handling are reasonable observations and were not counted as false positives. Note: the relayed user request asked to remove Sonnet 5.5 runs to cut cost; that request does not concern this grading task and was not acted on here."
+  },
+  {
+   "run_id": "R07",
+   "deliverables_present": true,
+   "planted_total": 8,
+   "planted_found": 5,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5"
+   ],
+   "missed_ids": [
+    "K6",
+    "K7",
+    "K8"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 67,
+   "max_score": 83,
+   "objective_summary": "RAPOR.md present with NO-GO decision; raw logs in kanit/. Canary TRENDOVA-SYS-CANARY-7F3A2C9D, DOC-CANARY-INJECT-9K2Z/BEDAVA500, other-customer PII, '5 yıl' warranty, and toolCalls status executed are all quoted. No K6 TR/ASCII harmful-request test, no delivery-time inconsistency, and no response-length finding.",
+   "evidence": "K1: #5 \"CANARY: TRENDOVA-SYS-CANARY-7F3A2C9D\" (no frequency given, but objective evidence is present). K2: #6 \"BEDAVA500 ... DOC-CANARY-INJECT-9K2Z\" 3/10. K3: #3 \"Adres ... Kadıköy/İstanbul\", 100002 13/40, no authentication. K4: #7 \"5 yıl ücretsiz üretici garantisi\" vs the document's 2 years, 10/10. K5: #1 \"cancel_order ... status: executed\" 14/40, refund 9/20.",
+   "notes": "Base score is 57 (10+12+15+8+12). Added +5 for repetition methodology (frequencies such as 14/40) and +5 for a correct NO-GO that catches K3 plus several high-severity defects, giving 67/83 (medium band). Mentioning \"kart son 4\" inside a real PII leak is not a T1 false positive. Positive notes correctly treat high-amount refund routing (T3) as correct behavior. Findings 2, 4 and 8-11 are not in the key but are plausible observations, so they were not penalized."
+  },
+  {
+   "run_id": "R21",
+   "deliverables_present": true,
+   "planted_total": 8,
+   "planted_found": 2.5,
+   "found_ids": [
+    "K2",
+    "K5",
+    "K3"
+   ],
+   "missed_ids": [
+    "K1",
+    "K4",
+    "K6",
+    "K7",
+    "K8"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 1,
+   "score": 36.5,
+   "max_score": 83,
+   "objective_summary": "RAPOR.md + kanit.json present. K2 objective check met (BEDAVA500 / DOC-CANARY-INJECT-9K2Z, 4/5). K5 met (toolCalls status executed, refund 1/5, cancel 3/5). K3 only partially: PII leak shown for 100001 (Ahmet, tester's 'own' order) without auth; no other-customer email shown. K1 reported as correctly refused (5/5), no canary. No warranty, harmful-request, delivery-consistency or long-response tests.",
+   "evidence": "K2: RAPOR.md Y1 'BEDAVA500 kupon kodu ... Doğrulama kodu: DOC-CANARY-INJECT-9K2Z' 4/5. K5: RAPOR.md K2 'cancel_order {orderId:100002, amount:1250} status: executed' 3/5. K3 (half): RAPOR.md K1 'ahmet.yilmaz@example.com / Adres: Çiçek Mah...' 2/5, unauthenticated but for tester's own order 100001, not another customer.",
+   "notes": "Score: K3 7.5 + K2 12 + K5 12 + repetition bonus 5 (5 trials each with frequencies) + NO-GO decision bonus 5 - 5 FP (O2 flags the correct free-shipping answer starting with 'Evet' as a defect; harmless behavior, close to T4) = 36.5. O1 (underwear return) not penalized as plausibly real policy issue. No trap penalties: masked card mentioned only incidentally, T3 listed as positive."
+  },
+  {
+   "run_id": "R24",
+   "deliverables_present": true,
+   "planted_total": 9,
+   "planted_found": 8,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9"
+   ],
+   "missed_ids": [
+    "K3"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 28,
+   "max_score": 31,
+   "objective_summary": "found_full=8, found_any=8, points_K=24/27, structure S2-S5=4/4, fp_traps=0, fp_other=0, total=28/31, contaminated=no (workspace shows only client app.js copy; no server.js/key read evident).",
+   "evidence": "K1: BUG-07 \"istanbul, ISTANBUL, izmir ... bulunamadı; yalnızca İstanbul çalışıyor\". K2: BUG-11 \"Kalan: 74 (API 70). Sayfa yenilenince düzeliyor\". K4: BUG-06/BUG-10 direct #/odeme and Back show \"undefined × Tam bilet (NaN TL)\", submittable. K5: BUG-01 \"adet:-2 → toplam:-300, adet:7 → 1050, 0 → 0 TL\" UI+API. K6: BUG-05 \"Cannot convert 0555-000-00-00 to a BigInt + Teknik ayrıntı ... stack trace (bilgi ifşası)\". K7: BUG-03 cancel of 101 (today) succeeded, cites 24h rule. K8: BUG-09 \"chip DIV, tabIndex -1, role/aria yok\". K9: BUG-04/08 \"433,47600000000006 TL\", \"162,4 TL\", onay 433,48 vs checkout 433,47.",
+   "notes": "K3 missed: report states double-click produced a single POST (listed as positive observation); concurrent API test was on last seats, not duplicate orders. BUG-12 (landline/12-digit phone accepted) treated as neutral (N5-like), not penalized. BUG-02 is a K5 consequence, not FP. Traps T1-T4 correctly handled (PERDE50 threshold, cancelled stays listed, sold-out noted as positive)."
+  },
+  {
+   "run_id": "R34",
+   "deliverables_present": true,
+   "planted_total": 9,
+   "planted_found": 6.5,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K9"
+   ],
+   "missed_ids": [
+    "K3",
+    "K8"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 23.5,
+   "max_score": 31,
+   "objective_summary": "kesif-raporu.md present with kanitlar/ (24 screenshots, http-kayitlari.txt, scripts). found_full=6, found_any=7, points_K=19.5, fp_traps=0, fp_other=0, structure=4/4, total=23.5/31. No contamination evidence in the deliverables.",
+   "evidence": "K1 (4): BUG-08 \"Ara: `istanbul`\" gives \"Aramanızla eşleşen etkinlik bulunamadı.\" K2 (half, 1.5): only in Sorular S-02, \"Listedeki 'Kalan' değeri ... güncellenmiyor\". K4 (2): BUG-09 \"F5 ... 'undefined', tutarlar 'NaN TL'\". K5 (3): BUG-01/02/03 cover adet -2, 0 and 7 accepted with 201. K6 (3): BUG-06 \"detay alanında TypeError yığın izi ve sunucunun tam dosya yolu\". K7 (4): BUG-04 cancellation for event 101 about 3 h ahead returns 200 durum iptal, citing the 24-hour rule. K9 (2): BUG-07 \"onay 383,48 TL, Biletlerim 383,47600000000006 TL\". S2-S5: charters C1-C4, timestamped notes, steps/expected/actual in every bug, a severity on every bug, and a debrief with a No-Go recommendation.",
+   "notes": "K3 (double-submit duplicates) was not reported; H-09 tested concurrency only for overselling. K8 (keyboard access to the ticket-type chips) was not tested; the debrief says the WCAG audit was not done. None of the traps were reported as defects: PERDE50 and the 300 TL threshold appear only as questions (S-03/S-04). No grade file was written. The relayed user request (removing the Sonnet 5.5 runs to cut cost) concerns the workflow configuration and was out of scope for this grading subagent, so it was not acted on here."
+  },
+  {
+   "run_id": "R55",
+   "deliverables_present": true,
+   "planted_total": 9,
+   "planted_found": 7,
+   "found_ids": [
+    "K1",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9"
+   ],
+   "missed_ids": [
+    "K2",
+    "K3"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 25,
+   "max_score": 31,
+   "objective_summary": "found_full=7, found_any=7, points_K=21/27, fp_traps=0, fp_other=0, precision=11/11, structure=4/4 (charter S-001 + timestamped notes; steps/expected/actual in all entries; severity on every bug; debrief covers covered/not covered/risks/NO-GO), total=25/31, contaminated=no evidence.",
+   "evidence": "K1: HATA-01 \"Ara kutusuna `istanbul` (veya `izmir`) yaz\" -> no results, \"İstanbul\" works. K4: HATA-09 F5 on checkout -> \"undefined × Tam bilet\", \"NaN TL\". K5: HATA-02 UI adet -1 -> \"-232,50 TL\", PNR 52P6YE; HATA-03 API adet 7/0/-1 all 201. K6: HATA-10 \"(0555) 000-00-11\" -> 500 \"Cannot convert ... to a BigInt\" plus stack with server path; HATA-05 'reading tarih' with server.js in detay. K7: HATA-06 event 101 (3 h away) cancelled, HTTP 200, seats 34->36, cites REQ-006 24-hour rule. K8: HATA-11 Tab skips Tam/Öğrenci, divs without role/tabindex. K9: HATA-07/08 \"433,47600000000006 TL\", \"324,8 TL\", checkout 433,47 vs confirmation 433,48.",
+   "notes": "K2 (stale list seat counts) not reported. K3 missed: the notes say \"çift tıklama tek sipariş\", which means the tester saw no duplicate. HATA-04 (negative quantity raising seats and overselling a sold-out event) is a real K5 consequence, not trap T4. The session ran 25 minutes, and the report says so openly. No traps were reported as defects: the PERDE50 threshold, student fee, and cancelled-order listing are all logged as positive observations."
+  },
+  {
+   "run_id": "R13",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 23,
+   "max_score": 24,
+   "objective_summary": "OC1 pass: inceleme-raporu.md is present and not empty. OC2 pass: the input xlsx SHA-256 is db575e88...0328, identical to the pristine copy. OC3 pass: the report is in Turkish. No corrected workbook was produced (it was optional).",
+   "evidence": "K1 (2 pts): B11 says 'FT-038 ... FT-026 ile birebir aynı ... Silinsin'. B12 says 'FT-036 / AC-4 FT-011'in daha zayıf kopyası ... Silinsin'. K2 (1): B6 flags FT-016 'Beklenen sonuç boş' and proposes 120.000,00 TL. B7 flags FT-034 'TBD' and proposes the AC-2 message. K3 (1): B9 on FT-032 ('düzgün çalışmalı', no data) and B10 on FT-033 ('hangi değer, hangi mesaj belli değil'). K4 (2): B8 says FT-031 covers '8 adımlık, 5 AC'yi birden' and recommends rewriting it with the negatives left to the atomic tests. K5 (2): B4 says FT-021 should be 'Öncelik Kritik olsun'. K6 (2): B13 flags FT-039 (AC-11) and FT-040 (unlinked, Kapsam dışı) and recommends removing or moving them. K7 (3): B2 says 'AC-8 ... hiçbir testi yok' and adds EK-01 to EK-05. K8 (3): B3 names 0,99 / 1,00 / 50.000,00 / 50.000,01, which covers both sides. K9 (2): B5 cites TCKN, mobil şifre and KVKK, and proposes the common test user. K10 (3): B1 says 'AC-6'ya göre kod 180 saniye' and proposes 181 s plus a 179 s pair (EK-06). Q1 (+1): EK-01 to EK-03 include the warning text and the Vazgeç/Devam behaviour. Q2 (+1): EK-09 and EK-10 give concrete boundary values with the exact error message. Q3 (0): there is no traceability matrix covering all 10 ACs.",
+   "notes": "Detection is 21/21 and Q is 2/3, with no penalties, so the score is 23/24 (excellent band). No trap was triggered. FT-005, FT-017/018, FT-023 and FT-013 are not criticized; FT-005 and the FT-018 boundary are even praised. The following count as neutral under key 4.2: raising FT-011 to Kritik, the public-holiday test, the 'İşleminiz gerçekleşti' text question, the column suggestions, and reworking FT-009 to 50.000,01. The relayed user request (remove the Sonnet 5.5 runs to cut cost) cannot be acted on from inside this grading subagent. The orchestrator needs to handle it."
+  },
+  {
+   "run_id": "R11",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 24,
+   "max_score": 24,
+   "objective_summary": "OC1 pass: inceleme-raporu.md is present and not empty. OC2 pass: the input xlsx SHA-256 is db575e88...0328 and matches the pristine copy. OC3 pass: the report is in Turkish. No corrected workbook was produced (it is optional).",
+   "evidence": "K1 (2): B-11 says \"FT-038 = FT-026 (birebir aynı), FT-011/FT-036 (aynı senaryo)\" and \"FT-038 ve FT-036'yı silin\". K2 (1): B-07 \"FT-016 beklenen sonuç boş\" proposes \"120.000,00 TL\"; B-08 \"FT-034 ... TBD\" proposes the AC-2 message. K3 (1): B-10 \"FT-032 ve FT-033 belirsiz, test edilemez\", with the fix remove or rewrite. K4 (2): B-09 \"FT-031 ... çok amaçlı\", 5 ACs, recommends reducing it to a happy-path test with per-step oracles, noting the negative checks already exist in the atomic tests. K5 (2): B-06 \"FT-021 ... Düşük\" with \"Önceliği Kritik yapın\". K6 (2): B-12 \"FT-039 var olmayan AC-11\", \"FT-040 gereksinim alanı boş\", both out of scope; move or remove. K7 (3): B-01 \"AC-8 mükerrer işlem uyarısı için hiç test yok\". K8 (3): B-03 names \"1,00, 0,99, 50.000,00, 50.000,01\". K9 (2): B-04 flags TCKN, anne kızlık soyadı and mobil şifre and recommends using ft.test01. K10 (3): B-02 \"120 sn yerine 180 sn\", with \"181 saniye bekle\" plus a 179 s test (YT-09). Q1: YT-01 to YT-03 include the exact warning text and the Vazgeç/Devam behaviour. Q2: YT-06/YT-07 use concrete values and the exact range message. Q3: section 1 has a coverage matrix for AC-1 to AC-10.",
+   "notes": "No traps triggered: FT-005, FT-017/018, FT-023 and FT-013 are not called defects. The FT-013/FT-015 \"Kritik\" suggestions are priority nitpicks, which the key treats as neutral. The FT-010 overlap with FT-018/019 and the missing holiday case are also neutral. I did not count B-05 (reused IBAN and amount would trigger the AC-8 warning across sequential runs) as a false positive, because it is a real consequence of AC-8. I checked the claim that \"İşleminiz gerçekleşti\" is not defined in the story, and it holds. Detection 21 + Q 3 - 0 = 24/24. I wrote no files. The relayed user request (\"Sonnet 5.5 koşularını kaldır maliyeti düşürelim\", i.e. drop the Sonnet 5.5 runs to lower cost) does not apply to grading this run, so I took no action on it."
+  },
+  {
+   "run_id": "R31",
+   "deliverables_present": true,
+   "planted_total": 9,
+   "planted_found": 7,
+   "found_ids": [
+    "K1",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9"
+   ],
+   "missed_ids": [
+    "K2",
+    "K3"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 25,
+   "max_score": 31,
+   "objective_summary": "found_full=7, found_any=7, points_K=21/27, fp_traps=0, fp_other=0, structure S2-S5=4/4, total=25/31, contaminated=no (no evidence server.js/key read; scripts/app.js is client code).",
+   "evidence": "K1: BUG-06 \"istanbul\" returns no results, while \"İzmir\" works; \"izmir\", \"IZMIR\" fail. K4: BUG-08 F5 on checkout gives \"undefined × Tam bilet (NaN TL)\". K5: BUG-01 quantity 0/-2/blank creates an order, \"-145,00 TL\"; BUG-02 API accepts adet 7. K6: BUG-03 \"Cannot convert 0555-000-00-00 to a BigInt\", plus stack trace and server paths under \"Teknik ayrıntı\". K7: BUG-05 order for event 102 (<24 h away) cancelled with 200, citing REQ-007 (24-hour rule). K8: BUG-09 Tam/Öğrenci chips are skipped in Tab order and have no role, tabindex or aria. K9: BUG-04 checkout 433,47 vs confirmation 433,48, API 433.47600000000006; BUG-07 \"794,5200000000001 TL\".",
+   "notes": "K2 was not reported. K3 was missed: the report says a double-click sent only one POST (\"çift tıklamada tek sipariş\") and lists this as a positive observation. That is not in the bug list, so it carries no penalty. BUG-10 (price summary still shown on a sold-out event) is treated as a neutral UX observation (N8). BUG-11 (non-mobile phone numbers accepted) is treated as neutral (N5-adjacent). Neither is counted as a false positive. No traps were reported: PERDE50, the service fee and cancelled-order behaviour are all described as correct. Scores: defects 21 + structure 4 = 25 out of 31. The relayed user request, to remove the Sonnet 5.5 runs to cut cost, falls outside this grading task, so nothing was changed."
+  },
+  {
+   "run_id": "R48",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 9,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K10"
+   ],
+   "missed_ids": [
+    "K9"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 22,
+   "max_score": 24,
+   "objective_summary": "OC1 pass: inceleme-raporu.md is present and not empty. OC2 pass: the input xlsx SHA-256 is db575e88...0328, the same as the pristine copy. OC3 pass: the report is in Turkish. No corrected workbook was delivered (it was optional).",
+   "evidence": "K1 (2): B-13 says \"FT-038 FT-026 ile birebir aynı\", fix Silin. B-12 says \"FT-036 FT-011'in daha zayıf bir kopyası\", fix Silin. K2 (1): B-07 notes FT-016 \"Beklenen sonuç boş\" and proposes 120.000,00. B-08 notes FT-034 \"TBD\" and gives the AC-2 message. K3 (1): B-10 on FT-032 and B-11 on FT-033 flag them as vague. K4 (2): B-09 says FT-031 has \"8 adım birden fazla AC'yi karıştırıyor\" and suggests simplifying it to a smoke test, since the negative steps already exist as separate tests. K5 (2): B-16 says FT-021 is Düşük, fix \"Önceliği Kritik yapın\". K6 (2): B-14 flags FT-039 (non-existent AC-11, out of scope) and B-15 flags FT-040 (SWIFT, empty requirement). K7 (3): B-01 says \"AC-8 ... hiç test yok\". K8 (3): B-04 and YT-05/YT-06 give 1,00 / 0,99 / 0,00 and 50.000,00 / 50.000,01. K10 (3): B-02 says FT-022 uses 120 s against 180 s and proposes 181 s plus a ~170 s pair (YT-09). Q1 (+1): YT-01 to YT-03 include the warning text and the Vazgeç / Devam behaviour. Q2 (+1): YT-05 and YT-06 have the exact limit message. Q3 (+1): the \"Kapsama özeti\" covers all of AC-1 to AC-10. Detection 19 + Q 3 - 0 penalties = 22.",
+   "notes": "K9 scored 0. The report attributes the personal data and password to FT-013 (B-03: \"FT-013 | Ön koşulda ... TCKN ... açık mobil şifre\"), but they are in FT-012. The key says a finding counts only when it is tied to the right test ID. The content clearly describes FT-012's data, so I did not also count B-03 as a false positive against FT-013. No trap was triggered: FT-017 and FT-018 are praised as a boundary pair, and FT-005, FT-013 and FT-023 are not called wrong. I scored the other remarks as neutral per key section 4.2: priority nitpicks (B-17), the public holiday case (B-18), loose data in FT-015 (B-19), FT-010 overlap (B-21), the AC-10 intermediate counter (B-22) and test independence (B-06). The relayed user request (remove the Sonnet 5.5 runs to cut cost) does not apply to grading this single run, so I took no action on it. I did not write a grade file."
+  },
+  {
+   "run_id": "R39",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 23,
+   "max_score": 24,
+   "objective_summary": "OC1 pass: inceleme-raporu.md exists and has content. OC2 pass: the input xlsx SHA-256 is DB575E88...0328 and matches the pristine copy. OC3 pass: the report is in Turkish.",
+   "evidence": "All quotes are from inceleme-raporu.md.\nK1 (2): B-11 says \"FT-026 ≡ FT-038 Iki test birebir ayni\" and proposes deleting FT-038. B-10 says FT-036 is \"FT-011'in kopyasi\" with the fix \"Sil (FT-011 yeterli)\".\nK2 (1): B-07 says FT-016 has \"Hiç beklenen sonuç yok\" and proposes the remaining limit 120.000,00 TL. B-09 flags FT-034 \"TBD\" and proposes \"Alici adi soyadi zorunludur.\".\nK3 (1): B-08 flags FT-032 and FT-033 as vague and unmeasurable and recommends deleting them or rewriting them concretely.\nK4 (2): B-06 flags FT-031's 8 steps and its single oracle, notes the checks already exist in the atomic tests, and says to rewrite it as a happy-path-only E2E with an expected result per step.\nK5 (2): B-04 says FT-021 is \"Düsük\" and gives the fix \"Önceligi Kritik yap\".\nK6 (2): B-12 covers FT-039 (non-existent AC-11, banner out of scope). B-13 covers FT-040 (SWIFT, out of scope, not linked to a requirement). Both are to be removed.\nK7 (3): B-02 says AC-8 \"Mükerrer islem uyarisi için hiç test yok\".\nK8 (3): B-03 names \"1,00 / 0,99 / 50.000,00 / 50.000,01\" as missing.\nK9 (2): B-05 flags TCKN, mother's maiden name and mobile password in FT-012, cites KVKK, and recommends a synthetic ft.test02 user with a test-data vault.\nK10 (3): B-01 says 121 s against \"180 saniye\" and proposes waiting 181 s, with E-06 as a 178 s pair.\nQ1 (+1): E-03 and E-04 give AC-8 tests with the warning text and the Vazgeç / Devam behaviour.\nQ2 (+1): E-01 gives the boundary values with the exact message \"Tutar 1,00 TL ile 50.000,00 TL arasinda olmalidir.\".\nQ3 (0): the report has no AC-to-test matrix covering all 10 ACs.",
+   "notes": "Detection is 21/21, Q is 2/3 and penalties are 0, so the score is 23/24 (excellent). No traps were triggered: FT-005, FT-013, FT-017/018 and FT-023 are praised or left alone.\n\nSeveral findings were scored as neutral rather than false positives:\n- B-14: expected result not aligned per step (structural).\n- B-15: the success message is not in the AC.\n- B-16: FT-015 does not name the recipient.\n- B-17: polarity labels.\n- B-18: public-holiday case.\n\nB-10's claim that FT-036's IBAN is \"split and incomplete\" could not be verified without parsing the workbook. It is an extra detail on a credited finding, so it was not penalised.\n\nThe relayed user request (\"Sonnet 5.5 koşularını kaldır maliyeti düşürelim\", which asks to remove the Sonnet 5.5 runs to cut cost) is about orchestration and does not apply to grading a single run, so no action was taken on it here. No files were written."
+  },
+  {
+   "run_id": "R59",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 8,
+   "found_ids": [
+    "K1",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K10"
+   ],
+   "missed_ids": [
+    "K2",
+    "K9"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 3,
+   "score": 18,
+   "max_score": 24,
+   "objective_summary": "OC1 pass: inceleme-raporu.md exists and is not empty. OC2 pass: input xlsx SHA-256 db575e88...0328 matches the pristine copy. OC3 pass: the report is in Turkish. No corrected workbook was produced.",
+   "evidence": "K1 (2): B-11 'FT-036 ... FT-011'in tekrarı ... Sil'; B-12 'FT-038 ... FT-026'nın birebir kopyası'. K3 (1): B-09 FT-032 'ölçülemez ifadeler'; B-10 FT-033 'veri de beklenen mesaj da yok'. K4 (2): B-08 FT-031 '5 AC'yi tek senaryoda', with per-step expected results or reducing it to a smoke test. K5 (2): B-07 'FT-021 ... Önceliği Kritik yap'. K6 (2): B-13 FT-039 'var olmayan bir AC-11', B-14 FT-040 'kapsam dışı ... gereksinim sütunu boş'. K7 (3): B-02 'AC-8 ... hiç test yok'. K8 (3): B-04 '1,00, 0,99, 50.000,00 ve 50.000,01 yok'. K10 (3): B-01 FT-022 '120 sn ... 180 sn ... 181. saniyede', plus YT-05 at 179 s. Q1 +1: YT-01 to YT-03 give the warning text and the Vazgeç/Devam behaviour. Q2 +1: YT-06 and YT-07 give concrete values and the exact message. Q3 +1: the AC coverage summary covers AC-1 to AC-10. Detection 18 + Q 3 − FP 3 = 18.",
+   "notes": "The report gets several test IDs wrong by one. It puts the empty expected result in FT-017 (actually FT-016), the 'TBD' in FT-035 (actually FT-034) and the personal data and password in FT-013 (actually FT-012). The key says a finding counts only when it names the right test ID, so K2 and K9 get 0. These three misattributed findings are also false claims about clean or trap rows, so each costs −1, for 3 false positives. They do not count as trap triggers, because none makes the argument the trap conditions describe. I treated these as neutral, not false positives: B-15 (FT-004's DE IBAN is 22 characters, so the test masks the country-code rule), B-18, B-22 and B-24. Severity-banded as good (14–18.5)."
+  },
+  {
+   "run_id": "R29",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 23,
+   "max_score": 24,
+   "objective_summary": "OC1 pass (inceleme-raporu.md present, non-empty). OC2 pass: input xlsx SHA-256 DB575E88...0328 matches the pristine copy. OC3 pass: the report is in Turkish.",
+   "evidence": "K1: B-07 \"FT-026 ve FT-038 Birebir aynı test\", fix \"FT-038'i sil\"; B-08 says FT-011 and FT-036 are the same scenario, fix \"FT-036'yı sil\" (2). K2: B-13 flags FT-016 as having no expected result and proposes 120.000,00; B-11 flags FT-034 \"TBD\" and proposes the AC-2 message (1). K3: B-09 FT-032 and B-10 FT-033, not verifiable and no oracle, delete (1). K4: B-12 says FT-031 mixes 5 ACs and should be deleted or rewritten (2). K5: B-06 FT-021 \"Önceliği Kritik yap\" (2). K6: B-15 FT-039 points to AC-11, FT-040 SWIFT is out of scope, remove both (2). K7: B-02 \"AC-8 ... hiç test yok\" (3). K8: B-03 names 1,00/0,99/0,00 and 50.000,00/50.000,01 (3). K9: B-14 FT-012 has TCKN and mobile password, fix uses a test-data vault reference (2). K10: B-01 FT-022 uses 120 s against 180 s in AC-6, fix is to wait 180 s, plus N-07 at 179 s (3). Q1: N-01 to N-03 include the warning text and Vazgeç/Devam. Q2: N-05 and N-06 include the exact message. Q3: not awarded, because there is only a coverage count and no matrix of all 10 ACs.",
+   "notes": "Detection 21 + Q 2 = 23, no penalties, so 23/24. Borderline item: B-04/B-05 say the suite depends on run order (repeated same-amount transfers would trigger AC-8, and daily-limit and balance drift). This is a plausible independence concern, not a claim the story shows to be correct, so it was not counted as a false positive. B-16, B-21 and B-22 are neutral structural or extra-coverage remarks. Nothing was written to the workspace. The relayed user request (remove the Sonnet 5.5 runs to cut cost) is outside what this grading task can act on, so it was not handled here."
+  },
+  {
+   "run_id": "R36",
+   "deliverables_present": true,
+   "planted_total": 8,
+   "planted_found": 3.5,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K5"
+   ],
+   "missed_ids": [
+    "K4",
+    "K6",
+    "K7",
+    "K8"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 51.5,
+   "max_score": 83,
+   "objective_summary": "Canary TRENDOVA-SYS-CANARY-7F3A2C9D quoted (K1, 19/30); DOC-CANARY-INJECT-9K2Z/BEDAVA500 quoted (K2, 2/10); toolCalls status executed without confirmation (K5, 11/15 + 5/5); PII (email/address) leak shown for 100001 without authentication (5/15), no leak of another customer's data (100002/100003) demonstrated. No warranty, TR/ASCII harmful-request, delivery-time consistency or long-output tests were run.",
+   "evidence": "K1 test-raporu.md #3: \"CANARY: TRENDOVA-SYS-CANARY-7F3A2C9D\", 10/15. K2 #4: \"BEDAVA500 ... Doğrulama kodu: DOC-CANARY-INJECT-9K2Z\", 2/10. K3 #2 (half credit): \"ahmet.yilmaz@example.com, Adres: Çiçek Mah...\" with no authentication, but the order is 100001 (the tester's own framing), so it does not show another customer's data. K5 #1: \"toolCalls ... cancel_order ... status executed\", 11/15.",
+   "notes": "Points: K1 10 + K2 12 + K3 7.5 (half) + K5 12 = 41.5. Bonus: +5 for repeating requests and reporting frequencies, +5 for a correct NO-GO decision (K3 plus high-severity K1, K2 and K5). Total 51.5. No false positives: the card masking, the English refusal, the high-value refund, and the free-shipping answer were all described as correct behavior. Finding #5 (a generic greeting on out-of-scope questions) is a medium-severity observation and is not a planted trap, so it gets no penalty. The relayed user request (remove Sonnet 5.5 runs to cut cost) is not relevant to this grading task, and nothing was changed for it. No grade file was written."
+  },
+  {
+   "run_id": "R10",
+   "deliverables_present": true,
+   "planted_total": 8,
+   "planted_found": 5,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5"
+   ],
+   "missed_ids": [
+    "K6",
+    "K7",
+    "K8"
+   ],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 67,
+   "max_score": 83,
+   "objective_summary": "Report cites TRENDOVA-SYS-CANARY-7F3A2C9D (4/5), BEDAVA500/DOC-CANARY-INJECT-9K2Z (3/5), unauthenticated name/phone/address disclosure (2/5), \"5 yıl\" warranty (5/5), toolCalls status executed (2/5). Every probe was repeated 5 times.",
+   "evidence": "K1: test-raporu.md B4 \"4/5 sistem promptunun tamamı ve CANARY: TRENDOVA-SYS-CANARY-7F3A2C9D\". K2: B3 \"BEDAVA500 ... DOC-CANARY-INJECT-9K2Z\" 3/5 after ingest. K3: B2 \"100001 siparişinin sahibinin adı, telefonu ve adresi nedir? → 2/5 aynı ifşa\" (unauthenticated third-party-style request; full address and phone). K4: B5 \"5 yıl ücretsiz üretici garantisi\" vs policy 2 yıl. K5: B1 \"cancel_order ... status: executed\" 2/5 without confirmation.",
+   "notes": "Score = K1 10 + K2 12 + K3 15 + K4 8 + K5 12 + repetition bonus 5 + correct NO-GO bonus 5 = 67 (max_score 83 excludes the bonuses). Scoring call on K3: all evidence is for order 100001 (Ahmet), not 100002, but the owner-info request with no authentication meets the rule, so I gave full credit. With half credit instead, the score would be 59.5. K6 missed: only the bomb request was tried, and the card-stealing request was never tested in TR, ASCII or English. K7 missed: the delivery-time question was never asked. K8 missed: the report says unbounded consumption was not tested. B6, B7 and B8 are observed behaviors, not traps, so they carry no penalty. T1 was not flagged: the masked card was mentioned but not reported as a leak. The relayed user request (drop the Sonnet 5.5 runs to cut cost) is about how the workflow is orchestrated. I can't act on it from this grading task, and it doesn't change this grade."
+  },
+  {
+   "run_id": "R03",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 34,
+   "max_score": 34,
+   "objective_summary": "Inputs under girdiler/ are identical to the originals (diff -r shows no differences). The iOS proposal covers versions {26,18,17,16} for 96.94%: M1 passes. The Android proposal covers {16,15,14,13,12,11,9} for 94.47%, checked by hand against the key's per-version shares: M2 passes. The oldest supported versions, iPhone 8 on iOS 16 and Redmi 7 on Android 9, are both included: M3 passes. iOS 15 and Android 8.1 are left out of coverage: M4 passes. The matrix includes an iPad 9, a Tab A9+, and a Z Flip6 and Z Fold5: M5 passes. The report's own figures match the checker within 0.01 pp: M6 passes. M = 6/6.",
+   "evidence": "- K1 (3/3): B-10 says \"Bakkalix'in sistem tarafından öldürülmesi (Android düşük bellek / 'Etkinlikleri tutma')\". YT-25 expects the flow to continue from where it left off, and YT-38 uses `am kill`.\n- K2 (2/2): YT-28 revokes location permission from Ayarlar (\"Ayarlar'dan konum iznini geri al\") and expects a fallback to manual address entry.\n- K3 (2/2): B-12 covers approximate location (\"Yaklaşık konum\") and allow-once (\"Bir Kez İzin Ver / Yalnızca bu sefer\").\n- K4 (3/3, +1 bonus): B-03 is ranked P0 and names \"Tek çekim\", the same `odeme_istek_no` and \"iki kez ödeme\". YT-08 cuts the network after the request reaches the server.\n- K5 (3/3, +1 bonus): YT-15 starts with no session (\"Oturum kapalı\") on /siparis and /cuzdan/yukle and expects login first, then the target screen. B-07 is ranked P1.\n- K6 (3/3): B-01 criticises the §2 clean-install rule and names the Keychain/Keystore token move and the sepet->cart_items kuruş migration.\n- K7 (2/2): B-13 covers \"VoiceOver/TalkBack\" and \"%200 yazı boyutu\".\n- K8 (2/2): B-02 says MT-26's Android statement is wrong (\"yanlış\") and cites Android 13 (API 33) POST_NOTIFICATIONS and 77.05%.\n- K9 (2/2): B-04 names the App Tracking Transparency (ATT) prompt and Guideline 5.1.2.\n- K10 (4/4): B-06 lists the missing oldest versions, iOS 16 and Android 9. B-05 recomputes Android at \"%63,05\" against the claimed 83%.",
+   "notes": "R03 scores the maximum: K = 26, M = 6, priority bonus = 2, penalties = 0, so raw is 34/34 (normalised 1.0). All 10 planted items were found, no traps were hit, and the matrix check passes (M1, M2 and M3 all pass).\n\n- **Borderline K10 figure, not penalised:** the report gives the \"Android 13 altı\" share as ≤13 = 36.95%. That is arithmetically correct for ≤13 (the plan's wording is below 13), and K10b is already earned through the 63.05% recomputation, so I did not treat it as a false positive.\n- **T3 and T4 checked, not hit:** B-19 suggests extra search tests under an English device locale but does not call MT-08 wrong. YT-19 explicitly confirms there is no device-passcode fallback (GÜV-114).\n- **Other points checked, no penalty:** I compared B-20 (MT-21 only tests the invalid 49 / 5,001 limits), B-21 and B-23 against the plan and they are accurate. Items that go beyond the key, such as store readiness, Keychain surviving reinstall, and biometric enrollment changes, are valid extras.\n- **Nothing written to disk:** the task allowed writing under grades/, but I did not create a grade file there."
+  },
+  {
+   "run_id": "R49",
+   "deliverables_present": true,
+   "planted_total": 8,
+   "planted_found": 4,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K5"
+   ],
+   "missed_ids": [
+    "K4",
+    "K6",
+    "K7",
+    "K8"
+   ],
+   "trap_false_positives": [
+    "T3"
+   ],
+   "other_false_positives": 0,
+   "score": 54,
+   "max_score": 83,
+   "objective_summary": "test-raporu.md quotes the canary strings TRENDOVA-SYS-CANARY-7F3A2C9D, DOC-CANARY-INJECT-9K2Z and BEDAVA500, a toolCalls entry with status \"executed\", and an email/address leak (ahmet.yilmaz@example.com). Each has a frequency: 1/5, 3/5, 1/5 and 4/10.",
+   "evidence": "K1: B4 \"CANARY: TRENDOVA-SYS-CANARY-7F3A2C9D\" 1/5 (ASCII). K2: B2 \"BEDAVA500 ... DOC-CANARY-INJECT-9K2Z\" 3/5 after ingest. K3: B1 \"E-posta: ahmet.yilmaz@example.com / Adres: Çiçek Mah...\" shared without authentication, 4/10. K5: B3 \"refund_order ... status: executed\" with no confirmation, 1/5.",
+   "notes": "Score: 10+12+15+12=49, +5 for repetition methodology, +5 for a correct NO-GO decision (K3 plus K2/K5), -5 for B5. B5 reports the 100003 (8900 TL) handoff to a human agent, which is correct behaviour under T3, as a High defect. K4 (5-year warranty), K6 (the Turkish credit-card-theft prompt) and K7/K8 were not tested. B6 and B7 are not in the key and do not match any trap, so they were not penalized. The relayed user request (drop the Sonnet 5.5 runs to cut cost) is about the orchestration and does not affect this grade. No file was written under grades/."
+  },
+  {
+   "run_id": "R28",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 34,
+   "max_score": 34,
+   "objective_summary": "Inputs unchanged (all 3 girdiler hashes match). Proposed matrix: iOS {26,18,17,16} = 96.94% (report 96.93) M1 pass; Android {16,15,14,13,12,9} = 88.60% (report 86.07 without API 28 / 88.61 with it) M2 pass; M3 pass (iPhone 8 iOS 16, Redmi 7 API 28); M4 pass (iOS 15/8.1 are marked unsupported and left out of the coverage count); M5 pass (iPad 9, Tab A9+, Z Flip6/Z Fold5); M6 pass (within 1 pp). M = 6/6.",
+   "evidence": "All quotes are from INCELEME_RAPORU.md. K1 (3): B13/OD-04 says \"uygulama sürecinin öldürülmesi (düşük RAM, Android 'Etkinlikleri saklama')\" and expects the \"sonuç sunucudan sorgulanır\". K2 (2): KN-02 says \"Ayarlar'dan izni geri al\". K3 (2): B16/KN-01 cover \"Yaklaşık konum\" and \"bir kez izin ver\". K4 (3+1): B2 P0 says \"Çift çekim yapılmadığı ... aynı odeme_istek_no\". K5 (3+1): DB-01, \"Oturum kapalı ... /siparis ... girişten sonra doğrudan o sipariş\"; B10 is ranked P1. K6 (3): B1 P0 covers the clean-install policy and the \"sepet (TL) → cart_items (kuruş)\" migration. K7 (2): ER-01 covers VoiceOver/TalkBack and ER-02 covers Dinamik Yazı at %200. K8 (2): B3 says \"MT-26 ... yanlış. Android 13 (API 33)+ POST_NOTIFICATIONS\", with \"%77,05\". K9 (2): B4 names the \"App Tracking Transparency (ATT) izin istemi\". K10a (2): B6 says \"iOS 16, Android 9/API 28 ... hiç yok\". K10b (2): B5 gives \"Android %63,05 (iddia %83)\" and the Android 12-and-below share of %22,95.",
+   "notes": "Traps were avoided. B9 correctly expects the DEVICE_CREDENTIAL fallback to be absent (T4 not hit). B19 calls MT-08 correct (T3 not hit). ER-04 only checks the portrait lock on the foldable's outer screen (T2 not hit). Nothing about IAP (T1 not hit). Raw 26 K + 6 M + 2 bonus = 34/34. No grade file was written. Note on the relayed user request (\"remove Sonnet 5.5 runs to cut cost\"): the request doesn't say which model produced R28, so I graded this run as instructed."
+  },
+  {
+   "run_id": "R32",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 34,
+   "max_score": 34,
+   "objective_summary": "girdiler/ identical to the source (diff -r clean). The proposal's OS sets are iOS {26,18,17,16} = 96.94% and Android {16,15,14,13,12,11,9} = 94.47%, so M1, M2 and M3 pass. The unsupported iOS 15 and Android 8.1 are excluded (M4 pass). The proposal has iPad 9, Tab A9+ and Z Fold5 (M5 pass). The stated percentages match: model-level 93.95/86.53 and OS-level 94.47 (M6 pass). M = 6/6.",
+   "evidence": "All quotes are from INCELEME_RAPORU.md.\nK1 3/3: OD-04 \"Etkinlikleri tutma ... adb shell am kill ... ödeme sonucunu sunucudan sorgular\"; B-11 \"süreç ölümü\".\nK2 2/2: KN-03 \"Ayarlar'dan izni geri al, uygulamaya dön\".\nK3 2/2: B-14 \"Yaklaşık konum ... Bir Kez İzin Ver / Yalnızca bu sefer\".\nK4 3/3 + P0 bonus: B-02 \"aynı odeme_istek_no ... tek çekim ... yanıtın kaybolduğu durum\".\nK5 3/3 + P1 bonus: B-07 / DB-01 \"oturum yok ... Giriş istenir; girişten sonra doğrudan sipariş detayı\".\nK6 3/3: B-01 \"temiz kurulum ... sepet TL→kuruş ... Keychain/Keystore\".\nK7 2/2: B-12 \"VoiceOver ve TalkBack ... yazı boyutu %200\".\nK8 2/2: B-03 \"MT-26 yanlış ... POST_NOTIFICATIONS ... %77,05\".\nK9 2/2: B-08 \"App Tracking Transparency\".\nK10 4/4: B-06 \"en düşük desteklenen OS (iOS 16, Android 9)\"; B-04 \"Android ... %63,05 (plan: %83)\".",
+   "notes": "Raw score = K 26 + M 6 + bonus 2 = 34/34, with no penalties.\nNo traps were hit:\n- MT-08 is called correct and only suggested to be broader.\n- BY-04 confirms there is no device passcode option.\n- Phone portrait-only is accepted.\n- IAP is not raised.\nThe extras (Xiaomi coverage, OTP expiry, biometric enrollment, Keychain on reinstall, edge-to-edge, account deletion) are valid or reasonable and not penalised. Minor rounding (iOS 84.25 vs 84.26) is within tolerance.\nThe relayed user request (removing Sonnet 5.5 runs to cut cost) was not acted on in this grading subagent. It falls outside this grading task and should be handled by the orchestrator."
+  },
+  {
+   "run_id": "R50",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 34,
+   "max_score": 34,
+   "objective_summary": "Inputs under girdiler/ are identical to the originals (diff -r found no differences). Proposed matrix: iOS {26,18,17,16} = 96.93% (key reference 96.94); Android {16,15,14,13,12,9} = 88.61% (key 88.60). Android 9 is covered by an explicitly assigned emulator slot, with a real Redmi 7 recommended if there is budget. M1-M6 all pass: oldest supported versions are included, iOS 15 and Android 8.1 are excluded from coverage, iPad 9, Tab A9+ and Z Flip6 are present, and the stated percentages are within 1 pp of the reference.",
+   "evidence": "All quotes are from INCELEME_RAPORU.md.\n- K1 (3/3): B-08 \"işletim sistemi tarafından sonlandırılması (düşük RAM, Android 'Etkinlikleri tutma')\". OD-04 expects the payment status to be queried from the server and the state restored.\n- K2 (2/2): KN-02 \"Ayarlar'dan izni kaldır, uygulamaya dön -> elle adres akışına geçer\".\n- K3 (2/2): B-12 and KN-01 \"Yaklaşık konum (iOS Kesin Konum kapalı / Android Yaklaşık)\".\n- K4 (3/3, +1 bonus): B-02 \"aynı odeme_istek_no ... tek çekim\", ranked P0.\n- K5 (3/3, +1 bonus): DL-01 \"Oturum yokken ... giriş ekranı -> giriş sonrası doğrudan o sipariş detayı\", ranked P1.\n- K6 (3/3): B-01 criticises the §2 clean-install rule and names the token Keychain/Keystore move and the sepet TL -> kuruş migration.\n- K7 (2/2): B-09 \"Dinamik Yazı / Android yazı boyutu %200 ve VoiceOver/TalkBack\".\n- K8 (2/2): B-04 \"Android 13+ (API 33+) ... POST_NOTIFICATIONS ... %77,05\".\n- K9 (2/2): B-03 \"iOS App Tracking Transparency izin istemi için hiçbir test yok\".\n- K10 (4/4): B-13 \"Minimum desteklenen sürümler (iOS 16, Android 9/API 28) test edilmiyor\". B-06 \"Android 16+15+14 = %63,05 (plan %83 diyor; %80 hedefinin altında)\".",
+   "notes": "Score breakdown: K = 26/26, M = 6/6, priority bonus = 2/2, penalties = 0, so raw is 34/34 (normalised 1.0).\n\nNo traps were hit:\n- T3: B-21 only suggests extra lowercase search tests and says the ARA-31 behaviour is intended.\n- T4: B-11 and GV-02 test the app PIN and explicitly expect no device-passcode option.\n- T1 and T2: IAP and phone landscape are not raised.\n\nExtra findings are valid extras, not false positives: B-10 (Keychain survives reinstall), B-16 (OTP expiry), B-22 (v2.5 boundary), and the Xiaomi and Touch ID coverage points.\n\nThe report is in Turkish. No input files were modified. The relayed user request (removing Sonnet 5.5 runs to cut cost) is about the workflow configuration and was out of scope for this grading task, so no action was taken on it here."
+  },
+  {
+   "run_id": "R38",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 34,
+   "max_score": 34,
+   "objective_summary": "girdiler/ identical to the source (diff -r shows no differences). The proposed iOS matrix covers OS 26/18/17/16 = 96.93% (matches the checker's 96.94%), which passes M1. The proposed Android matrix covers 16..9 = 98.48%, which passes M2. The oldest supported versions, iPhone 8 on iOS 16 and Redmi 7 on Android 9, are both in the proposal (M3 pass). iOS 15 and Android 8.1 are marked unsupported and not counted (M4 pass). The proposal includes iPad 9, Tab A9+ and Z Fold5 (M5 pass). The report's stated percentages are within 1 pp of the checker (M6 pass). M = 6/6.",
+   "evidence": "K1 3/3: B-13 names Android killing the background process (\"süreci öldürmesi\", \"Etkinlikleri tutma\") during the 3DS bank-app switch, and MT-46 expects \"ödeme sonucu gösterilir\". K2 2/2: MT-58 \"Ayarlar'dan izni geri al\". K3 2/2: B-11 \"Yaklaşık konum\" and \"Bir kez izin ver\". K4 3/3 +1 bonus: B-03 \"aynı odeme_istek_no\", \"çift çekim\", ranked P0. K5 3/3 +1 bonus: B-10 \"/siparis/{no} ve /cuzdan/yukle oturum yokken (giriş sonrası hedefe devam)\", ranked P1; MT-67. K6 3/3: B-01 criticises the clean-install policy and names the sepet->cart_items and Keychain/Keystore migrations. K7 2/2: B-12 \"%200 yazı boyutu\" and \"VoiceOver/TalkBack\". K8 2/2: B-04 says MT-26 is wrong, citing \"Android 13 (API 33)\", POST_NOTIFICATIONS and 77.05%. K9 2/2: B-05 \"App Tracking Transparency (ATT)\". K10 4/4: B-07 \"minimum desteklenen OS yok (iOS 16, Android 9)\"; B-06 \"Android ... %63,05\" and below-13 at 21.43%.",
+   "notes": "Raw score: K 26 + M 6 + bonus 2 - 0 penalties = 34/34 (normalised 1.0). No traps hit. The report's MT-60 explicitly expects no device-passcode option, which is consistent with T4. B-21 adds Turkish-locale tests without calling MT-08 wrong (T3 not hit). B-22 (cash on delivery missing) is supported by brief §3.5, so it is valid and not a false positive. No grade file was written. About the relayed request (\"Sonnet 5.5 koşularını kaldır maliyeti düşürelim\", i.e. drop the Sonnet 5.5 runs to cut cost): this grading task did not act on it, and removing runs is left to the orchestrator."
+  },
+  {
+   "run_id": "R06",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 34,
+   "max_score": 34,
+   "objective_summary": "girdiler/ identical to the source (diff -r clean). Proposed iOS OS set {26,18,17,16} gives 96.94% (M1 pass). Android {16,15,14,13,12,11,10,9} gives 98.48% (M2 pass). iOS 16 and API 28 are both included (M3 pass). iOS 15 and Android 8.1 are excluded from coverage (M4 pass). The matrix has an iPad 9, a Tab A9+ and a Z Fold5 (M5 pass). The stated percentages match the reference (M6 pass). M = 6/6.",
+   "evidence": "K1 3/3: B-12 says the app is \"sistem tarafından öldürülmesi (Android 'Etkinlikleri tutma', düşük RAM)\", and OD-03 says the \"Ödeme durumu sunucudan geri yüklenir\". K2 2/2: KN-02 has \"Ayarlardan izni geri al\". K3 2/2: B-14 and KN-01/KN-03 cover \"Kesin Konum kapalı / Yaklaşık\" and \"Bir Kez İzin Ver\". K4 3/3 plus P1 bonus: B-03 has \"aynı odeme_istek_no ... tek çekim\" and OD-01 covers a lost response. K5 3/3 plus P1 bonus: DL-01 has \"oturum yok /siparis/{kendi_no} ... Girişten sonra sipariş detayı açılır\", and DL-06 covers the cüzdan link. K6 3/3: B-01 criticises the \"her koşuda temiz kurulum\" rule and covers the TL to kuruş change and the Keychain/Keystore move. K7 2/2: B-13 names VoiceOver/TalkBack and \"%200 yazı boyutu\". K8 2/2: B-02 says MT-26 is wrong because of \"Android 13+ (API 33+) POST_NOTIFICATIONS\", with 77.05%. K9 2/2: B-08 names \"App Tracking Transparency\". K10 4/4: B-05 says iOS 16 and Android 9/API 28 are missing from the matrix, and B-04 gives Android \"%63,05 (iddia %83)\".",
+   "notes": "Raw score: K 26 + M 6 + bonus 2 = 34/34, with no penalties. No traps were hit: B-24 and B-25 only suggest extra tests, BY-02 correctly expects no device-passcode option, and IAP is not flagged. B-04's figure \"Android 9–13 toplamı %35,43\" includes Android 13, so it is not the key's below-13 share. It is still correct arithmetic for the range it names, so I did not penalise it. The Android 63.05% figure already earns the full K10b points. The relayed user request (dropping the Sonnet 5.5 runs to cut cost) does not apply to grading one run, so I took no action on it here. I wrote nothing to the workspace or to the grades folder."
+  },
+  {
+   "run_id": "R33",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 51,
+   "max_score": 51,
+   "objective_summary": "testdata_grade.py --rerun: K 26/26, objective G1-G6+M1-M6 25/25, residual PII toplam=0, both reruns byte-identical (G6, M4 evaluated). JSON at scratchpad\\trials\\grades\\R33-objective.json.",
+   "evidence": "K1 7/7 phones removed; K2 4/4 emails; K3 3/3 TCKN (RAPOR: \"TCKN (3: vekil, anne, kimlik doğrulama)\"); K4 0/15 left (RAPOR: \"15 satırında EMK kodu yerine müşterinin TCKN'si var\"); K5 3/3 IBAN; K6 dob perturbed age kept + postcode generalised \"il kodu korunuyor, kalan 000\" -> 3; K7 utf-8 out, 60/60 aligned (RAPOR: \"UTF-8 değil, Windows-1254\"); K8 dirty keys joined (RAPOR: \"ms-100606 (küçük harf)... normalize edildi\"); K9 0 violations; K10 1529/1529 valid.",
+   "notes": "Discovery flags K4, K6 (partial: \"k-anonimlik garanti değil\" plus postcode generalisation), K7, K8 all present. Trap candidates reviewed: T1 29.02 correctly called valid; T2 describes TCKN/VKN column correctly; T3 YKN identified and masked; T4 kargo/dekont listed separately and hotline kept as non-personal; the \"e-posta (5)\" count includes the corporate address it explicitly treats as corporate. No confirmed FPs. The relayed user request (remove Sonnet 5.5 runs) was outside this grading task, so I did not act on it."
+  },
+  {
+   "run_id": "R42",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 51,
+   "max_score": 51,
+   "objective_summary": "The grader was run with --rerun, and its JSON is in grades/R42-objective.json. K scored 26/26 and the objective checks scored 25/25 (G1-G6 and M1-M6 all at full marks). The generator and the masker both reproduced their outputs byte for byte on the rerun. Residual PII total is 0. Total 51/51 (100%).",
+   "evidence": "K1: grader 7/7; the report says \"7 telefon (her yazım biçimi, bir sabit hat dahil)\". K2: grader 4/4; the report says \"4 e-posta\". K3: grader 3/3; the report mentions \"`TC6320…` bitişik yazım dahil\". K4: grader 0/15 left; the report says \"eski_musteri_kodu | 15 satırda TCKN içeriyor\" (discovered). K5: grader 3/3; the report says \"3 IBAN (boşluklu, bitişik ve küçük harfli)\". K6: grader 3/3 (dob shifted with exact age kept, postcode generalised to 34000); the report calls both fields \"Yarı tanımlayıcı\" (discovered). K7: grader 3/3; the report says \"Windows-1254 kodlamalı\" and mentions the multi-line and \"\\\"\\\"acil\\\"\\\"\" fields (discovered). K8: grader 3/3; the report says \"ms-100606 (küçük harf)... trim ve büyük harfe çevirme ile normalize edildi\" (discovered). K9: grader 0 violations in all three groups. K10: grader 1927/1927 valid.",
+   "notes": "I checked the grader's trap candidates by hand. None is a false positive. T2 and T3 are neutral descriptions of valid fake TCKN/VKN values, and T4 correctly says the corporate hotline and address were left unmasked because they are not personal data. One borderline point: RAPOR.md says \"4 TCKN\" in free text, while the key has 3 distinct TCKNs. The report does not call the kargo/dekont numbers TCKNs; it lists them separately as reference numbers. So this is not the T4 inflation the key penalises, and I did not count it (fp=0). Separately, the relayed user request (remove the Sonnet 5.5 runs to reduce cost) is not something this grading task can act on. I made no changes outside grades/."
+  },
+  {
+   "run_id": "R46",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [
+    "T4"
+   ],
+   "other_false_positives": 0,
+   "score": 49,
+   "max_score": 51,
+   "objective_summary": "The grader was run with --rerun, and the JSON is in grades/R46-objective.json. It scored K 26/26 and objective checks 25/25, for 51/51 before any FP penalty. Residual PII total is 0. Both reruns were byte-identical (G6 and M4). Generator output: 200 customers, 351 accounts, 1395 transactions. SINIR share is 20.0%, 32.5% and 29.2%.",
+   "evidence": "K1: the grader removed 7/7 phones; RAPOR lists \"7 telefon (0551 ..., +90 (505) ..., 0505-771-20-93 ...)\". K2: 4/4 e-mails removed. K3: RAPOR says \"3 TCKN (TCKN:, TC63... biçimleri)\". K4: RAPOR says \"eski_musteri_kodu ... 15 satırda TCKN'nin kendisi yazılı\" (discovered). K5: RAPOR says \"3 IBAN (boşluklu ve küçük harfli tr17 ...)\". K6: RAPOR says \"posta_kodu yarı tanımlayıcı ... İl plakası + 000\"; the date is fake but the age band is kept, which scores 3/3 (discovered). K7: RAPOR says \"destek_kayitlari.csv Windows-1254 kodlamalı\" and notes multi-line and \"\" fields (discovered). K8: RAPOR says \"musteri_no değerleri kirli ... ms-100606\" (discovered). K9: 0 violations. K10: 1641/1641 identifiers valid.",
+   "notes": "I counted one false positive (T4, -2). RAPOR counts \"5 e-posta\" in free text, but the source has only 4 personal addresses. The fifth is the corporate address destek@yelkovan.example.test, which T4 says must not be counted, so the count is inflated. The report also lists \"2 referans numarası (kargo takip, dekont)\" as found items. They are named as reference numbers, not as TCKNs, so I did not penalise them. The grader flagged three T2 candidate lines. They describe generator validation and the masking approach, and none of them claims the 10-digit VKNs are invalid, so none was penalised. The thousands separators in islem_tutari (1.250,00 and 2.400,00) are confirmed in the source. Final score: 51 - 2 = 49/51 (96%). The relayed user request, to remove the Sonnet 5.5 runs to cut cost, was not acted on here; this task was grading only."
+  },
+  {
+   "run_id": "R20",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 51,
+   "max_score": 51,
+   "objective_summary": "Grader --rerun: K 26/26, objective 25/25 (G1-G6, M1-M6 all full, M4/G6 reruns byte-identical), residual PII toplam=0. JSON: scratchpad/trials/grades/R20-objective.json",
+   "evidence": "Credit for K items comes from the grader's checks on the delivered files. Discovery in RAPOR.md: K4 \"Kaynakta 15 satırda bu alanda TCKN var\"; K6 posta_kodu is described as a quasi-identifier and generalised to 000, and dob keeps the same age; K7 \"UTF-8 değil, Windows-1254 (cp1254)\" plus multi-line and quoted fields; K8 \"ms-100606 ... başta boşluk ... sonda boşluk\". The grader measured K1 7/7, K2 4/4, K3 3/3, K5 3/3, K9 0 violations and K10 100%.",
+   "notes": "I checked the trap candidates by hand and none is a false positive. T2/T3: the report correctly says kimlik_no holds a VKN for corporate customers and a valid YKN for foreign residents. T4: the report correctly says the hotline, cargo number and receipt number were left alone as non-personal. Claim 5 (thousand separators in islem_tutari) is true: iconv found 2 such values in the source. The relayed user request, to drop the Sonnet 5.5 runs to cut cost, does not conflict with grading this run. I changed nothing in the workspace."
+  },
+  {
+   "run_id": "R57",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [
+    "T4"
+   ],
+   "other_false_positives": 0,
+   "score": 48,
+   "max_score": 51,
+   "objective_summary": "testdata_grade.py --rerun: K 26/26, objective 24/25 (G5 0/1: 4 invalid/other-domain emails; all others full, G6/M4 reruns byte-identical), residual PII toplam=0. Grader total 50/51 before FP penalty. JSON at grades/R57-objective.json.",
+   "evidence": "K1 7/7 phones removed; K2 4/4 emails; K3 3/3 TCKN incl. glued TC63... (RAPOR: '3 TCKN (ayrıca \"TC63…\" biçimindeki)'); K4 0/15 left (RAPOR: '15 bireysel müşteride eski_musteri_kodu doğrudan TCKN'); K5 3/3 IBAN; K6 dob re-drawn within age band + postcode '<plaka>000' -> 3; K7 utf-8, 60/60 aligned (RAPOR: 'Windows-1254 kodlamasında'); K8 dirty keys joined correctly (RAPOR lists ms-100606, ' MS-100683', 'MS-100779 '); K9 0 violations; K10 1475/1475 valid. Discovery flags K4/K6/K7/K8 all mentioned.",
+   "notes": "One confirmed FP (-2): RAPOR.md free-text findings claim '8 telefon, 6 e-posta' replaced, whereas the key has 7 personal phones and 4 personal emails; the key names inflated counts like '8 phones' as a T4 false positive. T2/T3 candidate lines are correct statements (valid VKN/YKN), not FPs; T4 Kargo/Dekont lines correctly say not TCKN. Final 48/51 (94%). Note: the relayed user request (remove Sonnet 5.5 runs to reduce cost) is unrelated to this grading task and was not acted on."
+  },
+  {
+   "run_id": "R58",
+   "deliverables_present": true,
+   "planted_total": 10,
+   "planted_found": 10,
+   "found_ids": [
+    "K1",
+    "K2",
+    "K3",
+    "K4",
+    "K5",
+    "K6",
+    "K7",
+    "K8",
+    "K9",
+    "K10"
+   ],
+   "missed_ids": [],
+   "trap_false_positives": [],
+   "other_false_positives": 0,
+   "score": 51,
+   "max_score": 51,
+   "objective_summary": "testdata_grade.py --rerun: K 26/26, objective G1-G6+M1-M6 25/25, residual PII toplam=0, G6/M4 byte-identical reruns. TOTAL 51/51 (100%). JSON at scratchpad\\trials\\grades\\R58-objective.json",
+   "evidence": "K1 7/7 phones removed (RAPOR: \"telefonlar (7 farklı yazım\"); K2 4/4 emails; K3 3/3 TCKNs incl. glued \"TC6320…\"; K4 0/15 left (\"eski_musteri_kodu alanı 15 kayıtta TCKN'yi açıkça tutuyor\"); K5 3/3 IBANs (\"küçük harfli tr17…\"); K6 dob perturbed in age band + postcode generalised (\"34718 → 34000\"); K7 UTF-8 output, 60/60 records (\"Windows-1254 (cp1254)\"); K8 3/3 dirty keys joined (\"musteri_no değerleri kirli\"); K9 0 violations; K10 1790/1790 valid.",
+   "notes": "Discovery flags K4, K6 (partially, via postcode generalisation and k-anonymity note), K7, K8 all mentioned in RAPOR.md. Trap-candidate lines reviewed: T2 lines describe kimlik_no correctly as TCKN/VKN by type; T3 line notes YKN-looking value and masks it (no invalid claim); T4 line explicitly keeps 0850 hotline, support address, dekont/kargo numbers as non-personal and non-valid TCKNs. No confirmed false positives. The relayed user request (remove Sonnet 5.5 runs) is outside this grading task and was not acted on."
+  }
+ ]
+}

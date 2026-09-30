@@ -380,13 +380,15 @@ class AiEvalReqMapTests(unittest.TestCase):
 
     def test_precedence_category_group_owasp_default(self):
         rmap = {"default": "REQ-500", "categories": {"injection": "REQ-501", "injection_indirect": "REQ-502",
-                                                     "LLM06:2025": "REQ-503", "llm07": "REQ-504"}}
+                                                     "LLM06:2025": "REQ-503", "llm08": "REQ-504",
+                                                     "LLM10:2026": "REQ-505"}}
         with tempfile.TemporaryDirectory() as d:
             r, out, src = self.seed(d, "--req-map", write_json(Path(d) / "map.json", rmap), "--req", "REQ-900")
             self.assertEqual(r.returncode, 0, r.stderr)
             cases = [json.loads(x) for x in out.read_text(encoding="utf-8").splitlines()]
             reqs = {t["id"]: t["requirement_ids"] for t in parse(src)}
             self.assertTrue(all(not k.startswith("_") for c in cases for k in c))  # JSONL format unchanged
+            seen = set()
             for c in cases:
                 got = reqs[c["tc"]]
                 if c["category"] == "injection_direct":
@@ -394,12 +396,37 @@ class AiEvalReqMapTests(unittest.TestCase):
                 elif c["category"] == "injection_indirect":
                     self.assertEqual(got, ["REQ-502"])                       # exact category beats group
                 elif c["category"] == "excessive_agency":
-                    self.assertEqual(got, ["REQ-503"])                       # OWASP ID with year
-                elif "LLM07:2025" in c["owasp"]:
-                    self.assertEqual(got, ["REQ-504"])                       # OWASP ID without year
+                    self.assertEqual(got, ["REQ-503"])                       # 2025 ID -> same risk (LLM03:2026)
+                elif "LLM08:2026" in c["owasp"]:
+                    self.assertEqual(got, ["REQ-504"])                       # bare ID = 2026 edition
+                elif "LLM10:2026" in c["owasp"]:
+                    self.assertEqual(got, ["REQ-505"])                       # 2026 ID
                 else:
                     self.assertEqual(got, ["REQ-500"], c["id"])              # default beats --req
+                seen.add(tuple(got))
+            self.assertTrue({("REQ-503",), ("REQ-504",), ("REQ-505",)} <= seen)
             self.assertIn("requirements: ", r.stdout)
+            self.assertIn("'llm08' is read as LLM08:2026 (Hidden Context Exposure)", r.stderr)  # bare ID differs by edition
+
+    def test_owasp_keys_of_both_editions(self):
+        rmap = {"default": "REQ-600", "categories": {"LLM06": "REQ-601", "LLM07:2025": "REQ-602",
+                                                     "LLM03:2026": "REQ-603", "llm06:2025": "REQ-604",
+                                                     "LLM01": "REQ-605"}}
+        with tempfile.TemporaryDirectory() as d:
+            r, out, src = self.seed(d, "--req-map", write_json(Path(d) / "map.json", rmap),
+                                    cats="excessive_agency,unbounded,system_prompt,jailbreak")
+            self.assertEqual(r.returncode, 0, r.stderr)
+            cases = [json.loads(x) for x in out.read_text(encoding="utf-8").splitlines()]
+            reqs = {t["id"]: t["requirement_ids"] for t in parse(src)}
+            want = {"unbounded": ["REQ-601"],                  # bare LLM06 = LLM06:2026 Unbounded Consumption
+                    "system_prompt": ["REQ-602"],              # LLM07:2025 System Prompt Leakage = LLM08:2026
+                    "excessive_agency": ["REQ-603", "REQ-604"],  # LLM03:2026 and LLM06:2025 name the same risk
+                    "jailbreak": ["REQ-605"]}                  # LLM01 is the same in both editions
+            for c in cases:
+                self.assertEqual(reqs[c["tc"]], want[c["category"]], c["id"])
+            self.assertIn("'LLM06' is read as LLM06:2026 (Unbounded Consumption), not LLM06:2025", r.stderr)
+            self.assertNotIn("'LLM01'", r.stderr)                     # no warning where the editions agree
+            self.assertNotIn("not a category", r.stderr)
 
     def test_unmapped_categories_exit_2_and_write_nothing(self):
         with tempfile.TemporaryDirectory() as d:

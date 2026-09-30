@@ -86,3 +86,22 @@ node evals/trial-api/api/server.js      # http://127.0.0.1:4180, token-alice / t
 Veri taşıma denemesi için ajana yalnızca `evals/trial-migration/` altındaki iki CSV'yi ve `mapping-spec.md`'yi verin.
 
 Kör denemeyi doğru kurmak (klasörü repo dışına kopyalamak, cevap anahtarını ajandan uzak tutmak) ve puanlamak için: [evals/README.md](../evals/README.md).
+
+## 7. 0.7.0 kör denemeleri: skill'li ve skill'siz karşılaştırma (30 koşu)
+- **Kurulum:** Bağımsız tasarlanmış 5 deneme × skill'li/skill'siz × 3 tekrar. Model Opus 5.5, maliyeti düşürmek için düşük çaba (low) ayarında. Her koşuyu, hangi koldan geldiğini bilmeyen ayrı bir değerlendirici cevap anahtarına göre puanladı. Ham veri: `evals/results/trials-0.7.0.json`.
+- **Sonuçlar** (medyan puan %, parantezde koşu başına yanlış alarm):
+
+| Deneme | Skill'li | Skill'siz | Yorum |
+|---|---|---|---|
+| Excel test seti incelemesi | **96** (0,0,0) | 92 (0,0,3) | Skill daha tutarlı; yanlış alarm yok |
+| Yapay zekâ chatbot testi | **65** | 59 | Küçük artış; iki kol da zor bulgularda eksik |
+| Keşif testi | 81 | **90** | **Skill bu denemede katkı sağlamadı, geride kaldı** |
+| Mobil test planı incelemesi | 100 | 100 | Tavan etkisi; görev ayırt edici değil |
+| Test verisi ve maskeleme | 96 | **100** | Skill'li kolda 2 küçük yanlış alarm |
+
+- **Dürüst yorum:** Güçlü bir modelde bu 4 skill'in katkısı sınırlı; Excel incelemesinde ve AI testinde küçük bir fayda var, keşif testinde ise olumsuz etki görüldü. Skill'ler daha çok tutarlılık sağlıyor (daha düşük varyans), daha fazla hata bulmuyor. Bu yüzden keşif testi, mobil ve test verisi skill'leri **deneysel** etiketini koruyor.
+- **Sınırlar:**
+  - Koşu başına n=3. Düşük çaba ayarı kullanıldı. Sonnet ve Haiku ile koşulmadı.
+  - Yarıda kesilen ilk çalıştırmadan kalan dosyalar bazı çalışma klasörlerinde kalmış olabilir (en az bir koşu önceki raporu yeniden kullandı).
+  - Mobil ve test verisi denemeleri tavana dayandı; daha zor sürümleri gerekiyor.
+- **Yönlendirme (0.7.0, açıklamalar kısaltıldıktan sonra):** 84/84; Opus ile 2 kez, Haiku ile 2 kez.
