@@ -5,7 +5,7 @@
   },
   "metadata": {
     "description": "QA Suite: professional software testing skills (TR/EN) - requirements analysis, ISTQB test design, API/mobile/AI/migration/exploratory testing, test data, traceability, Xray/Zephyr/TestRail/Azure DevOps/Qase export, Playwright/BDD automation, NFR (k6, WCAG, ASVS), reporting and review.",
-    "version": "0.6.0"
+    "version": "0.7.0"
   },
   "plugins": [
     {

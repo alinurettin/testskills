@@ -4,7 +4,7 @@ description: Builds a requirements traceability matrix (RTM) from QA artifacts, 
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.6.0"
+  version: "0.7.0"
 ---
 
 # Tracing requirements

@@ -4,7 +4,7 @@ description: Prepares test data by deriving each test case's needs, generating d
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.6.0"
+  version: "0.7.0"
 ---
 
 # Preparing test data

@@ -1,5 +1,15 @@
 # Değişiklik günlüğü
 
+**0.7.0**: Derinleştirme, kanıt ve paylaşım hazırlığı
+- Skill açıklamaları 15.079 karakterden 7.441'e kısaltıldı (skill listesi bütçesi); CI bütçeyi koruyor.
+- `--req-map`: API, mobil, NFR ve AI üreticilerinde testler doğru gereksinime bağlanıyor; veri taşıma sonuçları `results.json`/RTM'ye akıyor; uçtan uca zincir testi.
+- Ortak `tr_ids.py` (TCKN/VKN/IBAN) ve kimlik politikası; ortak `junit_results.py` (Selenium, Cypress, pytest, REST Assured...); `.xlsx` inceleme importu.
+- Export formatları üretici dokümanlarıyla doğrulandı (Zephyr etiket ayracı artık virgül: kırıcı değişiklik); import kiti ve golden testler.
+- `docs/volatile-facts.json` + CI uyarısı; Play API 36, Node 22+, AB AI Act güncellendi. Xray `requirements` notu yalnızca Jira anahtarı taşıyor.
+- Hızlı başlangıç, manuel test rehberi, gizlilik bölümü, CONTRIBUTING, issue şablonları; cevap anahtarları `evals/keys/`.
+- 5 yeni bağımsız kör deneme; skill'li/skill'siz 30 koşu (sonuçlar karışık, bkz. `docs/EVALUATION.md` §7).
+- 266 test.
+
 **0.6.0**: Faz 5, kapsam genişletme ve kör denemeler
 - **6 yeni skill, toplam 17:**
   - `testing-apis`: OpenAPI 3'ten sözleşme testleri ve aynı TC ID'leriyle koşturulabilir Playwright API paketi üretir. Kapsamı: şema kontrolü, sınır/enum/tip/pattern testleri, 401 ve `Bearer`'sız başlık, yol ve gövde düzeyinde BOLA, önce oluşturup sonra okuma, hata gövdesi şeması, sözleşme boşluğu soruları, istek/yanıt kanıtı.
