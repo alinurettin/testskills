@@ -4,7 +4,7 @@ description: Exports QA Suite test-cases.json into validated import files for Xr
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.0"
+  version: "0.7.1"
 ---
 
 # Exporting test cases
@@ -81,6 +81,8 @@ When all requirements come from one Jira story or epic, derived and split requir
    - The re-import caveat: importers create new issues, so export only new tests next time.
 
 ## Encoding and locale
+
+- **CSV formula injection (CWE-1236):** cells starting with `=`, `+`, `@`, TAB/CR, or `-` followed by a non-space are prefixed with `'` so Excel never evaluates them. Plain negative numbers and `- ` bullet lists stay unchanged. Use `--no-formula-escape` only for a trusted importer that needs the raw text.
 
 - Xray, Zephyr, TestRail, Azure DevOps and Qase: plain UTF-8, delimiter `,` by default. Choose UTF-8 in the importer.
 - Generic CSV for Excel: written **with a BOM** automatically, so Excel shows `ç ğ ı İ ö ş ü` correctly. Excel in a Turkish locale expects `;` as the delimiter, so use `--delimiter ";"`.

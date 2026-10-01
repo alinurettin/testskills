@@ -4,7 +4,7 @@ description: Runs the whole QA Suite chain from requirements through analysis, r
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.0"
+  version: "0.7.1"
 ---
 
 # QA Suite orchestrator

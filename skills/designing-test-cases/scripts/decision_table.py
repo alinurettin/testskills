@@ -125,6 +125,15 @@ def run(spec: dict, coverage: str, lang: str) -> dict:
     infeasible = spec.get("infeasible", [])
     names = [c["name"] for c in conds]
 
+    size = 1
+    for c in conds:
+        size *= len(c["values"])
+    limit = int(spec.get("max_combinations", MAX_COMBINATIONS))
+    if size > limit:
+        raise ValueError(f"{size} combinations ({len(conds)} conditions) exceed the limit of {limit}. "
+                         "Split the rule set into independent tables, merge condition values into "
+                         "equivalence classes, or use pairwise.py for configuration-style factors. "
+                         "Raise the limit with --max-combinations only if you really need the full table.")
     combos = [dict(zip(names, vals)) for vals in itertools.product(*[c["values"] for c in conds])]
     table, gaps, conflicts, overlaps = [], [], [], []
     used_rules: set[str] = set()
@@ -230,6 +239,9 @@ def to_md(res: dict, lang: str) -> str:
     return "\n".join(o) + "\n"
 
 
+MAX_COMBINATIONS = 2048
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("spec")
@@ -237,9 +249,12 @@ def main() -> int:
     ap.add_argument("--lang", choices=["en", "tr"])
     ap.add_argument("--format", choices=["md", "json"], default="md")
     ap.add_argument("--out")
+    ap.add_argument("--max-combinations", type=int, help=f"guard against combinatorial explosion (default {MAX_COMBINATIONS})")
     a = ap.parse_args()
     try:
         spec = json.loads(Path(a.spec).read_text(encoding="utf-8-sig"))
+        if a.max_combinations:
+            spec["max_combinations"] = a.max_combinations
         lang = a.lang or spec.get("language", "en")
         lang = lang if lang in T else "en"
         res = run(spec, a.coverage, lang)

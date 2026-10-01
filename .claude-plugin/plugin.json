@@ -1,6 +1,6 @@
 {
   "name": "qa-suite",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Professional software testing skills (TR/EN): test planning, requirements analysis, risk-based ISTQB test design computed by scripts, API contract and authorization testing from OpenAPI, exploratory sessions (SBTM), mobile, AI/LLM feature and data-migration testing, test data generation and masking, non-functional testing (k6, WCAG 2.2, OWASP ASVS 5.0), traceability and regression selection, Xray/Zephyr/TestRail/Azure DevOps/Qase/Excel export, Playwright + BDD automation, defect and completion reporting, and test-suite review.",
   "author": {
     "name": "Ali Nurettin Demir",

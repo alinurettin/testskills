@@ -1,5 +1,12 @@
 # Değişiklik günlüğü
 
+**0.7.1**: Dış (Gemini) incelemesinden gelen sağlamlaştırma
+- **Export:** CSV formül enjeksiyonu (CWE-1236) kapatıldı. Riskli hücrelerin başına `'` ekleniyor; madde işaretleri ve negatif sayılar korunuyor; eski davranış için `--no-formula-escape`.
+- **`openapi_tests.py`:** OpenAPI 3.1'deki `type: ["string","null"]` gibi tip listelerinde artık çökmüyor.
+- **`decision_table.py`:** Kombinasyon patlamasına karşı sınır eklendi (varsayılan 2048, değiştirmek için `--max-combinations`); aşıldığında yol gösteren bir hata mesajı veriyor.
+- **`ep_bva.py`:** Sıfır veya negatif adım (`step`) ile ters aralık (min > max) artık hata kodu 2 ile reddediliyor.
+- **Testler:** `tests/test_hardening.py` eklendi.
+
 **0.7.0**: Derinleştirme, kanıt ve paylaşım hazırlığı
 - Skill açıklamaları 15.079 karakterden 7.441'e kısaltıldı (skill listesi bütçesi); CI bütçeyi koruyor.
 - `--req-map`: API, mobil, NFR ve AI üreticilerinde testler doğru gereksinime bağlanıyor; veri taşıma sonuçları `results.json`/RTM'ye akıyor; uçtan uca zincir testi.

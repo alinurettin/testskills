@@ -88,6 +88,8 @@ class Scale:
             self.step = Decimal(str(step or "0.01"))
         else:
             self.step = int(step or 1)
+        if self.step <= (dt.timedelta(0) if ptype == "date" else 0):
+            raise ValueError(f"step must be greater than zero (got {step!r})")
 
     def parse(self, v):
         if v is None:
@@ -157,6 +159,8 @@ def build_partitions(p: dict, sc: Scale, t: dict, warnings: list[str]) -> list[d
         return filled
 
     lo, hi = sc.parse(p.get("min")), sc.parse(p.get("max"))
+    if lo is not None and hi is not None and lo > hi:
+        raise ValueError(f"parameter '{name}': min {p.get('min')} is greater than max {p.get('max')}")
     floor = sc.parse(p.get("domain_min"))
     if p["type"] == "length" and floor is None:
         floor = 0

@@ -133,7 +133,15 @@ class Resolver:
                     merged["properties"].update(s.get("properties", {}))
                     merged["required"] += s.get("required", [])
                 return merged
-            return {k: self(v, depth + 1) for k, v in node.items()}
+            out = {k: self(v, depth + 1) for k, v in node.items()}
+            if isinstance(out.get("type"), list):  # OpenAPI 3.1: type: ["string", "null"]
+                types = [x for x in out["type"] if x != "null"]
+                if "null" in out["type"]:
+                    out["nullable"] = True
+                out["type"] = types[0] if types else "null"
+                if len(types) > 1:
+                    out["x-other-types"] = types[1:]
+            return out
         if isinstance(node, list):
             return [self(x, depth + 1) for x in node]
         return node

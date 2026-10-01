@@ -4,7 +4,7 @@ description: Turns user stories, PRD/SRS documents or tickets into atomic, testa
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.0"
+  version: "0.7.1"
 ---
 
 # Analyzing requirements

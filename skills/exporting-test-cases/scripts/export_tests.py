@@ -185,10 +185,26 @@ def labels_for(t: dict) -> list[str]:
     return list(dict.fromkeys(ls))
 
 
+FORMULA_START = ("=", "+", "@", "\t", "\r")
+NUMBER = re.compile(r"^-\d+([.,]\d+)?$")
+ESCAPE_FORMULAS = True  # set from --no-formula-escape
+
+
+def safe_cell(v):
+    """Neutralise spreadsheet formulas (CSV injection, CWE-1236): prefix ' to cells that start with
+    = + @ TAB CR, or with - followed by a non-space (a formula like -2+3+cmd|...), unless the cell is a plain
+    negative number (-150 or -150,00). "- item" bullet lists stay unchanged."""
+    if not ESCAPE_FORMULAS or not isinstance(v, str) or not v:
+        return v
+    if v.startswith(FORMULA_START) or (v.startswith("-") and len(v) > 1 and not v[1].isspace() and not NUMBER.match(v)):
+        return "'" + v
+    return v
+
+
 def csv_text(rows: list[list], delimiter: str) -> str:
     buf = io.StringIO()
     w = csv.writer(buf, delimiter=delimiter, quoting=csv.QUOTE_MINIMAL, lineterminator="\r\n")
-    w.writerows(rows)
+    w.writerows([[safe_cell(c) for c in r] for r in rows])
     return buf.getvalue()
 
 
@@ -579,6 +595,8 @@ def main() -> int:
     ap.add_argument("--tests", required=True)
     ap.add_argument("--requirements")
     ap.add_argument("--format", required=True, choices=["xray", "zephyr", "testrail", "azure-devops", "qase", "csv", "xlsx", "markdown"])
+    ap.add_argument("--no-formula-escape", action="store_true",
+                    help="write cells starting with = + - @ unchanged (default: prefix ' against CSV formula injection)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--delimiter", default=",")
     ap.add_argument("--list-delimiter", help="separator for multi-value cells (labels, keys); default ';' for xray, "
@@ -601,6 +619,8 @@ def main() -> int:
     ap.add_argument("--lang", choices=["en", "tr"])
     sys.stdout.reconfigure(encoding="utf-8")
     a = ap.parse_args()
+    global ESCAPE_FORMULAS
+    ESCAPE_FORMULAS = not a.no_formula_escape
     if a.list_delimiter is None:
         a.list_delimiter = LIST_DELIMITER.get(a.format, ";")
     try:
