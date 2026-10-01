@@ -4,7 +4,7 @@ description: Tests LLM and generative-AI features (chatbots, RAG, agents) with a
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Testing AI features
@@ -23,7 +23,7 @@ Match the user's language (`--lang tr|en`). Check types, OWASP IDs, JSON keys an
 
 ## Reading plan
 - This file covers the workflow.
-- Read `references/ai-testing.md` before designing beyond the starter dataset. It covers non-determinism statistics, golden sets, the assertion ladder and LLM-as-judge calibration, RAG metrics, the OWASP LLM Top 10 (2025) test ideas, agents, bias, cost and latency, regression on model change, monitoring, and EU AI Act awareness.
+- Read `references/ai-testing.md` before designing beyond the starter dataset. It covers non-determinism statistics, golden sets, the assertion ladder and LLM-as-judge calibration, RAG metrics, the OWASP LLM Top 10 (2026, with 2025 IDs) test ideas, agents, bias, cost and latency, regression on model change, monitoring, and EU AI Act awareness.
 - Use `assets/rubric-template.md` for every rubric (model-graded or human) check.
 - The compact format syntax is at `python scripts/qa_compact.py --help`.
 
@@ -133,7 +133,7 @@ Correctness, completeness, tone and faithfulness need judgement. Use `assets/rub
 Follow `references/ai-testing.md`:
 - **RAG:** retrieval hit rate and recall@k on labelled questions, context precision and recall, faithfulness (every claim supported by the retrieved text), citation correctness, "I don't know" behaviour when nothing relevant is retrieved, and document-level permissions (OWASP LLM08).
 - **Agents:** tools run with the user's permissions, confirmations are enforced server-side, arguments are validated, and loops and steps are capped. Tool calls to backend APIs are API tests too: see the testing-apis skill (BOLA through the agent).
-- **Security:** walk through all ten OWASP LLM 2025 risks, including those the seed cannot cover (LLM03 supply chain, LLM04 poisoning, LLM05 output handling in the UI). The testing-nonfunctional skill covers classic web security and load (k6).
+- **Security:** walk through all ten OWASP LLM 2026 risks, including those the seed cannot cover (LLM04 supply chain, LLM05 poisoning, LLM10 output handling in the UI). The testing-nonfunctional skill covers classic web security and load (k6).
 - **Bias and toxicity:** paired (counterfactual) probes that change only a name or group cue, a toxicity classifier or human rating, and results reported by group.
 
 ### 7. Regression, monitoring, reporting
@@ -151,4 +151,4 @@ Follow `references/ai-testing.md`:
 - `scripts/ai_eval.py`: `seed` writes a starter TR/EN dataset (JSONL, optional compact test cases linked to REQs per category via `--req-map`). `score` evaluates repeated runs with deterministic checks and reports pass rates, flaky cases, per-category rates, latency p50/p95 and tokens. It gates the release (exit 1), and writes a Markdown/JSON report and `results.json`.
 - `scripts/qa_compact.py`: compact ⇄ JSON.
 - `assets/rubric-template.md`: model-graded and human rubric template, with judge prompt, calibration procedure and log.
-- `references/ai-testing.md`: non-determinism and statistics, datasets, the assertion ladder, LLM-as-judge, RAG, OWASP LLM Top 10 (2025), agents, bias, privacy, cost and latency, regression, monitoring, EU AI Act awareness, reporting.
+- `references/ai-testing.md`: non-determinism and statistics, datasets, the assertion ladder, LLM-as-judge, RAG, OWASP LLM Top 10 (2026, with 2025 IDs), agents, bias, privacy, cost and latency, regression, monitoring, EU AI Act awareness, reporting.

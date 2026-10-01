@@ -4,7 +4,7 @@ description: Plans and reports session-based exploratory testing (SBTM). Writes 
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Running exploratory tests

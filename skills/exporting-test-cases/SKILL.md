@@ -4,7 +4,7 @@ description: Exports QA Suite test-cases.json into validated import files for Xr
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Exporting test cases

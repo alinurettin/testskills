@@ -77,5 +77,42 @@ class HardeningTests(unittest.TestCase):
                 self.assertIn("error:", r.stderr)
 
 
+class InternationalDataTests(unittest.TestCase):
+    def test_new_types_are_valid(self):
+        sys.path.insert(0, str(SK / "preparing-test-data" / "scripts"))
+        import tr_ids
+        with tempfile.TemporaryDirectory() as d:
+            schema = Path(d) / "s.json"
+            schema.write_text(json.dumps({"fields": [
+                {"name": "card", "type": "card_test"}, {"name": "us", "type": "phone_intl", "country": "US"},
+                {"name": "gb", "type": "phone_intl", "country": "GB"},
+                {"name": "iban", "type": "iban", "country": "DE"}, {"name": "nl", "type": "iban", "country": "NL"}]}),
+                encoding="utf-8")
+            out = Path(d) / "o.csv"
+            r = run(SK / "preparing-test-data/scripts/gen_data.py", "--schema", schema, "--rows", 200, "--seed", 7, "--out", out)
+            self.assertEqual(r.returncode, 0, r.stderr)
+            rows = list(csv.DictReader(io.StringIO(out.read_text(encoding="utf-8-sig"))))
+            published = {c for v in tr_ids.TEST_CARDS.values() for c in v}
+            for row in rows:
+                self.assertIn(row["card"], published)
+                self.assertTrue(tr_ids.luhn_ok(row["card"]))
+                self.assertRegex(row["us"], r"^\+1\d{3}5550(1\d\d)$")   # NANPA fictional 555-0100..0199
+                self.assertRegex(row["gb"], r"^\+447700900\d{3}$")       # Ofcom drama range
+                self.assertTrue(tr_ids.is_valid_iban(row["iban"]) and row["iban"].startswith("DE"))
+                self.assertTrue(tr_ids.is_valid_iban(row["nl"]))
+        self.assertFalse(tr_ids.luhn_ok("4111111111111112"))
+
+
+class SecurityProbeTests(unittest.TestCase):
+    def test_probes_are_opt_in(self):
+        doc = SK.parent / "evals" / "trial-api" / "api" / "openapi.json"
+        with tempfile.TemporaryDirectory() as d:
+            for flag, expect in ((None, False), ("--security-probes", True)):
+                args = [doc, "--req", "REQ-1", "--out", Path(d) / "o.md", "--spec-out", Path(d) / "o.ts"] + ([flag] if flag else [])
+                self.assertEqual(run(SK / "testing-apis/scripts/openapi_tests.py", *args).returncode, 0)
+                ts = (Path(d) / "o.ts").read_text(encoding="utf-8")
+                self.assertEqual("' OR '1'='1' --" in ts and "<script>alert(1)</script>" in ts, expect)
+
+
 if __name__ == "__main__":
     unittest.main()

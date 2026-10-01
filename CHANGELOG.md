@@ -1,5 +1,10 @@
 # Değişiklik günlüğü
 
+**0.8.0**: Uluslararası test verisi, API güvenlik denemeleri, OWASP LLM 2026
+- `preparing-test-data`: `card_test` (yalnızca yayımlanmış sandbox test kartları, Luhn), `phone_intl` (ABD/İngiltere kurgusal numara aralıkları), `iban` (TR, DE, GB, FR, NL, ES, IT için mod-97). Ortak `tr_ids.py`'ye `luhn_ok` ve `gen_iban` eklendi.
+- `testing-apis`: isteğe bağlı `--security-probes` ile işlem başına bir SQL enjeksiyonu ve bir XSS denemesi (5xx yok, veritabanı hatası sızmıyor, HTML'de kaçırılmamış betik yok).
+- `testing-ai-features`: OWASP LLM Top 10 2026 birincil sürüm; 2025 kimlikleri çapraz referans olarak korunuyor (referans tablosu ve README güncellendi).
+
 **0.7.1**: Dış (Gemini) incelemesinden gelen sağlamlaştırma
 - **Export:** CSV formül enjeksiyonu (CWE-1236) kapatıldı. Riskli hücrelerin başına `'` ekleniyor; madde işaretleri ve negatif sayılar korunuyor; eski davranış için `--no-formula-escape`.
 - **`openapi_tests.py`:** OpenAPI 3.1'deki `type: ["string","null"]` gibi tip listelerinde artık çökmüyor.

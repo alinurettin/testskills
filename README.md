@@ -1,6 +1,6 @@
 # QA Suite: Yapay zekâ için profesyonel yazılım test skill'leri
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.7.1-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.8.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[English README →](README.en.md)**
 
@@ -67,7 +67,7 @@ Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVAL
 | `reviewing-test-cases` | Excel/TestRail CSV içe aktarımı ve test kalitesi denetimi |
 | `testing-apis` | OpenAPI 3'ten sözleşme testleri ve aynı TC ID'leriyle koşturulabilir Playwright API paketi: şema kontrolü, sınırlar, BOLA, sözleşme boşluğu soruları, istek/yanıt kanıtı |
 | `running-exploratory-tests` **(deneysel)** | Oturum bazlı keşif testi: riske göre sıralı görev kartları (charter), sezgisel yöntemler (SFDIPOT, FEW HICCUPPS, turlar), oturum notlarından özet, hata ve regresyon testi |
-| `testing-ai-features` **(deneysel)** | LLM, chatbot ve RAG testi: saldırgan eval seti (OWASP LLM Top 10 2025, TR/EN), tekrarlı koşularda deterministik puanlama, kararsızlık ve yayın kapısı |
+| `testing-ai-features` **(deneysel)** | LLM, chatbot ve RAG testi: saldırgan eval seti (OWASP LLM Top 10 2026, TR/EN), tekrarlı koşularda deterministik puanlama, kararsızlık ve yayın kapısı |
 | `preparing-test-data` **(deneysel)** | Geçerli TCKN/VKN/IBAN'lı, ilişkisel bütünlüklü sentetik veri; üretim extract'larının deterministik maskelenmesi (KVKK/GDPR) |
 | `testing-mobile-apps` **(deneysel)** | iOS/Android kontrol listeleri (yaşam döngüsü, kesintiler, izinler, çevrimdışı, MASVS, erişilebilirlik), kullanım payından cihaz matrisi, JUnit → sonuçlar |
 | `testing-data-migrations` | Kaynak–hedef mutabakatı (anahtarlar, alanlar, kontrol toplamları, Türkçe karakter kodlama tuzakları), SQL şablonları, imza kriterleri |

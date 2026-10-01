@@ -7,7 +7,7 @@
 4. Eval datasets and golden sets
 5. The assertion ladder: deterministic, model-graded, human
 6. RAG quality
-7. Security: OWASP Top 10 for LLM Applications 2025
+7. Security: OWASP Top 10 for LLM Applications 2026 (with 2025 IDs)
 8. Agents and tool use
 9. Bias, fairness and toxicity
 10. Privacy and personal data
@@ -135,22 +135,22 @@ More checks:
 
 Example frameworks teams use for these metrics are RAGAS, DeepEval, promptfoo and TruLens. They are not required; ask before installing anything.
 
-## 7. Security: OWASP Top 10 for LLM Applications 2025
+## 7. Security: OWASP Top 10 for LLM Applications 2026 (with 2025 IDs)
 
-**A 2026 edition exists (published August 2026, verified 2026-09-30).** It keeps the same themes but re-ranks them, so the IDs change: LLM01 Prompt Injection and LLM02 Sensitive Information Disclosure stay; Excessive Agency is now LLM03 (was LLM06), Supply Chain LLM04 (was LLM03), Data and Model Poisoning LLM05 (was LLM04), Unbounded Consumption LLM06 (was LLM10), Misinformation LLM07 (was LLM09), **Hidden Context Exposure** LLM08 (System Prompt Leakage, was LLM07, renamed and broadened), Vector and Embedding Weaknesses LLM09 (was LLM08), Improper Output Handling LLM10 (was LLM05). The seed and `ai_eval.py` still tag cases with the 2025 IDs below; when a report must cite the 2026 list, translate with this mapping and say which edition you cite.
+**Primary edition: 2026** (official page https://genai.owasp.org/resource/owasp-genai-llm-top-10-2026/, published August 2026; ranking confirmed by https://www.helpnetsecurity.com/2026/08/06/owasp-2026-llm-top-10-released/). The 2026 list re-ranks the 2025 risks, and System Prompt Leakage is broadened into **Hidden Context Exposure**. `ai_eval.py` tags cases with 2026 IDs and keeps the 2025 IDs as a cross-reference; the table gives both.
 
-| ID | Risk | What to test | Where |
-|---|---|---|---|
-| LLM01:2025 | Prompt Injection | Direct (user text), indirect (documents, web pages, e-mails, tool results), encoded (Base64), multilingual and role-play variants. Check effects, not only words: markers, links, tool calls | seed: `injection_direct`, `injection_indirect`, `jailbreak`, `multilingual` |
-| LLM02:2025 | Sensitive Information Disclosure | Other users' data, secrets in context, training data memorisation, PII in logs and in error messages | seed: `pii`; `no_pii` check; log review |
-| LLM03:2025 | Supply Chain | Model provenance and licence, pinned model versions, third-party model hubs, plugins and MCP servers, fine-tuning adapters, an AI bill of materials | review/checklist; not testable by prompts |
-| LLM04:2025 | Data and Model Poisoning | Provenance of fine-tuning and RAG data, who can add documents to the index, backdoor triggers in fine-tuned models | review plus planted-document tests in a test index |
-| LLM05:2025 | Improper Output Handling | LLM output treated as untrusted: HTML/markdown rendering (XSS, image exfiltration), output passed to SQL, shell, file paths or URLs (SSRF), JSON consumed without validation | seed: markdown-image case, `json_valid`; UI and API tests (testing-nonfunctional, testing-apis skills) |
-| LLM06:2025 | Excessive Agency | Too many tools, too broad permissions, actions without confirmation; the agent acting on injected instructions | seed: `excessive_agency`; §8 |
-| LLM07:2025 | System Prompt Leakage | Extraction attempts detected with a canary; more importantly, **no secrets, keys or authorisation logic in the system prompt at all** | seed: `system_prompt`, canary |
-| LLM08:2025 | Vector and Embedding Weaknesses | Cross-user or cross-tenant retrieval, missing document-level access control, poisoned embeddings, embedding inversion | two-user RAG tests (§6) |
-| LLM09:2025 | Misinformation | Hallucination, false premises, fabricated citations, overreliance (no uncertainty signalled) | seed: `hallucination`; faithfulness and citation metrics |
-| LLM10:2025 | Unbounded Consumption | Huge inputs, output loops, many parallel requests, cost exhaustion ("denial of wallet"), model extraction via mass querying | seed: `unbounded`; rate limit and quota tests at the API; load tests (testing-nonfunctional) |
+| 2026 ID | 2025 ID | Risk | What to test | Where |
+|---|---|---|---|---|
+| LLM01:2026 | LLM01:2025 | Prompt Injection | Direct (user text), indirect (documents, web pages, e-mails, tool results), encoded (Base64), multilingual and role-play variants. Check effects, not only words: markers, links, tool calls | seed: `injection_direct`, `injection_indirect`, `jailbreak`, `multilingual` |
+| LLM02:2026 | LLM02:2025 | Sensitive Information Disclosure | Other users' data, secrets in context, training data memorisation, PII in logs and in error messages | seed: `pii`; `no_pii` check; log review |
+| LLM03:2026 | LLM06:2025 | Excessive Agency | Too many tools, too broad permissions, actions without confirmation; the agent acting on injected instructions | seed: `excessive_agency`; §8 |
+| LLM04:2026 | LLM03:2025 | Supply Chain | Model provenance and licence, pinned model versions, third-party model hubs, plugins and MCP servers, fine-tuning adapters, an AI bill of materials | review/checklist; not testable by prompts |
+| LLM05:2026 | LLM04:2025 | Data and Model Poisoning | Provenance of fine-tuning and RAG data, who can add documents to the index, backdoor triggers in fine-tuned models | review plus planted-document tests in a test index |
+| LLM06:2026 | LLM10:2025 | Unbounded Consumption | Huge inputs, output loops, many parallel requests, cost exhaustion ("denial of wallet"), model extraction via mass querying | seed: `unbounded`; rate limit and quota tests at the API; load tests (testing-nonfunctional) |
+| LLM07:2026 | LLM09:2025 | Misinformation | Hallucination, false premises, fabricated citations, overreliance (no uncertainty signalled) | seed: `hallucination`; faithfulness and citation metrics |
+| LLM08:2026 | LLM07:2025 | System Prompt Leakage | Extraction attempts detected with a canary; more importantly, **no secrets, keys or authorisation logic in the system prompt at all** | seed: `system_prompt`, canary |
+| LLM09:2026 | LLM08:2025 | Vector and Embedding Weaknesses | Cross-user or cross-tenant retrieval, missing document-level access control, poisoned embeddings, embedding inversion | two-user RAG tests (§6) |
+| LLM10:2026 | LLM05:2025 | Improper Output Handling | LLM output treated as untrusted: HTML/markdown rendering (XSS, image exfiltration), output passed to SQL, shell, file paths or URLs (SSRF), JSON consumed without validation | seed: markdown-image case, `json_valid`; UI and API tests (testing-nonfunctional, testing-apis skills) |
 
 Notes:
 - **Test effects, not words.** An injection that the model "refuses" in text but that still triggers a tool call has succeeded. Check tool calls, rendered output and side effects.

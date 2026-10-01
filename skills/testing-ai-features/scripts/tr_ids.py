@@ -230,3 +230,41 @@ def invalid_variants(kind: str, value: str) -> list[tuple[str, str, str]]:
             (s.lower(), "lower case (accept after normalising? clarify)", "clarify"),
             (" ".join(s[i:i + 4] for i in range(0, len(s), 4)), "grouped with spaces (usually accepted)", "clarify"),
             ("DE" + s[2:], "wrong country code", "invalid")]
+
+
+# ---------------------------------------------------------------- international (0.7.2)
+# Payment card numbers: only PUBLISHED TEST numbers (Visa/Mastercard/Amex test PANs listed by payment
+# providers for sandbox use, e.g. https://docs.stripe.com/testing). They pass Luhn but are never real cards.
+TEST_CARDS = {
+    "visa": ["4111111111111111", "4242424242424242", "4012888888881881"],
+    "mastercard": ["5555555555554444", "5105105105105100", "2223003122003222"],
+    "amex": ["378282246310005", "371449635398431"],
+}
+
+
+def luhn_ok(value) -> bool:
+    """Luhn (mod 10) check used by payment card numbers and IMEIs. Spaces and dashes are ignored."""
+    d = re.sub(r"[\s-]", "", str(value))
+    if not d.isdigit() or len(d) < 2:
+        return False
+    total = 0
+    for i, ch in enumerate(reversed(d)):
+        n = int(ch)
+        if i % 2:
+            n = n * 2 - 9 if n > 4 else n * 2
+        total += n
+    return total % 10 == 0
+
+
+# BBAN layouts (n = digit, a = upper-case letter) for synthetic IBANs. Only mod-97 is guaranteed;
+# national check digits inside the BBAN (e.g. the French RIB key) are not computed.
+IBAN_BBAN = {"TR": "nnnnn0nnnnnnnnnnnnnnnn", "DE": "nnnnnnnnnnnnnnnnnn", "GB": "aaaannnnnnnnnnnnnn",
+             "FR": "nnnnnnnnnnnnnnnnnnnnnnn", "NL": "aaaannnnnnnnnn", "ES": "nnnnnnnnnnnnnnnnnnnn",
+             "IT": "annnnnnnnnnnnnnnnnnnnnnn"}
+
+
+def gen_iban(rng, country: str = "TR") -> str:
+    """A mod-97-valid synthetic IBAN for one of IBAN_BBAN's countries. Can coincide with a real account."""
+    layout = IBAN_BBAN[country.upper()]
+    bban = "".join(str(rng.randint(0, 9)) if c == "n" else (chr(rng.randint(65, 90)) if c == "a" else c) for c in layout)
+    return country.upper() + iban_check_digits(country.upper(), bban) + bban

@@ -4,7 +4,7 @@ description: Tests data migrations, ETL pipelines and system replacements agains
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Testing data migrations

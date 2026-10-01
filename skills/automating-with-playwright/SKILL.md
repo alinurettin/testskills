@@ -4,7 +4,7 @@ description: Turns QA Suite test cases into Playwright TypeScript automation tha
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Automating with Playwright

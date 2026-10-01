@@ -4,7 +4,7 @@ description: Prepares test data by deriving each test case's needs, generating d
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Preparing test data
@@ -78,6 +78,7 @@ python scripts/gen_data.py --schema customers.json --rows 5000 --seed 7 --format
 - **Types:**
   - `seq`, `first_name`, `last_name`, `full_name`, `email`, `uuid`, `ref`;
   - `phone_tr`, `tckn`, `vkn`, `iban_tr`, `city_tr`, `postcode_tr`;
+  - international: `card_test` (only published sandbox test card numbers, Luhn-valid; edge rows add a Luhn-invalid one), `phone_intl` (US 555-0100..0199 and UK 07700 900xxx fictional ranges, or TR), `iban` (mod-97-valid for TR, DE, GB, FR, NL, ES, IT; national BBAN check digits such as the French RIB key are not computed);
   - `int`, `decimal`, `date`, `datetime`, `enum`, `bool`, `text`.
   The name lists include Turkish characters (Işıl, Çağrı, Gökçe, Şükrü).
 - **Determinism:** the same schema and seed produce the same file. Put the seed in defect reports.

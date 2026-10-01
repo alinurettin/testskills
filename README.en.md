@@ -1,6 +1,6 @@
 # QA Suite: professional software-testing skills for AI agents
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.7.1-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.8.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[Türkçe README →](README.md)**
 
@@ -67,7 +67,7 @@ Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/E
 | `reviewing-test-cases` | Imports Excel or TestRail CSV exports and audits the tests' quality |
 | `testing-apis` | OpenAPI 3 → contract tests and an executable Playwright API suite with the same TC IDs: schema checks, boundaries, BOLA, contract-gap questions, request/response evidence |
 | `running-exploratory-tests` **(experimental)** | Session-based exploratory testing: risk-ranked charters, heuristics (SFDIPOT, FEW HICCUPPS, tours), session sheets → summary, defects and regression tests |
-| `testing-ai-features` **(experimental)** | LLM, chatbot and RAG testing: an adversarial eval set (OWASP LLM Top 10 2025, TR/EN), deterministic scoring over repeated runs, flakiness and a release gate |
+| `testing-ai-features` **(experimental)** | LLM, chatbot and RAG testing: an adversarial eval set (OWASP LLM Top 10 2026, TR/EN), deterministic scoring over repeated runs, flakiness and a release gate |
 | `preparing-test-data` **(experimental)** | Synthetic data with valid TCKN/VKN/IBAN and referential integrity; deterministic masking of production extracts (KVKK/GDPR) |
 | `testing-mobile-apps` **(experimental)** | iOS/Android checklists (lifecycle, interruptions, permissions, offline, MASVS, accessibility), a device matrix from usage share, JUnit → results |
 | `testing-data-migrations` | Source–target reconciliation (keys, fields, control totals, Turkish encoding traps), SQL templates, sign-off criteria |

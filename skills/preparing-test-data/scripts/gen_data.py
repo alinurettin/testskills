@@ -78,7 +78,8 @@ from pathlib import Path
 # ----------------------------------------------------------------------------------------------
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from tr_ids import (DEFAULT_BANK_CODES, gen_tckn, gen_tr_iban, gen_vkn, iban_check_digits,  # noqa: E402,F401
-                    iban_display, is_valid_iban, is_valid_tckn, is_valid_vkn, tckn_check_digits, vkn_check_digit)
+                    iban_display, is_valid_iban, is_valid_tckn, is_valid_vkn, tckn_check_digits, vkn_check_digit,
+                    IBAN_BBAN, TEST_CARDS, gen_iban, luhn_ok)
 
 
 # ----------------------------------------------------------------------------------------------
@@ -142,7 +143,16 @@ TYPES = {
     "text": {"min_len", "max_len", "charset"},
     "city_tr": set(), "postcode_tr": {"city_field"}, "uuid": set(),
     "ref": {"source", "distinct"},
+    # international (0.7.2)
+    "card_test": {"brand", "format"}, "phone_intl": {"country", "format"}, "iban": {"country", "format"},
 }
+
+# Phone ranges reserved for fiction/drama, so generated numbers never ring a real person:
+# US/CA 555-0100..0199 (NANPA), UK mobile 07700 900000..900999 (Ofcom). Other countries have no
+# documented fictional range; TR uses the normal mobile prefixes (keep such data in test systems).
+PHONE_INTL = {"US": ("+1", lambda rng: f"{rng.choice(['202', '312', '415', '646'])}5550{rng.randint(100, 199)}"),
+              "GB": ("+44", lambda rng: f"7700900{rng.randint(0, 999):03d}"),
+              "TR": ("+90", lambda rng: rng.choice(MOBILE_PREFIXES) + "".join(str(rng.randint(0, 9)) for _ in range(7)))}
 NO_EDGE = {"seq", "bool", "ref"}
 
 MSG = {"en": {"done": "Generated {rows} rows -> {out} (seed {seed}, edge rows {edge})",
@@ -330,6 +340,21 @@ def _check_field(f: dict, typ: str, where: str, earlier: list[str], tables: list
             raise SchemaError(f"{where}: bank_codes must be a list of 5-digit strings")
         if f.get("format", "compact") not in ("compact", "display"):
             raise SchemaError(f"{where}: format must be compact or display")
+    elif typ == "card_test":
+        if f.get("brand", "any") not in ("any", *TEST_CARDS):
+            raise SchemaError(f"{where}: brand must be any, {', '.join(TEST_CARDS)}")
+        if f.get("format", "compact") not in ("compact", "display"):
+            raise SchemaError(f"{where}: format must be compact or display")
+    elif typ == "phone_intl":
+        if str(f.get("country", "US")).upper() not in PHONE_INTL:
+            raise SchemaError(f"{where}: country must be one of {', '.join(PHONE_INTL)}")
+        if f.get("format", "e164") not in ("e164", "display"):
+            raise SchemaError(f"{where}: format must be e164 or display")
+    elif typ == "iban":
+        if str(f.get("country", "TR")).upper() not in IBAN_BBAN:
+            raise SchemaError(f"{where}: country must be one of {', '.join(IBAN_BBAN)}")
+        if f.get("format", "compact") not in ("compact", "display"):
+            raise SchemaError(f"{where}: format must be compact or display")
     elif typ == "seq":
         for k in ("start", "width", "step"):
             if k in f and (not isinstance(f[k], int) or (k == "step" and f[k] == 0)):
@@ -425,6 +450,18 @@ def gen_value(f: dict, ctx: dict):
     if typ == "iban_tr":
         iban = gen_iban_tr(rng, f.get("bank_codes"))
         return iban_display(iban) if f.get("format") == "display" else iban
+    if typ == "card_test":
+        brand = f.get("brand", "any")
+        pool = [c for b in TEST_CARDS for c in TEST_CARDS[b]] if brand == "any" else TEST_CARDS[brand]
+        pan = rng.choice(pool)
+        return " ".join(pan[i:i + 4] for i in range(0, len(pan), 4)) if f.get("format") == "display" else pan
+    if typ == "phone_intl":
+        cc, make = PHONE_INTL[str(f.get("country", "US")).upper()]
+        n = make(rng)
+        return f"{cc} {n}" if f.get("format") == "display" else cc + n
+    if typ == "iban":
+        iban = gen_iban(rng, str(f.get("country", "TR")))
+        return iban_display(iban) if f.get("format") == "display" else iban
     if typ == "int":
         return rng.randint(f.get("min", 0), f.get("max", 1000))
     if typ == "decimal":
@@ -506,6 +543,16 @@ def edge_value(f: dict, ctx: dict):
     elif typ == "iban_tr":
         iban = gen_iban_tr(rng, f.get("bank_codes"))
         cands = [iban if f.get("format") == "display" else iban_display(iban)]  # the other notation
+    elif typ == "card_test":
+        pan = gen_value(f, ctx).replace(" ", "")
+        cands = [pan[:-1] + str((int(pan[-1]) + 1) % 10),  # Luhn-invalid: must be rejected
+                 " ".join(pan[i:i + 4] for i in range(0, len(pan), 4)), pan[:-1]]  # spaced; one digit short
+    elif typ == "phone_intl":
+        v = gen_value({**f, "format": "display" if f.get("format", "e164") == "e164" else "e164"}, ctx)
+        cands = [v]  # the other notation
+    elif typ == "iban":
+        iban = gen_iban(ctx["rng"], str(f.get("country", "TR")))
+        cands = [iban if f.get("format") == "display" else iban_display(iban), iban.lower()]
     elif typ == "int":
         lo, hi = f.get("min", 0), f.get("max", 1000)
         cands = sorted({lo, min(lo + 1, hi), max(hi - 1, lo), hi} | ({0} if lo <= 0 <= hi else set()))

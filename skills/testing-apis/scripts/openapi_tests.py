@@ -52,6 +52,9 @@ T = {
            "type": "{m} {p} '{f}' yanlış tipte ({v}) reddedilir", "notfound": "{m} {p} olmayan kaynak için 404 döner",
            "bola": "{m} {p} başka kullanıcının kaynağına erişimi reddeder (BOLA)",
            "badscheme": "{m} {p} 'Bearer' şeması olmayan Authorization başlığını 401 ile reddeder",
+           "sqli": "{m} {p} SQL enjeksiyonu denemesinde 500 vermez ve veritabanı hatası sızdırmaz ({f})",
+           "xss": "{m} {p} XSS denemesini HTML yanıtta kaçırmadan geri döndürmez ({f})",
+           "exp_probe": "HTTP 2xx veya 4xx (asla 5xx); yanıtta veritabanı/stack hatası veya kaçırılmamış betik yok",
            "pattern": "{m} {p} '{f}' kalıba uymayan değerle ({v}) reddedilir",
            "bola_body": "{m} {p} gövdedeki '{f}' başka kullanıcıya aitse işlemi reddeder (BOLA, gövde)",
            "bola_body_step": "A kullanıcısının kaynağını ('{f}') içeren isteği B kullanıcısının token'ı ile gönder",
@@ -77,6 +80,9 @@ T = {
            "type": "{m} {p} '{f}' with a wrong type ({v}) is rejected", "notfound": "{m} {p} for an unknown resource returns 404",
            "bola": "{m} {p} denies access to another user's resource (BOLA)",
            "badscheme": "{m} {p} rejects an Authorization header without the 'Bearer' scheme with 401",
+           "sqli": "{m} {p} survives an SQL injection probe without a 5xx or a leaked database error ({f})",
+           "xss": "{m} {p} does not reflect an XSS probe unescaped in an HTML response ({f})",
+           "exp_probe": "HTTP 2xx or 4xx (never 5xx); no database/stack error or unescaped script in the response",
            "pattern": "{m} {p} '{f}' not matching the pattern ({v}) is rejected",
            "bola_body": "{m} {p} rejects the operation when body '{f}' belongs to another user (BOLA, body)",
            "bola_body_step": "Send the request containing user A's resource ('{f}') with user B's token",
@@ -333,6 +339,8 @@ def main() -> int:
     ap.add_argument("--start", type=int)
     ap.add_argument("--lang", choices=["tr", "en"], default="en")
     ap.add_argument("--only-tag", help="only operations with this OpenAPI tag")
+    ap.add_argument("--security-probes", action="store_true",
+                    help="add SQL-injection and XSS probe tests for free-text body fields (test environments only)")
     ap.add_argument("--out", required=True, help="compact test cases (.src.md)")
     ap.add_argument("--spec-out", dest="spec_out", help="Playwright API spec (.spec.ts) with the same TC IDs")
     sys.stdout.reconfigure(encoding="utf-8")
@@ -585,6 +593,23 @@ def main() -> int:
                                  f"    const res = await api(request, {call_args}, {{ body: {ts(b2)} }});",
                                  f"    {assertion}", "  });"]
                         counts["exec"] += 1
+            # optional DAST-lite probes: one SQLi and one XSS test per operation over all free-text string fields
+            free = [f for f, v in ((body_schema or {}).get("properties") or {}).items()
+                    if v.get("type") == "string" and not v.get("readOnly") and not any(k in v for k in ("enum", "format", "pattern"))]
+            if a.security_probes and isinstance(body, dict) and free:
+                for kind, payload in (("sqli", "' OR '1'='1' --"), ("xss", "<script>alert(1)</script>")):
+                    b2 = {**body, **{f: payload for f in free}}
+                    title = t[kind].format(m=M, p=path, f=", ".join(free))
+                    tid = add(title, "h", "-", "eg", [(t["step_send"].format(m=M, p=path), b2, t["exp_probe"])],
+                              ["api", "security", kind, tag])
+                    check = ("    expect(text).not.toMatch(/SQL syntax|SQLSTATE|ORA-\\d{5}|syntax error at or near|sqlite3?\\.|unterminated quoted string|Traceback|at [\\w.$]+\\(.*:\\d+\\)/i);"
+                             if kind == "sqli" else
+                             "    if ((res.headers()['content-type'] ?? '').includes('html')) expect(text).not.toContain('<script>alert(1)</script>');")
+                    spec += [f"  test({ts(tid + ' ' + title)}, {{ tag: ['@{tid}', '@api', '@security'] }}, async ({{ request }}) => {{",
+                             f"    const res = await api(request, {call_args}, {{ body: {ts(b2)} }});",
+                             "    expect(res.status()).toBeLessThan(500);",
+                             "    const text = await res.text();", check, "  });"]
+                    counts["exec"] += 1
             path_params = [p for p in params if p.get("in") == "path"]
             if path_params and "404" in codes:
                 bad = {**pvals, **{p["name"]: ("999999999" if p.get("schema", {}).get("type") in ("integer", "number") else "does-not-exist-000") for p in path_params}}

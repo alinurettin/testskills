@@ -4,7 +4,7 @@ description: Designs risk-based manual test cases from requirements with ISTQB t
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.7.1"
+  version: "0.8.0"
 ---
 
 # Designing test cases
