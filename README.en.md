@@ -47,7 +47,9 @@ In each trial the agent got only what a tester would get (a story, an OpenAPI do
 | Demo Bank API (OpenAPI) | **5/5**, including BOLA | 2 real unplanted defects; 17 contract questions | An independent rerun gave the same result: 31 passed / 11 failed |
 | Customer data migration (cp1254 → UTF-8) | **9/9** | No false positives on the Turkish-casing and format traps | No-go: correct |
 
-Proxy routing across all 17 skills: **84/84** requests routed correctly, including 5 near-misses that need no skill. There are 150 unit tests.
+Proxy routing across all 17 skills: **84/84** requests routed correctly, including 5 near-misses that need no skill. There are over 280 unit tests.
+
+**With vs without skills (126 runs, 7 independent trials, 3 models):** the skills help most on the weakest model. On Haiku the mean rose from 85.4 to 89.3 (test design 86 → 100); on Sonnet 5.5 and Opus the gap is small (about +2) and several trials hit the ceiling. The skills tie or lose on mobile plan review and on exploratory testing with Haiku. Each cell has 3 runs: a signal, not statistical proof.
 
 Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/EVALUATION.en.md)**. The real outputs of each trial are in [examples/](examples/). They are in Turkish.
 
@@ -72,7 +74,7 @@ Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/E
 | `testing-mobile-apps` **(experimental)** | iOS/Android checklists (lifecycle, interruptions, permissions, offline, MASVS, accessibility), a device matrix from usage share, JUnit → results |
 | `testing-data-migrations` | Source–target reconciliation (keys, fields, control totals, Turkish encoding traps), SQL templates, sign-off criteria |
 
-**Experimental:** these four skills have no blind trial yet. They are covered by unit tests and script demos; their blind trials are running for 0.7.
+**Experimental:** blind trials now exist for these four skills (see `docs/EVALUATION.en.md` §7–8), but the results are mixed: the model without skills often scores high too, and exploratory testing still lags on a weak model. The label stays.
 
 There are also **domain packs** for fintech/banking, e-commerce, health, the public sector, insurance/pensions and telecom. Each contains a regulations checklist, the requirements people often forget, high-risk rules, and synthetic test data.
 
@@ -139,7 +141,7 @@ No standard text is reproduced; the content is paraphrased into actionable check
 - **Not yet tested against real tools:** the Xray, Zephyr, TestRail, Azure DevOps and Qase imports and the Xray results reporter follow the official documentation but have not been run against a live server. Do a 2–3 test trial import first.
 - **k6:** the scripts are generated and syntax-checked, but no real load run has been done.
 - **Triggering:** skill routing has only been measured with a proxy method (84/84), not with Claude Code's real trigger mechanism.
-- **No blind trial yet** for the exploratory, AI, mobile and test-data skills: they are covered by unit tests and script demos.
+- **Small samples:** at most 3 runs per cell, low effort, and the grader model differs between rounds. Results are a signal, not statistical proof.
 - **Windows console:** if Turkish help text looks garbled in PowerShell, set `$env:PYTHONIOENCODING='utf-8'` (the files themselves are always UTF-8).
 - **Domain packs** are checklists, not legal advice. Confirm the current regulations with your compliance team.
 

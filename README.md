@@ -47,7 +47,9 @@ Her denemede ajana yalnızca bir test uzmanına verilecek girdiler verildi: bir 
 | Demo Bank API (OpenAPI) | BOLA dahil **5/5** | Yerleştirilmemiş 2 gerçek hata; 17 sözleşme sorusu | Bağımsız yeniden koşum aynı sonucu verdi: 31 geçti / 11 kaldı |
 | Müşteri verisi taşıma (cp1254 → UTF-8) | **9/9** | Türkçe büyük harf ve format tuzaklarında yanlış alarm yok | "Go değil": doğru |
 
-17 skill'in tamamında vekil yönlendirme ölçümü: **84/84** istek doğru skill'e gitti. Bunlara skill gerektirmeyen 5 yakın istek de dahil. Ayrıca 150 birim testi var.
+17 skill'in tamamında vekil yönlendirme ölçümü: **84/84** istek doğru skill'e gitti. Bunlara skill gerektirmeyen 5 yakın istek de dahil. Ayrıca 280'den fazla birim testi var.
+
+**Skill'li ve skill'siz karşılaştırma (126 koşu, 7 bağımsız deneme, 3 model):** skill'ler en çok zayıf modele katkı sağlıyor. Haiku'da ortalama 85,4'ten 89,3'e çıktı (test tasarımında 86'dan 100'e); Sonnet 5.5 ve Opus'ta fark küçük (+2 civarı) ve çoğu denemede iki taraf da tavana yakın. Mobil plan incelemesinde ve Haiku'daki keşif testinde skill'li kol geride ya da eşit. Her hücrede 3 koşu var; sinyaldir, istatistiksel kanıt değildir.
 
 Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVALUATION.md)**. Her denemenin gerçek çıktıları: [examples/](examples/).
 
@@ -72,7 +74,7 @@ Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVAL
 | `testing-mobile-apps` **(deneysel)** | iOS/Android kontrol listeleri (yaşam döngüsü, kesintiler, izinler, çevrimdışı, MASVS, erişilebilirlik), kullanım payından cihaz matrisi, JUnit → sonuçlar |
 | `testing-data-migrations` | Kaynak–hedef mutabakatı (anahtarlar, alanlar, kontrol toplamları, Türkçe karakter kodlama tuzakları), SQL şablonları, imza kriterleri |
 
-**Deneysel:** Bu dört skill'in henüz kör denemesi yok. Birim testleri ve script demolarıyla doğrulandılar; 0.7 için kör denemeleri sürüyor.
+**Deneysel:** Bu dört skill için kör denemeler yapıldı (bkz. `docs/EVALUATION.md` §7–8) ama sonuçlar karışık: skill'siz model de çoğunda yüksek puan alıyor, keşif testi zayıf modelde geride. Etiket bu yüzden duruyor.
 
 Ek olarak **sektör paketleri** var: fintech/bankacılık, e-ticaret, sağlık, kamu, sigorta/emeklilik ve telekom. Her birinde mevzuat kontrol listesi, sık unutulan gereksinimler, yüksek riskli kurallar ve sentetik test verisi bulunur.
 
@@ -139,7 +141,7 @@ Standart metinleri kopyalanmadı; içerikler uygulanabilir kontrol listelerine d
 - **Gerçek araçlarda denenmedi:** Xray, Zephyr, TestRail, Azure DevOps ve Qase içe aktarımları ile Xray sonuç reporter'ı gerçek bir sunucuda denenmedi. Resmi dokümantasyona göre hazırlandı; önce 2–3 testlik deneme importu yapın.
 - **k6:** Script'ler üretilip sözdizimi kontrolünden geçirildi, ama gerçek bir yük testi koşturulmadı.
 - **Otomatik devreye girme:** Skill yönlendirmesi yalnızca vekil bir yöntemle ölçüldü (84/84). Claude Code'un gerçek tetiklenme mekanizmasıyla ölçülmedi.
-- **Kör denemesi olmayanlar:** Keşif testi, yapay zekâ, mobil ve test verisi skill'leri için henüz kör deneme yapılmadı. Bunlar birim testleri ve script demolarıyla doğrulandı.
+- **Kör denemeler tek koşu/üç koşu:** Her hücrede en fazla 3 koşu, düşük çaba ayarı; puanlayıcı modeller turlar arasında farklı. Sonuçlar sinyaldir, istatistiksel kanıt değildir.
 - **Windows konsolu:** PowerShell'de Türkçe yardım metni bozuk görünüyorsa `$env:PYTHONIOENCODING='utf-8'` ayarlayın. Dosyaların kendisi her zaman UTF-8'dir.
 - **Sektör paketleri** kontrol listesidir, hukuki tavsiye değildir. Mevzuatın güncel hâlini uyum ekibinizle teyit edin.
 
