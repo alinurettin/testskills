@@ -1,6 +1,8 @@
 # Değişiklik günlüğü
 
-**Yayımlanmamış**: Keşif testi skill'i 0.7.0 kör denemesine göre yeniden düzenlendi
+**0.9.0**: Keşif skill'i düzeltmesi ve 126 koşuluk yeni değerlendirme
+- 7 yeni bağımsız deneme ve cevap anahtarı; Opus, Sonnet 5.5 ve Haiku ile skill'li/skill'siz 126 koşu. Skill'ler en çok zayıf modele (Haiku) katkı sağlıyor (+3,9 puan); güçlü modellerde fark küçük. Ayrıntı: `docs/EVALUATION.md` §8.
+- Keşif testi skill'i yeniden düzenlendi (aşağıda): Opus'ta 74'e karşı 90, Haiku'da hâlâ geride.
 - `running-exploratory-tests`:
   - **Kısa oturum modu** (45 dakikanın altı): tek satırlık görev cümlesi, test ederken alınan notlar, sonda tek rapor; sürenin en az %75'i uygulamanın üzerinde. Tam SBTM evrakı uzun ve çok oturumlu işlerde kalıyor.
   - **Veriyi takip et:** her durum değişikliğinden sonra aynı verinin göründüğü tüm ekranlar, listeler, toplamlar, dışa aktarımlar ve API yanıtı yeniden kontrol ediliyor; yenileme, geri/ileri, ikinci sekme ve yeniden girişten sonra da.

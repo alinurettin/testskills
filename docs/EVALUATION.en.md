@@ -121,3 +121,27 @@ node evals/trial-api/api/server.js      # http://127.0.0.1:4180, token-alice / t
 For the migration trial, give the agent only the two CSV files and `mapping-spec.md` from `evals/trial-migration/`.
 
 How to set up a blind trial correctly (copy the folder outside the repo, keep the answer keys away from the agent) and how to grade it: [evals/README.md](../evals/README.md).
+
+## 8. 0.9.0: 7 new independent trials, 3 models, 126 runs
+- **Setup:** 7 trials built by designers who never saw the skills (API 3.1, two-table data migration, requirements analysis, test design, hard mobile, hard test data, exploratory) × with/without skills × Opus, Sonnet 5.5, Haiku × 3 runs. All at low effort. Graders were blind and used Sonnet 5.5 (Opus in §7). Raw data: `evals/results/trials-0.9.0.json`.
+- **Median score %, with / without skills:**
+
+| Trial | Haiku | Sonnet 5.5 | Opus |
+|---|---|---|---|
+| Test design | **100 / 86** | 100 / 100 | 100 / 100 |
+| API (OpenAPI 3.1) | **85 / 81** | 99 / 99 | 100 / 100 |
+| Requirements analysis | **93 / 91** | **96 / 93** | 91 / 91 |
+| Test data | 98 / 97 | 100 / 100 | 100 / 100 |
+| Data migration | 100 / 100 | 100 / 100 | 100 / 100 |
+| Mobile plan review | 80 / 83 | 92 / 91 | 92 / 91 |
+| Exploratory | 65 / 74 | 79 / 74 | **90 / 74** |
+| **Mean (all runs)** | **89.3 / 85.4** | **94.9 / 92.6** | **95.2 / 93.3** |
+
+- **Reading:** the skills help most on the weakest model (Haiku: +3.9 points, +14 on test design). On strong models the gap is small (+1.9 / +2.3), and several trials hit the ceiling. So the skills lift a cheaper model, and mostly add consistency on a strong one.
+- **Exploratory fix:** in 0.7.0 the with-skill arm lost. The revised skill (short-session mode, "follow the data", attack checklist) scored 90 vs 74 on Opus and 79 vs 74 on Sonnet. It still loses on Haiku (65 vs 74); a weak model may not use long instructions well. That remains open.
+- **Mobile plan review:** no difference; the skill added nothing here.
+- **Limits (important):**
+  - n=3 per cell, low effort. Most gaps are within single-run noise: a signal, not statistical proof.
+  - The grader model differs from §7 (Sonnet 5.5 instead of Opus), so exploratory scores are not comparable across the two evaluations: the same arm (Opus, without skills) scored 90 in §7 and 74 here. Comparisons are valid only within this section (same grader, same key).
+  - We had the trials written and the trial data is public in the repo; anyone re-running them can set up the same conditions as long as the agent is not shown the keys.
+  - Routing was not re-measured this round (last: 84/84).

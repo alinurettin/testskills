@@ -105,3 +105,27 @@ Kör denemeyi doğru kurmak (klasörü repo dışına kopyalamak, cevap anahtar�
   - Yarıda kesilen ilk çalıştırmadan kalan dosyalar bazı çalışma klasörlerinde kalmış olabilir (en az bir koşu önceki raporu yeniden kullandı).
   - Mobil ve test verisi denemeleri tavana dayandı; daha zor sürümleri gerekiyor.
 - **Yönlendirme (0.7.0, açıklamalar kısaltıldıktan sonra):** 84/84; Opus ile 2 kez, Haiku ile 2 kez.
+
+## 8. 0.9.0: 7 yeni bağımsız deneme, 3 model, 126 koşu
+- **Kurulum:** Skill'leri hiç görmeyen tasarımcıların hazırladığı 7 deneme (API 3.1, iki tablolu veri taşıma, gereksinim analizi, test tasarımı, zor mobil, zor test verisi, keşif testi) × skill'li/skill'siz × Opus, Sonnet 5.5, Haiku × 3 koşu. Hepsi düşük çaba ayarında. Puanlayıcılar kör ve Sonnet 5.5 idi (§7'de Opus). Ham veri: `evals/results/trials-0.9.0.json`.
+- **Medyan puan %, skill'li / skill'siz:**
+
+| Deneme | Haiku | Sonnet 5.5 | Opus |
+|---|---|---|---|
+| Test tasarımı | **100 / 86** | 100 / 100 | 100 / 100 |
+| API (OpenAPI 3.1) | **85 / 81** | 99 / 99 | 100 / 100 |
+| Gereksinim analizi | **93 / 91** | **96 / 93** | 91 / 91 |
+| Test verisi | 98 / 97 | 100 / 100 | 100 / 100 |
+| Veri taşıma | 100 / 100 | 100 / 100 | 100 / 100 |
+| Mobil plan incelemesi | 80 / 83 | 92 / 91 | 92 / 91 |
+| Keşif testi | 65 / 74 | 79 / 74 | **90 / 74** |
+| **Ortalama (tüm koşular)** | **89,3 / 85,4** | **94,9 / 92,6** | **95,2 / 93,3** |
+
+- **Okuma:** Skill'lerin katkısı en çok en zayıf modelde (Haiku: +3,9 puan, test tasarımında +14). Güçlü modellerde fark küçük (+1,9 / +2,3), çoğu denemede tavan etkisi var. Yani skill'ler daha ucuz modelin kalitesini yükseltiyor; güçlü modelde ise çoğunlukla tutarlılık sağlıyor.
+- **Keşif testi düzeltmesi:** 0.7.0'da skill'li kol geride kalmıştı. Düzeltilmiş skill (kısa oturum modu, "veriyi takip et", saldırı listesi) Opus'ta 74'e karşı 90, Sonnet'te 74'e karşı 79 verdi. Haiku'da hâlâ geride (65'e 74): zayıf model uzun talimatı iyi kullanamıyor olabilir, bu açık kalan bir sorun.
+- **Mobil planı incelemesi:** Fark yok; skill bu denemede katkı sağlamadı.
+- **Sınırlar (önemli):**
+  - Koşu başına n=3, düşük çaba ayarı. Farkların çoğu tek koşulardaki dalgalanma sınırında; istatistiksel kanıt değil, sinyal.
+  - Puanlayıcı modeli §7'den farklı (Sonnet 5.5 yerine Opus). Bu yüzden iki değerlendirmenin keşif puanları birbiriyle karşılaştırılamaz: aynı kol (Opus, skill'siz) §7'de 90, burada 74 aldı. Karşılaştırma yalnızca bu bölümün kendi içinde (aynı puanlayıcı, aynı anahtar) geçerli.
+  - Denemeleri biz yazdırdık ve deneme verisi repoda herkese açık; aynı denemelerle yeniden ölçen biri, ajana anahtarı göstermediği sürece aynı koşulları kurabilir.
+  - Yönlendirme ölçümü bu turda tekrarlanmadı (son: 84/84).

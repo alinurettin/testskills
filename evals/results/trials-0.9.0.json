@@ -1,0 +1,1803 @@
+{
+ "date": "2026-10-21",
+ "note": "126 runs, 7 trials x skill/noskill x Opus/Sonnet 5.5/Haiku x 3; effort low; blind graders (Sonnet 5.5, low effort)",
+ "runs": [
+  {
+   "id": "R074",
+   "trial": "exploratory",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 28,
+   "max": 31,
+   "found": 8,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K3"
+   ]
+  },
+  {
+   "id": "R036",
+   "trial": "exploratory",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 20.5,
+   "max": 31,
+   "found": 5.5,
+   "total": 9,
+   "false_positives": 1,
+   "missed": [
+    "K2",
+    "K3",
+    "K4"
+   ]
+  },
+  {
+   "id": "R096",
+   "trial": "exploratory",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 20,
+   "max": 31,
+   "found": 5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3",
+    "K4",
+    "K8"
+   ]
+  },
+  {
+   "id": "R048",
+   "trial": "api2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 81,
+   "max": 100,
+   "found": 8,
+   "total": 10,
+   "false_positives": 0,
+   "missed": [
+    "K3",
+    "K4"
+   ]
+  },
+  {
+   "id": "R095",
+   "trial": "api2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R017",
+   "trial": "api2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 99,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R012",
+   "trial": "api2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 99,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R097",
+   "trial": "api2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 99,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R079",
+   "trial": "api2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R053",
+   "trial": "api2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 99,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R070",
+   "trial": "api2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 89,
+   "max": 100,
+   "found": 9,
+   "total": 10,
+   "false_positives": 0,
+   "missed": [
+    "K3"
+   ]
+  },
+  {
+   "id": "R067",
+   "trial": "api2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R105",
+   "trial": "api2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R006",
+   "trial": "migration2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R015",
+   "trial": "migration2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R022",
+   "trial": "migration2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R045",
+   "trial": "migration2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R054",
+   "trial": "migration2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R059",
+   "trial": "migration2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R085",
+   "trial": "api2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 74,
+   "max": 100,
+   "found": 8,
+   "total": 10,
+   "false_positives": 2,
+   "missed": [
+    "K5",
+    "K8"
+   ]
+  },
+  {
+   "id": "R040",
+   "trial": "api2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R021",
+   "trial": "api2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 81,
+   "max": 100,
+   "found": 8,
+   "total": 10,
+   "false_positives": 1,
+   "missed": [
+    "K7",
+    "K8"
+   ]
+  },
+  {
+   "id": "R103",
+   "trial": "migration2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R013",
+   "trial": "migration2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R109",
+   "trial": "api2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 81,
+   "max": 100,
+   "found": 8,
+   "total": 10,
+   "false_positives": 1,
+   "missed": [
+    "K7",
+    "K8"
+   ]
+  },
+  {
+   "id": "R119",
+   "trial": "migration2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R082",
+   "trial": "migration2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R110",
+   "trial": "api2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R123",
+   "trial": "api2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 85,
+   "max": 100,
+   "found": 8,
+   "total": 10,
+   "false_positives": 0,
+   "missed": [
+    "K7",
+    "K8"
+   ]
+  },
+  {
+   "id": "R101",
+   "trial": "api2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R120",
+   "trial": "migration2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R121",
+   "trial": "migration2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R029",
+   "trial": "requirements",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 42,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R003",
+   "trial": "requirements",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 43,
+   "max": 46,
+   "found": 10.5,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R038",
+   "trial": "requirements",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 42,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R043",
+   "trial": "requirements",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 42,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R061",
+   "trial": "api2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 90,
+   "max": 100,
+   "found": 9,
+   "total": 10,
+   "false_positives": 0,
+   "missed": [
+    "K8"
+   ]
+  },
+  {
+   "id": "R057",
+   "trial": "requirements",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 40,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 1,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R046",
+   "trial": "requirements",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 42,
+   "max": 46,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R069",
+   "trial": "requirements",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 42,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R078",
+   "trial": "requirements",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 41,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R088",
+   "trial": "requirements",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 41,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R080",
+   "trial": "requirements",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 44,
+   "max": 46,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R008",
+   "trial": "design",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R107",
+   "trial": "requirements",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 44,
+   "max": 46,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K4"
+   ]
+  },
+  {
+   "id": "R023",
+   "trial": "requirements",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 42,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R014",
+   "trial": "design",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R113",
+   "trial": "requirements",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 44,
+   "max": 46,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K4"
+   ]
+  },
+  {
+   "id": "R055",
+   "trial": "requirements",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 43,
+   "max": 46,
+   "found": 11,
+   "total": 12,
+   "false_positives": 1,
+   "missed": [
+    "K4"
+   ]
+  },
+  {
+   "id": "R066",
+   "trial": "migration2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R007",
+   "trial": "requirements",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 42,
+   "max": 46,
+   "found": 12,
+   "total": 12,
+   "false_positives": 1,
+   "missed": []
+  },
+  {
+   "id": "R072",
+   "trial": "requirements",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 36,
+   "max": 46,
+   "found": 10,
+   "total": 12,
+   "false_positives": 2,
+   "missed": [
+    "K2",
+    "K10"
+   ]
+  },
+  {
+   "id": "R009",
+   "trial": "migration2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R064",
+   "trial": "design",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R050",
+   "trial": "design",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R084",
+   "trial": "migration2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R037",
+   "trial": "requirements",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 43,
+   "max": 46,
+   "found": 12,
+   "total": 12,
+   "false_positives": 1,
+   "missed": []
+  },
+  {
+   "id": "R065",
+   "trial": "design",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R063",
+   "trial": "design",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R083",
+   "trial": "design",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R076",
+   "trial": "design",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R086",
+   "trial": "design",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R114",
+   "trial": "design",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R126",
+   "trial": "migration2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R001",
+   "trial": "exploratory",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 25,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3"
+   ]
+  },
+  {
+   "id": "R124",
+   "trial": "design",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 34,
+   "max": 36,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9b"
+   ]
+  },
+  {
+   "id": "R032",
+   "trial": "design",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 26,
+   "max": 36,
+   "found": 8,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K5",
+    "K9"
+   ]
+  },
+  {
+   "id": "R056",
+   "trial": "migration2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R116",
+   "trial": "design",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R019",
+   "trial": "exploratory",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 26.5,
+   "max": 31,
+   "found": 7.5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R011",
+   "trial": "exploratory",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 23.5,
+   "max": 31,
+   "found": 6.5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K8"
+   ]
+  },
+  {
+   "id": "R039",
+   "trial": "exploratory",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 23,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 1,
+   "missed": [
+    "K2",
+    "K3"
+   ]
+  },
+  {
+   "id": "R122",
+   "trial": "requirements",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 46,
+   "max": 46,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R090",
+   "trial": "exploratory",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 25,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3"
+   ]
+  },
+  {
+   "id": "R091",
+   "trial": "exploratory",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 24.5,
+   "max": 31,
+   "found": 7.5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K4"
+   ]
+  },
+  {
+   "id": "R099",
+   "trial": "exploratory",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 23,
+   "max": 31,
+   "found": 6,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3",
+    "K4"
+   ]
+  },
+  {
+   "id": "R117",
+   "trial": "migration2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 38,
+   "max": 38,
+   "found": 11,
+   "total": 11,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R112",
+   "trial": "exploratory",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 25,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3"
+   ]
+  },
+  {
+   "id": "R052",
+   "trial": "exploratory",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 28,
+   "max": 31,
+   "found": 8,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K3"
+   ]
+  },
+  {
+   "id": "R034",
+   "trial": "design",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 34,
+   "max": 36,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9b"
+   ]
+  },
+  {
+   "id": "R004",
+   "trial": "mobile2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 105,
+   "max": 120,
+   "found": 11,
+   "total": 12,
+   "false_positives": 1,
+   "missed": [
+    "K9 (kill during flush not covered)",
+    "K10(c) constrained-background tests"
+   ]
+  },
+  {
+   "id": "R071",
+   "trial": "design",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 31,
+   "max": 36,
+   "found": 11,
+   "total": 12,
+   "false_positives": 1,
+   "missed": [
+    "K9"
+   ]
+  },
+  {
+   "id": "R026",
+   "trial": "exploratory",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 25,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3"
+   ]
+  },
+  {
+   "id": "R058",
+   "trial": "design",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 32,
+   "max": 36,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9"
+   ]
+  },
+  {
+   "id": "R027",
+   "trial": "mobile2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 109,
+   "max": 120,
+   "found": 11.5,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9 (full credit)",
+    "K10(c)"
+   ]
+  },
+  {
+   "id": "R062",
+   "trial": "design",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R028",
+   "trial": "mobile2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 109,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R030",
+   "trial": "mobile2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 117,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R104",
+   "trial": "design",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R044",
+   "trial": "mobile2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 107,
+   "max": 120,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R033",
+   "trial": "mobile2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 109,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R035",
+   "trial": "mobile2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 105,
+   "max": 120,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9 kill during flush",
+    "K10(a) force-stop",
+    "K10(c) concrete constrained-background tests"
+   ]
+  },
+  {
+   "id": "R049",
+   "trial": "mobile2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 112,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R005",
+   "trial": "mobile2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 101,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R093",
+   "trial": "exploratory",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 26.5,
+   "max": 31,
+   "found": 7.5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R073",
+   "trial": "mobile2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 110,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R111",
+   "trial": "mobile2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 112,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R118",
+   "trial": "mobile2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 109,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R002",
+   "trial": "exploratory",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 22,
+   "max": 31,
+   "found": 6,
+   "total": 9,
+   "false_positives": 1,
+   "missed": [
+    "K2",
+    "K3",
+    "K4"
+   ]
+  },
+  {
+   "id": "R016",
+   "trial": "testdata2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 3,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R100",
+   "trial": "exploratory",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 18,
+   "max": 31,
+   "found": 5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K1",
+    "K2",
+    "K3",
+    "K8"
+   ]
+  },
+  {
+   "id": "R010",
+   "trial": "mobile2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 104,
+   "max": 120,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9"
+   ]
+  },
+  {
+   "id": "R024",
+   "trial": "mobile2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 89,
+   "max": 120,
+   "found": 9,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K3",
+    "K9"
+   ]
+  },
+  {
+   "id": "R020",
+   "trial": "testdata2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R125",
+   "trial": "exploratory",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 20,
+   "max": 31,
+   "found": 5,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3",
+    "K4",
+    "K8"
+   ]
+  },
+  {
+   "id": "R018",
+   "trial": "mobile2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 100,
+   "max": 120,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R025",
+   "trial": "testdata2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R041",
+   "trial": "mobile2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 3,
+   "score": 110.5,
+   "max": 120,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R077",
+   "trial": "testdata2",
+   "model": "opus",
+   "arm": "noskill",
+   "n": 2,
+   "score": 97.6,
+   "max": 100,
+   "found": 11.7,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K7 (1 residual: 5-digit phone 5323425276 in musteri 105 notlar, third-party 0090 532 342 52 76)"
+   ]
+  },
+  {
+   "id": "R089",
+   "trial": "exploratory",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 23,
+   "max": 31,
+   "found": 6,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3",
+    "K4"
+   ]
+  },
+  {
+   "id": "R094",
+   "trial": "testdata2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R060",
+   "trial": "mobile2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 96,
+   "max": 120,
+   "found": 10,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K3",
+    "K9"
+   ]
+  },
+  {
+   "id": "R087",
+   "trial": "mobile2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 97,
+   "max": 120,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K9"
+   ]
+  },
+  {
+   "id": "R081",
+   "trial": "testdata2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 2,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R047",
+   "trial": "testdata2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 1,
+   "score": 97.92,
+   "max": 100,
+   "found": 9,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R075",
+   "trial": "testdata2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 1,
+   "score": 97.67,
+   "max": 100,
+   "found": 11.97,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R098",
+   "trial": "testdata2",
+   "model": "opus",
+   "arm": "skill",
+   "n": 2,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R051",
+   "trial": "testdata2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R042",
+   "trial": "testdata2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 2,
+   "score": 97,
+   "max": 100,
+   "found": 11,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R092",
+   "trial": "testdata2",
+   "model": "sonnet",
+   "arm": "noskill",
+   "n": 3,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R108",
+   "trial": "testdata2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 3,
+   "score": 91.25,
+   "max": 100,
+   "found": 9,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K8",
+    "K6",
+    "K4",
+    "K10"
+   ]
+  },
+  {
+   "id": "R102",
+   "trial": "testdata2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 2,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R031",
+   "trial": "testdata2",
+   "model": "haiku",
+   "arm": "noskill",
+   "n": 3,
+   "score": 61.52,
+   "max": 100,
+   "found": 5.1,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [
+    "K2 (mostly)",
+    "K4 (mostly)"
+   ]
+  },
+  {
+   "id": "R068",
+   "trial": "testdata2",
+   "model": "haiku",
+   "arm": "skill",
+   "n": 2,
+   "score": 99.33,
+   "max": 100,
+   "found": 11.93,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R106",
+   "trial": "testdata2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 1,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  },
+  {
+   "id": "R115",
+   "trial": "testdata2",
+   "model": "sonnet",
+   "arm": "skill",
+   "n": 3,
+   "score": 100,
+   "max": 100,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": []
+  }
+ ]
+}
