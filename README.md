@@ -54,6 +54,8 @@ Her denemede ajana yalnızca bir test uzmanına verilecek girdiler verildi: bir 
 Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVALUATION.md)**. Her denemenin gerçek çıktıları: [examples/](examples/).
 
 ## Skill'ler
+![17 skill ne yapabiliyor](docs/assets/qa-suite-linkedin-capabilities.png)
+
 | Skill | Ne yapar |
 |---|---|
 | `qa-orchestrator` | Uçtan uca akışı, aşamaları ve kapıları yönetir |

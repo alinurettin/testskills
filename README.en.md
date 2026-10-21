@@ -54,6 +54,8 @@ Proxy routing across all 17 skills: **84/84** requests routed correctly, includi
 Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/EVALUATION.en.md)**. The real outputs of each trial are in [examples/](examples/). They are in Turkish.
 
 ## Skills
+![What the 17 skills can do](docs/assets/qa-suite-linkedin-capabilities-en.png)
+
 | Skill | What it does |
 |---|---|
 | `qa-orchestrator` | Runs the end-to-end flow, its stages and its gates |
