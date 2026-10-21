@@ -1,0 +1,408 @@
+openapi: 3.1.0
+info:
+  title: Anadolu Güven Sigorta - Poliçe & Hasar API
+  version: 1.0.0
+  description: >
+    Anadolu Güven Sigorta A.Ş. (kurgusal) bireysel poliçe ve hasar
+    yönetimi için REST API. Tüm uçlar (sağlık kontrolü hariç) bearer
+    token ile kimlik doğrulaması gerektirir.
+
+
+    Yetkilendirme kuralları:
+
+    * Normal kullanıcı (role=user) yalnızca KENDİ poliçelerine ve KENDİ
+      hasar taleplerine erişebilir.
+    * Yönetici (role=admin) tüm kaynaklara erişebilir.
+servers:
+  - url: http://localhost:3000
+    description: Yerel test sunucusu (PORT ortam değişkeni ile değişir, varsayılan 3000)
+security:
+  - bearerAuth: []
+tags:
+  - name: policies
+    description: Poliçe işlemleri
+  - name: claims
+    description: Hasar talebi işlemleri
+  - name: admin
+    description: Yönetici işlemleri (yalnızca role=admin)
+paths:
+  /health:
+    get:
+      summary: Servis sağlık kontrolü
+      security: []
+      tags: [policies]
+      responses:
+        '200':
+          description: Servis çalışıyor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: { type: string }
+
+  /policies:
+    get:
+      operationId: listPolicies
+      tags: [policies]
+      summary: Poliçeleri listele
+      description: >
+        Kimliği doğrulanan kullanıcının KENDİ poliçelerini döner.
+        Yönetici tüm poliçeleri görür.
+      responses:
+        '200':
+          description: Poliçe listesi
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Policy' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /policies/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getPolicy
+      tags: [policies]
+      summary: Tek bir poliçeyi getir
+      description: >
+        Poliçe yalnızca sahibi veya yönetici tarafından görülebilir.
+        Sahibi olmayan normal kullanıcı için 403 dönülür.
+      responses:
+        '200':
+          description: Poliçe
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Policy' }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    patch:
+      operationId: updatePolicy
+      tags: [policies]
+      summary: Poliçeyi güncelle
+      description: >
+        Poliçe sahibi YALNIZCA `holderName` ve `agentName` alanlarını
+        güncelleyebilir. `premium`, `coverageLimit`, `status`,
+        `ownerUserId`, `policyNumber`, `coverageType` alanları salt
+        okunurdur ve istek gövdesiyle DEĞİŞTİRİLEMEZ; bu alanlar gövdede
+        gönderilse bile yok sayılmalıdır. Poliçenin durumu (`status`)
+        yalnızca iç iş süreçleriyle değişir.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PolicyUpdate' }
+      responses:
+        '200':
+          description: Güncellenmiş poliçe
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Policy' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /claims:
+    get:
+      operationId: listClaims
+      tags: [claims]
+      summary: Hasar taleplerini listele (sayfalı)
+      description: >
+        Kimliği doğrulanan kullanıcının KENDİ hasar taleplerini sayfalı
+        olarak döner. `policyId` sorgu parametresi verilirse yalnızca o
+        poliçeye ait talepler süzülür; ancak bu durumda da yetkilendirme
+        kuralı geçerlidir: kullanıcı yalnızca KENDİSİNE ait poliçelerin
+        taleplerini görebilir.
+
+
+        Yanıttaki `meta.total` alanı, sayfalama uygulanmadan önceki
+        TOPLAM (tüm sayfalardaki) kayıt sayısını belirtir; yalnızca
+        geçerli sayfadaki kayıt sayısını değil.
+      parameters:
+        - name: policyId
+          in: query
+          required: false
+          schema: { type: string }
+        - name: page
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, default: 1 }
+        - name: pageSize
+          in: query
+          required: false
+          schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+      responses:
+        '200':
+          description: Sayfalı hasar listesi
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Claim' }
+                  meta: { $ref: '#/components/schemas/PageMeta' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createClaim
+      tags: [claims]
+      summary: Yeni hasar talebi oluştur
+      description: >
+        Kullanıcı yalnızca KENDİ poliçesi için hasar talebi oluşturabilir.
+
+
+        İş kuralı: Bir hasar talebinin tutarı (`amount`), ilgili poliçenin
+        teminat limitini (`coverageLimit`) AŞAMAZ. Aşan istekler 422 ile
+        reddedilmelidir.
+
+
+        Idempotency (tekrar koruması): İstek `Idempotency-Key` başlığı ile
+        gönderilirse, aynı anahtarla yapılan tekrar istekleri YENİ kayıt
+        OLUŞTURMAMALI, ilk oluşturulan kaydı aynen döndürmelidir.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string }
+          description: Tekrar eden POST isteklerinde mükerrer kayıt oluşmasını önler.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ClaimCreate' }
+      responses:
+        '201':
+          description: Oluşturulan hasar talebi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Claim' }
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          description: İş kuralı ihlali (ör. tutar teminat limitini aşıyor)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Error' }
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /claims/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: getClaim
+      tags: [claims]
+      summary: Tek bir hasar talebini getir
+      description: Yalnızca sahibi veya yönetici erişebilir.
+      responses:
+        '200':
+          description: Hasar talebi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Claim' }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/policies:
+    get:
+      operationId: adminListPolicies
+      tags: [admin]
+      summary: Tüm poliçeleri listele (yönetici)
+      description: Yalnızca role=admin erişebilir; aksi halde 403.
+      responses:
+        '200':
+          description: Tüm poliçeler
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/Policy' }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/stats:
+    get:
+      operationId: adminStats
+      tags: [admin]
+      summary: Özet istatistikler (yönetici)
+      description: >
+        Sistem genel istatistiklerini döner. Yalnızca role=admin
+        erişebilir; normal kullanıcı için 403 dönülmelidir.
+      responses:
+        '200':
+          description: İstatistikler
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalPolicies: { type: integer }
+                  totalClaims: { type: integer }
+                  totalPremium: { type: number }
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  responses:
+    Unauthorized:
+      description: Kimlik doğrulanamadı
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Erişim engellendi
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Kaynak bulunamadı
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    BadRequest:
+      description: Geçersiz istek
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    Policy:
+      type: object
+      required:
+        - id
+        - policyNumber
+        - ownerUserId
+        - holderName
+        - coverageType
+        - premium
+        - coverageLimit
+        - status
+        - agentName
+        - startDate
+        - endDate
+      properties:
+        id: { type: string, examples: ['pol_1'] }
+        policyNumber: { type: string, examples: ['POL-2026-0001'] }
+        ownerUserId: { type: string, examples: ['u1'] }
+        holderName: { type: string }
+        holderTckn:
+          type: ['string', 'null']
+          description: Sigortalı TC Kimlik No (kurgusal/sentetik veri).
+        coverageType:
+          type: string
+          enum: [kasko, trafik, konut, saglik]
+        premium:
+          type: number
+          description: Yıllık prim tutarı (TL).
+        coverageLimit:
+          type: integer
+          description: Poliçe teminat limiti (TL).
+        status:
+          type: string
+          enum: [active, cancelled, expired, pending]
+        agentName:
+          type: ['string', 'null']
+          description: >
+            Poliçeyi düzenleyen acente temsilcisi. Acente atanmamışsa
+            null döner.
+        startDate: { type: string, format: date }
+        endDate: { type: string, format: date }
+    PolicyUpdate:
+      type: object
+      description: >
+        Yalnızca holderName ve agentName güncellenebilir. Diğer alanlar
+        gönderilse de yok sayılır.
+      properties:
+        holderName: { type: string }
+        agentName: { type: ['string', 'null'] }
+      additionalProperties: false
+    Claim:
+      type: object
+      required:
+        - id
+        - claimNumber
+        - policyId
+        - ownerUserId
+        - amount
+        - status
+        - createdAt
+      properties:
+        id: { type: string, examples: ['clm_1'] }
+        claimNumber:
+          type: string
+          description: İnsan tarafından okunabilir hasar talep numarası.
+          examples: ['CLM-2026-0001']
+        policyId: { type: string, examples: ['pol_1'] }
+        ownerUserId: { type: string, examples: ['u1'] }
+        amount:
+          type: number
+          minimum: 1
+          description: Talep edilen tutar (TL). 1'den küçük olamaz.
+        status:
+          type: string
+          enum: [submitted, approved, rejected]
+        description:
+          type: ['string', 'null']
+        createdAt: { type: string, format: date-time }
+    ClaimCreate:
+      type: object
+      required: [policyId, amount]
+      properties:
+        policyId: { type: string }
+        amount:
+          type: number
+          minimum: 1
+          description: Talep edilen tutar (TL). 1'den küçük olamaz ve poliçenin teminat limitini aşamaz.
+        description:
+          type: ['string', 'null']
+      additionalProperties: false
+    PageMeta:
+      type: object
+      required: [page, pageSize, total]
+      properties:
+        page: { type: integer }
+        pageSize: { type: integer }
+        total:
+          type: integer
+          description: Sayfalama öncesi toplam (tüm sayfalardaki) kayıt sayısı.
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error: { type: string }
+        message: { type: ['string', 'null'] }

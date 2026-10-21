@@ -1,0 +1,3 @@
+test_id;uyelik;ara_toplam;kupon;teslimat_tipi;bolge;odeme_yontemi;beklenen_durum;beklenen_kupon_indirimi;beklenen_net_tutar;beklenen_kargo;beklenen_hizmet_bedeli;beklenen_odenecek;beklenen_puan;aciklama
+ORNEK-1;KLASIK;250.00;;STANDART;NORMAL;KREDI_KARTI;KABUL;0.00;250.00;39.90;0.00;289.90;25;Format örneği (başarılı yanıt) - değerlendirmeye alınmaz
+ORNEK-2;PLATIN;250.00;;STANDART;NORMAL;KREDI_KARTI;ERR_GECERSIZ_GIRDI;;;;;;;Format örneği (hata yanıtı) - değerlendirmeye alınmaz

@@ -1,0 +1,15 @@
+kategori_kodu;kategori_adi;iade_edilebilir;iade_suresi_gun;acilmis_ambalaj_kabul;aciklama
+GIY-01;Kadın Giyim;EVET;30;EVET;Etiketi sökülmemiş olmalı
+GIY-02;Erkek Giyim;EVET;30;EVET;Etiketi sökülmemiş olmalı
+GIY-03;İç Giyim ve Mayo;HAYIR;0;HAYIR;Hijyen nedeniyle iade alınmaz
+AYK-01;Ayakkabı;EVET;30;EVET;Tabanı kirlenmemiş olmalı
+SPR-01;Spor ve Outdoor;EVET;15;EVET;
+ELK-01;Küçük Ev Aletleri;EVET;15;EVET;Kullanılmamış olmalı
+ELK-02;Cep Telefonu;EVET;14;HAYIR;Kutu açılmışsa IMEI kaydı nedeniyle iade alınmaz
+ELK-03;Bilgisayar ve Tablet;EVET;15;HAYIR;
+KOZ-01;Kozmetik ve Kişisel Bakım;EVET;15;EVET;Kullanılmamış olmalı
+KOZ-02;Parfüm;EVET;15;HAYIR;Jelatini açılmamış olmalı
+EVY-01;Ev ve Yaşam;EVET;15;EVET;
+KIT-01;Kitap ve Kırtasiye;EVET;15;EVET;
+DIJ-01;Dijital Kod ve Hediye Kartı;HAYIR;0;HAYIR;Kod teslim edildiği anda kullanılmış sayılır
+OZL-01;Kişiye Özel Ürünler;HAYIR;0;HAYIR;Kişiye özel üretim

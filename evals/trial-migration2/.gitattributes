@@ -1,0 +1,2 @@
+# Keep trial inputs byte-exact (legacy exports are cp1254 + CRLF, target exports UTF-8 + LF).
+inputs/** -text

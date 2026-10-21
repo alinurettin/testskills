@@ -66,7 +66,7 @@ Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/E
 | `reporting-test-results` | Defect reports, and a completion report that evaluates the exit criteria automatically |
 | `reviewing-test-cases` | Imports Excel or TestRail CSV exports and audits the tests' quality |
 | `testing-apis` | OpenAPI 3 → contract tests and an executable Playwright API suite with the same TC IDs: schema checks, boundaries, BOLA, contract-gap questions, request/response evidence |
-| `running-exploratory-tests` **(experimental)** | Session-based exploratory testing: risk-ranked charters, heuristics (SFDIPOT, FEW HICCUPPS, tours), session sheets → summary, defects and regression tests |
+| `running-exploratory-tests` **(experimental)** | Exploratory testing: short bug hunts (follow the data across views, a web/API attack checklist) or full SBTM with risk-ranked charters, heuristics (SFDIPOT, FEW HICCUPPS, tours), session sheets → summary, defects and regression tests |
 | `testing-ai-features` **(experimental)** | LLM, chatbot and RAG testing: an adversarial eval set (OWASP LLM Top 10 2026, TR/EN), deterministic scoring over repeated runs, flakiness and a release gate |
 | `preparing-test-data` **(experimental)** | Synthetic data with valid TCKN/VKN/IBAN and referential integrity; deterministic masking of production extracts (KVKK/GDPR) |
 | `testing-mobile-apps` **(experimental)** | iOS/Android checklists (lifecycle, interruptions, permissions, offline, MASVS, accessibility), a device matrix from usage share, JUnit → results |

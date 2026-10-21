@@ -1,5 +1,14 @@
 # Değişiklik günlüğü
 
+**Yayımlanmamış**: Keşif testi skill'i 0.7.0 kör denemesine göre yeniden düzenlendi
+- `running-exploratory-tests`:
+  - **Kısa oturum modu** (45 dakikanın altı): tek satırlık görev cümlesi, test ederken alınan notlar, sonda tek rapor; sürenin en az %75'i uygulamanın üzerinde. Tam SBTM evrakı uzun ve çok oturumlu işlerde kalıyor.
+  - **Veriyi takip et:** her durum değişikliğinden sonra aynı verinin göründüğü tüm ekranlar, listeler, toplamlar, dışa aktarımlar ve API yanıtı yeniden kontrol ediliyor; yenileme, geri/ileri, ikinci sekme ve yeniden girişten sonra da.
+  - **Kısa web/API saldırı listesi:** çift gönderim ve istek tekrarı, eşzamanlılık, geri/yenile/derin bağlantı, sınırlar, Türkçe karakter ve büyük/küçük harf (İ/ı), para yuvarlama ve biçim tutarlılığı, zaman kuralları, hata mesajında bilgi sızıntısı, klavye ve ekran okuyucu, kimlik değiştirerek yetki.
+  - Ayrıntılar referansa taşındı (16 bölüm); SKILL.md gövdesi 157 satır.
+- `sbtm.py`: 10–45 dakikalık oturumlar artık süre uyarısı vermiyor; uyarı yalnızca 10 dakikanın altı ve 180 dakikanın üstü için.
+- 5 yeni test: kısa oturum ayrıştırma, süre uyarısı sınırları, referans bölüm numaraları, SKILL.md içeriği.
+
 **0.8.0**: Uluslararası test verisi, API güvenlik denemeleri, OWASP LLM 2026
 - `preparing-test-data`: `card_test` (yalnızca yayımlanmış sandbox test kartları, Luhn), `phone_intl` (ABD/İngiltere kurgusal numara aralıkları), `iban` (TR, DE, GB, FR, NL, ES, IT için mod-97). Ortak `tr_ids.py`'ye `luhn_ok` ve `gen_iban` eklendi.
 - `testing-apis`: isteğe bağlı `--security-probes` ile işlem başına bir SQL enjeksiyonu ve bir XSS denemesi (5xx yok, veritabanı hatası sızmıyor, HTML'de kaçırılmamış betik yok).

@@ -1,0 +1,35 @@
+PoliçeNova Göç Aracı (migtool v2.4.1) - Çalıştırma Raporu
+Ortam            : PROVA-2 (genel prova / dress rehearsal)
+Kaynak           : SIGMA/400 dışa aktarımı 28.09.2026 18:00 (POLMAS.csv, TAKSIT.csv)
+Hedef            : PNOVA_MIG şeması (policies, installments)
+Kesim tarihi     : 30.09.2026
+Filtre           : DURUM_KD <> 'B' (teklifler ve teklif taksitleri hariç)
+Yükleme sırası   : parti bazında; parti içinde POL_NO, TAKSIT_NO artan
+
+=== Çalıştırma R1 ===
+Başlangıç : 28.09.2026 22:04:51 (TRT)
+Mod       : poliçe MERGE (anahtar: policy_id), taksit INSERT (installment_id = sıra no)
+Parti 1 (A01, A02, A03): poliçe okunan 20 / yazılan 20 / reddedilen 0 ; taksit okunan 83 / yazılan 83 / reddedilen 0
+Parti 2 (A04, A05, A07): poliçe okunan 18 / yazılan 18 / reddedilen 0 ; taksit okunan 65 / yazılan 65 / reddedilen 0
+Parti 3 (A06, A08): poliçe okunan 12 / yazılan 12 / reddedilen 0 ; taksit okunan 41 / yazılan 5 / reddedilen 0
+          HATA: hedef veritabanı bağlantısı zaman aşımı (300 sn). Parti 3 yarıda kesildi.
+Parti 4 (A09, A10): poliçe okunan 10 / yazılan 10 / reddedilen 0 ; taksit okunan 45 / yazılan 45 / reddedilen 0
+Bitiş     : 28.09.2026 23:41:07 (TRT) - DURUM: KISMEN BAŞARILI (1 parti hatalı)
+
+=== Çalıştırma R2 (yeniden çalıştırma) ===
+Başlangıç : 29.09.2026 01:12:30 (TRT)
+Kapsam    : yalnızca Parti 3
+Mod       : poliçe MERGE (anahtar: policy_id), taksit INSERT (installment_id = sıra no)
+Parti 3 (A06, A08): poliçe okunan 12 / yazılan 12 / reddedilen 0 ; taksit okunan 41 / yazılan 41 / reddedilen 0
+Bitiş     : 29.09.2026 01:19:44 (TRT) - DURUM: BAŞARILI
+
+=== Mutabakat özeti (migtool otomatik; yükleme sayaçları ve hazırlık tablosu toplamları) ===
+Poliçe sayısı   : kaynak (teklif hariç) 60 | hedef 60 | fark 0   OK
+Taksit sayısı   : kaynak (teklif hariç) 234 | hedef 234 | fark 0   OK
+Brüt prim TRY   : kaynak 779.577,63 | hedef 779.577,63 | fark 0,00   OK
+Brüt prim USD   : kaynak 15.369,38 | hedef 15.369,38 | fark 0,00   OK
+Brüt prim EUR   : kaynak 13.200,91 | hedef 13.200,91 | fark 0,00   OK
+Uyarı sayısı    : 0
+
+SONUÇ: Mutabakat başarılı. Canlı geçiş için teknik engel bulunmamaktadır.
+Hazırlayan: Göç Ekibi (migtool otomatik rapor)

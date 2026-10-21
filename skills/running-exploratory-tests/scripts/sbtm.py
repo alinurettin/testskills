@@ -41,6 +41,8 @@ Session sheet format (keys are case-insensitive; Turkish keys work too):
   "[REQ-###]" after a tag links that note to specific requirements. Indented lines below a
   note add detail; for BUG notes the keys steps/expected/actual/severity/data/evidence
   (adımlar/beklenen/gerçekleşen/önem/veri/kanıt) fill the defect draft.
+  Only charter and duration are required, so a short session (10-45 min) can keep a two-line
+  header; durations under 10 or over 180 min produce a warning.
 
 Usage:
   python sbtm.py charters --requirements qa/requirements.json --top 8 --lang tr \\
@@ -569,9 +571,11 @@ def parse_session(path: Path) -> tuple[dict, list[str], list[str]]:
     s["duration"] = parse_duration(h.get("duration", ""))
     if s["duration"] is None:
         errors.append(f"{path.name}: missing or unreadable 'duration:' (minutes, e.g. 90, 1h30, 1:30)")
-    elif not 30 <= s["duration"] <= 180:
-        warns.append(f"{path.name}: duration {s['duration']} min is outside the usual 60-120 min SBTM session; "
-                     "split long sessions, merge very short ones")
+    elif s["duration"] < 10:  # short sessions (10-45 min) are a supported mode; see SKILL.md
+        warns.append(f"{path.name}: duration {s['duration']} min is too short to be a session; merge it with the next one")
+    elif s["duration"] > 180:
+        warns.append(f"{path.name}: duration {s['duration']} min is longer than one session (usually 60-120 min); "
+                     "split it")
     s["reqs"] = REQ_RE.findall(h.get("req", ""))
     if not s["reqs"]:
         warns.append(f"{path.name}: no 'req:' IDs - findings cannot be traced to requirements")

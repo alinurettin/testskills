@@ -1,0 +1,2 @@
+test_id;odeme_yontemi;olay_dizisi;beklenen_son_olay_sonucu;beklenen_son_durum;aciklama
+ORNEK-1;KREDI_KARTI;ODEME_BASARILI > HAZIRLAMAYA_BASLA;KABUL;HAZIRLANIYOR;Format örneği - değerlendirmeye alınmaz

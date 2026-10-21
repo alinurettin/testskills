@@ -20,6 +20,9 @@ Indented lines under a note add detail. For BUG notes these keys fill the defect
 tbs = percent of session time spent on Test design and execution / Bug investigation and reporting /
 Setup (environment, data, access). The three numbers must add up to 100. Estimate them at the end.
 opportunity = percent of time spent off-charter (worth doing, but not what the charter asked).
+Short session (under ~45 min): only "charter:" (one line) and "duration:" are required; the other
+header lines are optional. Write the notes as you test and do not reformat them; add a rough tbs at
+the end (aim for test >= 75). Spend the time probing, not on this sheet.
 Use test environments and synthetic data only (example.com addresses, fictional names).
 -->
 

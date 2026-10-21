@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import re
 import subprocess
 import sys
 import tempfile
@@ -192,11 +193,77 @@ class ReportTests(unittest.TestCase):
             self.assertEqual(sorted({n["tag"] for n in s["notes"]}), sorted(sbtm.TAGS), name)
             self.assertEqual(s["tbs"], (60, 25, 15))
 
+    def test_short_session_needs_only_charter_and_duration(self):
+        s = self.sheet("S-010.md", "charter: Explore the shop with the attack checklist and follow-the-data\n"
+                                   "duration: 25\n\n"
+                                   "10:03 COVERED: order create; list, detail, cart badge, GET /api/orders\n"
+                                   "10:09 BUG: Double click on Pay creates two orders\n"
+                                   "  steps: Add one item; double-click Pay\n"
+                                   "  expected: One order\n"
+                                   "  actual: Two orders with the same total\n"
+                                   "  severity: high\n"
+                                   "10:15 BUG: Order list keeps the old total after editing the order\n"
+                                   "10:21 COVERED: second tab, refresh, re-login after the edit\n")
+        sess, errors, warns = sbtm.parse_session(s)
+        self.assertEqual((errors, sess["duration"]), ([], 25))
+        self.assertFalse([w for w in warns if "duration" in w], warns)
+        p = run("report", str(s), "--out-dir", str(self.dir / "out"))
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertNotIn("duration", p.stdout)
+        self.assertEqual((self.dir / "out" / "defects.md").read_text(encoding="utf-8").count("\n## D-"), 2)
+        items, errs = compact_items((self.dir / "out" / "candidate-tests.src.md").read_text(encoding="utf-8"))
+        self.assertEqual((errs, len(items)), ([], 2))
+
+    def test_duration_warnings_only_for_extremes(self):
+        for minutes, warned in ((5, True), (10, False), (45, False), (120, False), (180, False), (200, True)):
+            s = self.sheet(f"D-{minutes}.md", f"charter: Explore x\nduration: {minutes}\nreq: REQ-001\n10:00 COVERED: x\n")
+            _, errors, warns = sbtm.parse_session(s)
+            self.assertEqual(errors, [])
+            self.assertEqual(any("duration" in w for w in warns), warned, minutes)
+
     def test_help_runs(self):
         p = run("--help")
         self.assertEqual(p.returncode, 0)
         self.assertIn("charters", p.stdout)
         self.assertEqual(run("report").returncode, 2)
+
+
+class GuidanceStructureTests(unittest.TestCase):
+    """SKILL.md sends the reader to numbered reference sections; keep the numbers and contents in step."""
+
+    REF = SKILL / "references" / "exploratory-testing.md"
+
+    def headings(self) -> dict[int, str]:
+        text = self.REF.read_text(encoding="utf-8")
+        return {int(m.group(1)): m.group(2) for m in re.finditer(r"^## (\d+)\. (.+)$", text, re.M)}
+
+    def test_contents_list_matches_numbered_headings(self):
+        text = self.REF.read_text(encoding="utf-8")
+        contents = text.split("## Contents", 1)[1].split("\n---", 1)[0]
+        listed = {int(m.group(1)): m.group(2).strip() for m in re.finditer(r"^(\d+)\. (.+)$", contents, re.M)}
+        heads = self.headings()
+        self.assertEqual(listed, heads)
+        self.assertEqual(sorted(heads), list(range(1, len(heads) + 1)))
+
+    def test_section_references_resolve(self):
+        heads = self.headings()
+        for path in (SKILL / "SKILL.md", self.REF):
+            text = path.read_text(encoding="utf-8")
+            for group in re.findall(r"\bsections? (\d+(?:(?:, | and )\d+)*)", text):
+                for n in map(int, re.findall(r"\d+", group)):
+                    self.assertIn(n, heads, f"{path.name}: section {n}")
+        # The short-session reading plan in SKILL.md names sections 2, 5 and 6.
+        self.assertIn("Short sessions", heads[2])
+        self.assertIn("Follow the data", heads[5])
+        self.assertIn("attack checklist", heads[6])
+        self.assertIn("AI-agent", heads[13])
+
+    def test_short_mode_and_checklist_are_in_the_skill_body(self):
+        body = (SKILL / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[1]
+        for needle in ("## Choose the mode", "## The core loop", "### Attack checklist", "## Short session",
+                       "Double submit and replay", "Follow the data", "≥ 75%"):
+            self.assertIn(needle, body)
+        self.assertLess(body.count("\n"), 250, "keep SKILL.md lean; move detail to the reference")
 
 
 if __name__ == "__main__":

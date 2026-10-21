@@ -1,0 +1,125 @@
+﻿musteri_no;musteri_tipi;tckn;vkn;ad;soyad;unvan;sirket_turu;dogum_tarihi;kurulus_tarihi;cinsiyet;il;ilce;eposta;telefon;kayit_tarihi;notlar
+M103877;BIREYSEL;35119405750;;Orhan;Eren;;;01.07.2005;;E;İstanbul;Ataşehir;orhan.eren@example.com;0506 695 67 74;2023-12-27;
+M110665;BIREYSEL;80624794516;;Öykü;Işık;;;10.11.2004;;K;İstanbul;Beşiktaş;oyku.isik@example.com;0533 642 97 55;2023-03-13;Müşteri memnuniyeti anketine katıldı.
+M124191;BIREYSEL;10300488026;;Levent;Güler;;;21.12.1996;;E;İstanbul;Beşiktaş;levent.guler@example.test;(0505) 035-4971;2017-11-16;
+M125323;KURUMSAL;;3493117517;;;Kaya Turizm ve Seyahat A.Ş.;AS;;2021-02-11;;İzmir;Konak;iletisim.kaya@example.com;(0232) 840-4718;2021-09-17;
+M125746;BIREYSEL;33570600868;;Ebru;Akın;;;21.02.1995;;K;İzmir;Konak;ebru.akin@example.com;5431618422;2017-08-16;
+M126074;KURUMSAL;;1612820857;;;Uludağ Otomotiv Yan Sanayi A.Ş.;AS;;2011-07-08;;Bursa;Nilüfer;iletisim.uludag@example.com;0224 995 53 79;2013-06-18;
+M132788;BIREYSEL;23829805502;;Cengiz;Sezer;;;02.04.1998;;E;İstanbul;Üsküdar;cengiz.sezer@example.com;(0505) 041-4819;2016-04-29;
+M139452;BIREYSEL;88855618144;;Hakan;Kaplan;;;29.04.2003;;E;İstanbul;Kadıköy;hakan.kaplan@example.com;(0535) 195-7128;2023-11-10;
+M140891;BIREYSEL;92440161366;;Serkan;Bulut;;;06.10.2001;;E;Ankara;Çankaya;serkan.bulut@example.test;5063775744;2021-05-05;Kredi kartı limit artışı talep etti.
+M149273;BIREYSEL;64628897886;;Halil;Gündoğdu;;;09.03.1983;;E;Ankara;Etimesgut;halil.gundogdu@example.com;0542 224 38 41;2018-01-29;
+M149806;KURUMSAL;;3997833173;;;Çukurova Pamuk A.Ş.;AS;;1992-01-30;;Adana;Çukurova;iletisim.cukurova@example.com;(0322) 898-9686;2005-11-11;
+M164486;BIREYSEL;35680725882;;Bülent;Özer;;;22.05.1982;;E;Ankara;Etimesgut;bulent.ozer@example.test;0533 694 62 65;2011-04-13;Hesap özeti e-posta ile gönderilsin istedi.
+M213773;KURUMSAL;;3888183236;;;Göksu İnşaat Ltd. Şti.;LTD;;2021-02-20;;Ankara;Etimesgut;iletisim.goksu@example.com;(0312) 815-8293;2021-05-28;
+M227546;BIREYSEL;11754297400;;Erdem;Coşkun;;;12.05.1931;;E;Şanlıurfa;Halfeti;erdem.coskun@example.test;0533 047 02 16;2011-09-16;
+M229105;BIREYSEL;56823285896;;Levent;Şimşek;;;09.07.1972;;E;Ankara;Keçiören;levent.simsek@example.test;(0532) 853-9225;2018-12-18;
+M229451;BIREYSEL;86583528308;;Dilek;Taş;;;27.12.1995;;K;Ankara;Etimesgut;dilek.tas@example.com;+90 543 139 24 94;2014-06-07;
+M238042;BIREYSEL;18149600548;;Erdem;Erdem;;;29.07.1980;;E;İzmir;Konak;erdem.erdem@example.com;5536799499;2010-10-26;Şube ziyareti - bilgi güncelleme.
+M239352;KURUMSAL;;2146118531;;;Kuzgun Bilişim Ltd. Şti.;LTD;;1998-07-23;;İstanbul;Üsküdar;iletisim.kuzgun@example.com;0216 595 09 14;2008-11-13;Kurumsal internet bankacılığı yetki tanımı yapıldı.
+M244638;KURUMSAL;;4209148905;;;Toros Tarım Ürünleri A.Ş.;AS;;1987-07-10;;Adana;Seyhan;iletisim.toros@example.com;0322 655 07 61;2024-05-28;
+M258080;BIREYSEL;97188557426;;Kadir;İnce;;;16.06.1972;;E;İstanbul;Beşiktaş;kadir.ince@example.test;(0555) 603-9827;2005-05-15;Adres değişikliği talebi alındı.
+M262228;BIREYSEL;87540343026;;Mehmet Ali;Kaya;;;14.07.1971;;E;Ankara;Çankaya;mehmet.ali.kaya@example.com;(0553) 354-4988;2011-07-27;"Sn. KAYA MEHMET ALİ maaş müşterisi; maaşı IBAN tr41 0099 0002 0700 0010 7151 61 üzerine yatıyor."
+M268279;BIREYSEL;29712254686;;Abdullah;Aydın;;;08.12.1976;;E;İstanbul;Şişli;abdullah.aydin@example.com;(0535) 192-5473;2018-07-13;
+M275479;BIREYSEL;27253141038;;Onur;Keskin;;;09.07.1984;;E;İzmir;Konak;onur.keskin@example.com;+90 543 233 66 22;2007-06-08;
+M286181;KURUMSAL;;8195143545;;;Sarp Makine Sanayi A.Ş.;AS;;1985-11-29;;Ankara;Etimesgut;iletisim.sarp@example.com;+90 312 218 41 96;2020-02-28;
+M292710;BIREYSEL;55871476980;;Gökhan;Yazıcı;;;19.09.2002;;E;İstanbul;Bakırköy;gokhan.yazici@example.com;5068117856;2022-09-09;Hesap özeti e-posta ile gönderilsin istedi.
+M297360;BIREYSEL;22027635300;;İbrahim;Çelik;;;30.11.1963;;E;İstanbul;Üsküdar;ibrahim.celik@example.test;+90 505 589 61 92;2010-04-30;Eşi Fatma Demir'in cep telefonu 0555-044-4637, acil durumda aranabilir.
+M298797;BIREYSEL;37701899756;;Nazlı;Sezer;;;24.12.1994;;K;İzmir;Konak;nazli.sezer@example.com;5358432920;2024-03-11;
+M314204;BIREYSEL;92653249448;;Hülya;Sarı;;;14.08.1996;;K;İstanbul;Ataşehir;hulya.sari@example.test;0535 795 21 69;2018-05-09;
+M317929;BIREYSEL;36255124222;;Şule;Oral;;;17.06.1997;;K;Ankara;Keçiören;sule.oral@example.com;0532 078 27 04;2022-10-17;
+M320579;BIREYSEL;47511709824;;Berk;Özdemir;;;24.10.2002;;E;İstanbul;Şişli;berk.ozdemir@example.test;0532 264 41 51;2024-07-28;
+M329990;BIREYSEL;92606926808;;Filiz;Keskin;;;01.11.1998;;K;Ankara;Keçiören;filiz.keskin@example.com;0553 119 75 97;2023-07-15;Müşteri memnuniyeti anketine katıldı.
+M345053;BIREYSEL;37843238536;;Selim;Doğan;;;31.07.1968;;E;İstanbul;Şişli;selim.dogan@example.test;(0542) 808-6721;2010-01-27;
+M347975;KURUMSAL;;3901953503;;;Ilgın Kozmetik A.Ş.;AS;;2002-03-05;;İstanbul;Şişli;iletisim.ilgin@example.com;0216 714 50 77;2012-10-09;Kampanya bilgilendirmesi istemiyor.
+M348187;KURUMSAL;;5417458687;;;Mavi Liman Denizcilik A.Ş.;AS;;1991-11-06;;İzmir;Karşıyaka;iletisim.mavi@example.com;+90 232 623 66 36;2020-08-24;
+M360829;BIREYSEL;43882389870;;Işıl;Kılıç;;;11.10.1994;;K;İzmir;Karşıyaka;isil.kilic@example.com;5339861289;2013-01-29;Vekaletname: vekil İSMAİL ŞAHİN (T.C. 28155-981-616) adına düzenlendi. Müşteri IŞIL KILIÇ imzaladı.
+M383090;BIREYSEL;24114210612;;Şerife;Karaca;;;30.12.1984;;K;Ankara;Çankaya;serife.karaca@example.test;5540318400;2024-07-17;Müşteri memnuniyeti anketine katıldı.
+M385525;BIREYSEL;47496449760;;Berk;Sarı;;;23.02.1996;;E;İstanbul;Kadıköy;berk.sari@example.test;0555 334 28 82;2022-03-23;
+M393373;BIREYSEL;14858608202;;Neslihan;Sarı;;;25.08.1972;;K;İstanbul;Ataşehir;neslihan.sari@example.test;0543 903 26 57;2014-07-19;
+M393784;BIREYSEL;39202961888;;Melike;Özer;;;19.03.1995;;K;İzmir;Buca;melike.ozer@example.com;0505 922 76 87;2024-09-20;
+M396604;BIREYSEL;82012772830;;Uğur;Güler;;;10.08.2001;;E;Ankara;Yenimahalle;ugur.guler@example.com;5322732342;2023-08-06;
+M408250;BIREYSEL;12854907534;;Elif Naz;Demir;;;29.02.2008;;K;İstanbul;Kadıköy;elif.naz.demir@example.com;5434223093;2026-03-01;Annesi Sevim Demir ile şubeye geldi, ilk hesabını açtı.
+M413611;BIREYSEL;48509826844;;Yiğit;Bulut;;;18.03.1987;;E;İstanbul;Şişli;yigit.bulut@example.com;(0554) 757-1221;2018-03-14;
+M416053;KURUMSAL;;4425027801;;;Hatice Arslan Tekstil;SAHIS;;1998-02-22;;İstanbul;Bakırköy;hatice.arslan.isletme@example.com;0532 013 52 26;2009-09-05;Firma sahibi Hatice Arslan aynı zamanda bireysel müşterimiz (M802046). Muhasebe e-postası: HATICE.ARSLAN@EXAMPLE.COM
+M417316;BIREYSEL;37114815268;;Mustafa;İnce;;;20.05.1985;;E;İstanbul;Beşiktaş;mustafa.ince@example.com;+90 555 728 19 95;2018-01-01;Hesap özeti e-posta ile gönderilsin istedi.
+M424799;KURUMSAL;;4168610595;;;Akdeniz Narenciye A.Ş.;AS;;1992-01-20;;Adana;Seyhan;iletisim.akdeniz@example.com;0322 717 28 11;2017-06-02;Kredi kartı limit artışı talep etti.
+M426567;KURUMSAL;;2151474949;;;Bereket Ambalaj Ltd. Şti.;LTD;;2020-09-18;;Bursa;Osmangazi;iletisim.bereket@example.com;+90 224 282 26 51;2021-10-01;
+M429458;BIREYSEL;71562144112;;Selim;Coşkun;;;16.12.1989;;E;İstanbul;Ataşehir;selim.coskun@example.test;0543 577 41 18;2012-08-12;
+M439077;BIREYSEL;33746875946;;Hasan;Doğan;;;15.03.1981;;E;İstanbul;Kadıköy;hasan.dogan@example.com;+90 553 355 92 20;2026-06-18;
+M439686;KURUMSAL;;6598380696;;;Kapadokya Seramik A.Ş.;AS;;2009-12-16;;Ankara;Çankaya;iletisim.kapadokya@example.com;0312 703 70 34;2015-07-08;
+M443632;BIREYSEL;62587589460;;Selim;Uçar;;;24.06.1982;;E;İzmir;Buca;selim.ucar@example.test;5350251227;2005-08-20;
+M467337;BIREYSEL;66025472192;;Umut;Tunç;;;08.03.1987;;E;İstanbul;Kadıköy;umut.tunc@example.test;0555 198 44 47;2012-09-30;Adres değişikliği talebi alındı.
+M480509;BIREYSEL;47231583520;;Arda;Aslan;;;20.06.1983;;E;İstanbul;Üsküdar;arda.aslan@example.test;(0555) 782-4206;2020-05-15;
+M492579;BIREYSEL;23598159394;;Taner;Kaplan;;;31.08.2004;;E;İstanbul;Bakırköy;taner.kaplan@example.test;(0533) 959-1936;2025-03-15;Hesap özeti e-posta ile gönderilsin istedi.
+M500831;KURUMSAL;;7855767649;;;Boğaziçi Danışmanlık Ltd. Şti.;LTD;;1993-04-08;;İstanbul;Beşiktaş;iletisim.bogazici@example.com;+90 216 392 70 93;2020-09-29;
+M507080;BIREYSEL;90769711774;;Arda;Karaca;;;15.04.1960;;E;İstanbul;Üsküdar;arda.karaca@example.test;0542 834 77 25;2024-04-20;E-bülten aboneliği: arda.karaca(at)example.test
+M526353;BIREYSEL;73725336488;;Şeyma;Altun;;;06.01.1989;;K;İstanbul;Bakırköy;seyma.altun@example.test;0553 793 80 32;2026-03-15;
+M539583;BIREYSEL;74027053110;;Mehmet;Öztürk;;;02.12.1987;;E;Ankara;Keçiören;mehmet.ozturk@example.com;0542 974 87 04;2019-09-25;"Şikayet kaydı #4471:
+Müşteri MEHMET ÖZTÜRK, ATM'de kartının sıkıştığını bildirdi.
+Geri arama numarası: +905429748704"
+M539878;BIREYSEL;45876979128;;Merve;Yazıcı;;;08.04.1996;;K;İstanbul;Bakırköy;merve.yazici@example.com;(0532) 710-6792;2023-04-11;
+M541990;KURUMSAL;;4699247468;;;Trakya Un Sanayi A.Ş.;AS;;1992-05-04;;İstanbul;Bakırköy;iletisim.trakya@example.com;(0216) 225-8357;2009-01-20;
+M552699;KURUMSAL;;2324621253;;;Demir Çelik Sanayi A.Ş.;AS;;2011-09-12;;Bursa;Osmangazi;iletisim.demir@example.com;+90 224 921 27 59;2020-02-14;
+M559608;BIREYSEL;97274933172;;Can;Akbulut;;;03.02.1967;;E;İstanbul;Beşiktaş;can.akbulut@example.com;0554 407 70 93;2021-05-08;
+M559667;BIREYSEL;46510062060;;Mustafa;Altun;;;29.05.1981;;E;İzmir;Karşıyaka;mustafa.altun@example.test;5427577366;2021-10-24;Mobil bankacılık şifre sıfırlama yapıldı.
+M559909;KURUMSAL;;3708526993;;;Aksu Kimya A.Ş.;AS;;2024-10-09;;İstanbul;Kadıköy;iletisim.aksu@example.com;+90 216 360 74 81;2024-10-09;Kurumsal internet bankacılığı yetki tanımı yapıldı.
+M560471;BIREYSEL;28268870876;;Feride;Ateş;;;03.02.1994;;K;İstanbul;Şişli;feride.ates@example.test;+90 553 801 54 83;2015-06-25;
+M569995;BIREYSEL;87857488274;;Serkan;Doğan;;;20.09.1963;;E;İstanbul;Bakırköy;serkan.dogan@example.com;+90 542 715 59 12;2022-01-10;Şube ziyareti - bilgi güncelleme.
+M575467;BIREYSEL;42202926344;;Berna;Soylu;;;19.04.2008;;K;İstanbul;Üsküdar;berna.soylu@example.test;(0543) 793-4296;2026-05-28;
+M578557;BIREYSEL;82229285604;;Ali;Kaya;;;09.03.1976;;E;İstanbul;Beşiktaş;ali.kaya@example.com;+90 554 838 24 21;2019-03-03;"İletişim tercihi e-posta: ali.kaya [at] example.com; cep: 0 (554) 838 24 21"
+M584052;BIREYSEL;24713194528;;Gökhan;Duman;;;22.07.1972;;E;Ankara;Etimesgut;gokhan.duman@example.test;(0543) 128-9757;2008-03-30;
+M586454;BIREYSEL;37599127092;;Hülya;Toprak;;;09.05.1994;;K;Ankara;Keçiören;hulya.toprak@example.test;0533 643 04 39;2024-05-15;Şube ziyareti - bilgi güncelleme.
+M586770;BIREYSEL;47825601272;;Taner;Akın;;;22.05.2007;;E;Ankara;Etimesgut;taner.akin@example.com;5330968949;2025-10-25;
+M595870;BIREYSEL;97356912620;;Yasemin;Korkmaz;;;06.05.1989;;K;İstanbul;Şişli;yasemin.korkmaz@example.com;5553849814;2011-02-14;
+M596042;BIREYSEL;68223959284;;Zehra;Ekinci;;;03.08.1955;;K;Bayburt;Merkez;zehra.ekinci@example.test;0506 185 71 36;2023-12-03;Mobil bankacılık şifre sıfırlama yapıldı.
+M602227;BIREYSEL;40029821354;;Tülay;Karaca;;;11.07.2000;;K;İstanbul;Şişli;tulay.karaca@example.test;5431781040;2019-01-06;
+M628818;KURUMSAL;;7599954884;;;Marmara Yazılım Ltd. Şti.;LTD;;2018-06-05;;İstanbul;Ataşehir;iletisim.marmara@example.com;+90 216 671 45 73;2024-12-19;
+M636147;KURUMSAL;;6604920410;;;Selvi Peyzaj A.Ş.;AS;;2015-06-14;;Bursa;Nilüfer;iletisim.selvi@example.com;+90 224 779 46 89;2015-06-14;
+M642854;BIREYSEL;49150884504;;Ayşe;Yılmaz;;;17.06.1984;;K;İstanbul;Kadıköy;ayse.yilmaz@example.com;0543 914 03 92;2015-12-20;Müşteri TCKN 491 508 845 04 ile şubeye geldi, kimlik teyit edildi.
+M645214;BIREYSEL;24345792062;;Tolga;Bozkurt;;;07.08.1970;;E;Ankara;Yenimahalle;tolga.bozkurt@example.com;+90 532 046 22 50;2016-01-20;Şube ziyareti - bilgi güncelleme.
+M686307;KURUMSAL;;4386066411;;;Doruk Medikal Ltd. Şti.;LTD;;2011-12-09;;İzmir;Buca;iletisim.doruk@example.com;+90 232 863 12 84;2024-06-19;Hesap özeti e-posta ile gönderilsin istedi.
+M686868;KURUMSAL;;8345909210;;;Ege Tekstil Dış Ticaret A.Ş.;AS;;2002-07-24;;İzmir;Bornova;iletisim.ege@example.com;+90 232 625 15 97;2015-04-25;
+M696512;KURUMSAL;;0371083303;;;Mustafa Kurt Oto Yedek Parça;SAHIS;;2008-03-17;;Bursa;Osmangazi;mustafa.kurt.isletme@example.com;(0543) 104-7439;2014-11-21;Firma sahibi Mustafa Kurt, TCKN 58518515660. Fatura no 40001234567 ile ilgili itiraz kaydı açıldı.
+M697051;KURUMSAL;;1818687801;;;Kırlangıç Turizm A.Ş.;AS;;2022-01-08;;Trabzon;Ortahisar;iletisim.kirlangic@example.com;+90 462 949 00 70;2024-03-27;
+M702582;BIREYSEL;34425646048;;Umut;Gündoğdu;;;03.12.1997;;E;İstanbul;Şişli;umut.gundogdu@example.test;5532526302;2025-07-09;
+M712825;BIREYSEL;71387657194;;Berna;Güneş;;;26.07.1984;;K;İstanbul;Bakırköy;berna.gunes@example.test;(0555) 883-4204;2018-02-16;
+M715626;BIREYSEL;52900916226;;Burcu;Uçar;;;17.12.1988;;K;İstanbul;Şişli;burcu.ucar@example.com;(0505) 007-6243;2017-05-09;
+M716630;BIREYSEL;82855922584;;Kadir;Coşkun;;;03.02.1974;;E;İstanbul;Beşiktaş;kadir.coskun@example.test;(0542) 505-3716;2019-05-06;
+M719678;KURUMSAL;;9526477506;;;Fırat Enerji A.Ş.;AS;;1988-05-13;;Şanlıurfa;Haliliye;iletisim.firat@example.com;0414 575 66 44;2019-03-23;
+M737628;BIREYSEL;39578108078;;İrem;Karaca;;;02.04.1999;;K;İstanbul;Bakırköy;irem.karaca@example.com;0542 330 09 60;2026-01-01;
+M748890;BIREYSEL;19082061984;;Tolga;Türkmen;;;23.11.1999;;E;İzmir;Buca;tolga.turkmen@example.test;0506 548 70 69;2025-10-12;
+M752892;BIREYSEL;90077508400;;Ceren;Bozkurt;;;19.08.1970;;K;İstanbul;Üsküdar;ceren.bozkurt@example.com;0506 730 34 70;2023-09-26;
+M759377;BIREYSEL;48792556084;;Erdem;Uçar;;;06.05.1981;;E;Ankara;Çankaya;erdem.ucar@example.com;0505 949 55 63;2023-10-18;Müşteri memnuniyeti anketine katıldı.
+M773268;KURUMSAL;;5550536091;;;Anadolu Gıda Pazarlama A.Ş.;AS;;1993-05-23;;Ankara;Yenimahalle;iletisim.anadolu@example.com;(0312) 354-1248;2009-05-30;
+M777039;KURUMSAL;;3660939524;;;Karadeniz Su Ürünleri Ltd. Şti.;LTD;;2022-04-16;;Trabzon;Ortahisar;iletisim.karadeniz@example.com;(0462) 817-2547;2022-07-28;Kurumsal internet bankacılığı yetki tanımı yapıldı.
+M779801;BIREYSEL;49264018352;;Meryem;Ekinci;;;14.04.1999;;K;İstanbul;Bakırköy;meryem.ekinci@example.com;0506 452 62 17;2021-01-19;
+M797258;BIREYSEL;89038370996;;Hanife;Güneş;;;13.01.1986;;K;Ankara;Çankaya;hanife.gunes@example.com;(0553) 816-5762;2021-01-01;
+M800097;BIREYSEL;12550650802;;Abdullah;Özdemir;;;03.08.1983;;E;Ankara;Keçiören;abdullah.ozdemir@example.test;0535 961 33 58;2008-07-06;
+M802046;BIREYSEL;57269014330;;Hatice;Arslan;;;21.01.1972;;K;İstanbul;Bakırköy;hatice.arslan@example.com;0535 045 63 41;2015-06-09;Kimlik No: 572.690.143.30 (nüfus cüzdanı yenilendi)
+M803279;KURUMSAL;;3465733637;;;Recep Polat Nakliyat;SAHIS;;2011-02-24;;Adana;Seyhan;recep.polat.isletme@example.com;+90 532 633 16 67;2021-12-18;
+M814575;BIREYSEL;82079219200;;Onur;Özer;;;11.11.1979;;E;İstanbul;Ataşehir;onur.ozer@example.com;(0543) 603-2244;2023-06-27;Kampanya bilgilendirmesi istemiyor.
+M815272;BIREYSEL;64931930454;;Cengiz;Güneş;;;03.03.1992;;E;İstanbul;Bakırköy;cengiz.gunes@example.com;5557208186;2026-04-16;
+M817071;BIREYSEL;67065787444;;Melike;İnce;;;15.02.1980;;K;Ankara;Çankaya;melike.ince@example.com;+90 506 970 30 69;2012-01-23;
+M818843;BIREYSEL;67649997276;;Gülşen;Çelik;;;05.09.1978;;K;İstanbul;Ataşehir;gulsen.celik@example.test;0535 159 67 46;2007-07-31;E-posta adresi GULSEN.CELIK @ EXAMPLE.TEST olarak düzeltildi.
+M820079;BIREYSEL;57176518662;;Emre;Yıldız;;;29.02.2004;;E;Ankara;Yenimahalle;emre.yildiz@example.com;0505 956 67 78;2022-03-01;
+M823275;BIREYSEL;50857494170;;Hüseyin;Kılıç;;;26.04.1982;;E;İzmir;Bornova;huseyin.kilic@example.test;(0553) 696-1795;2016-10-28;Kardeşi Gülşen Çelik de müşterimiz (M818843). WhatsApp hattı: 5536961795
+M831099;BIREYSEL;40970203476;;Hülya;Bulut;;;19.02.1995;;K;Ankara;Yenimahalle;hulya.bulut@example.test;0533 220 62 56;2024-05-03;
+M832623;BIREYSEL;39365492472;;Burak;Güneş;;;25.02.2008;;E;Ankara;Yenimahalle;burak.gunes@example.com;+90 555 147 36 16;2026-06-26;
+M839032;KURUMSAL;;0754546367;;;Kuzey Lojistik Ltd. Şti.;LTD;;2018-02-05;;İstanbul;Şişli;iletisim.kuzey@example.com;0216 895 12 20;2023-04-26;Yetkili: Sn. Barış Aksoy, tel 0090 532 342 52 76. Kurumsal çağrı merkezi yönlendirmesi: Pusula Müşteri Hizmetleri 0850 724 00 00
+M841181;BIREYSEL;51003172188;;Şule;Karaca;;;31.01.1986;;K;Ankara;Etimesgut;sule.karaca@example.com;(0532) 256-1512;2019-09-10;
+M847640;BIREYSEL;16192538634;;Tülay;Soylu;;;05.03.2002;;K;İstanbul;Üsküdar;tulay.soylu@example.com;0532 428 14 10;2021-10-29;
+M853027;KURUMSAL;;6184026672;;;Yeşilırmak Mobilya Ltd. Şti.;LTD;;1993-03-02;;Ankara;Keçiören;iletisim.yesilirmak@example.com;0312 981 77 91;2024-11-20;
+M872211;BIREYSEL;93094790674;;Burcu;Karaca;;;13.01.1987;;K;İstanbul;Kadıköy;burcu.karaca@example.com;+90 542 140 50 76;2005-12-17;
+M886431;BIREYSEL;20172700560;;Zeynep;Erdem;;;11.02.1973;;K;İstanbul;Ataşehir;zeynep.erdem@example.com;(0533) 143-6798;2025-09-19;
+M896220;BIREYSEL;53080698346;;Tarık;Özkan;;;08.11.1980;;E;İstanbul;Üsküdar;tarik.ozkan@example.com;5546853407;2024-04-23;
+M903941;BIREYSEL;78392155134;;Erdem;Yazıcı;;;24.01.1995;;E;İstanbul;Kadıköy;erdem.yazici@example.test;5553989127;2020-11-11;
+M944149;BIREYSEL;21497384480;;Sultan;Çetin;;;30.11.1982;;K;İstanbul;Ataşehir;sultan.cetin@example.com;0535 349 65 56;2015-10-09;
+M945074;BIREYSEL;15246850562;;Hanife;Eren;;;22.08.1998;;K;İzmir;Konak;hanife.eren@example.test;0532 079 28 07;2023-03-05;
+M968310;BIREYSEL;15170280510;;Ahmet;Erdem;;;10.12.1974;;E;İstanbul;Kadıköy;ahmet.erdem@example.com;5553958833;2014-02-17;Müşteri memnuniyeti anketine katıldı.
+M980152;BIREYSEL;93655654384;;Nermin;Güler;;;13.08.1998;;K;İstanbul;Bakırköy;nermin.guler@example.test;0532 037 07 96;2022-03-04;
+M985766;BIREYSEL;99458230022;;Ramazan;Uçar;;;07.04.1980;;E;Ankara;Etimesgut;ramazan.ucar@example.test;(0553) 447-6159;2010-09-17;Kredi kartı limit artışı talep etti.
+M986052;BIREYSEL;77017975126;;İrem;Acar;;;14.09.1971;;K;İstanbul;Bakırköy;irem.acar@example.com;0553 551 76 61;2019-05-06;
+M986324;BIREYSEL;72152248944;;Şerife;Şimşek;;;07.02.1980;;K;Ankara;Yenimahalle;serife.simsek@example.com;(0535) 382-4771;2014-10-07;
+M994842;BIREYSEL;96459211388;;Mahmut;Gündoğdu;;;02.11.1975;;E;Ankara;Yenimahalle;mahmut.gundogdu@example.com;0533 453 50 92;2006-07-15;
+M995021;KURUMSAL;;1296799326;;;Zeynep Aydın Kırtasiye;SAHIS;;1997-12-29;;Ankara;Çankaya;zeynep.aydin.isletme@example.com;0554 771 10 85;2007-01-02;
