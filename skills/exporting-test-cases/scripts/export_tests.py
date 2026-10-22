@@ -49,6 +49,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import copy
 import io
 import json
 import re
@@ -488,7 +489,8 @@ def write_xlsx(path: Path, sheets: list[tuple[str, list[list], list[int]]]):
                   'ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>')
         wb_rels.append(f'<Relationship Id="rId{i}" Type="http://schemas.openxmlformats.org/officeDocument/2006/'
                        f'relationships/worksheet" Target="worksheets/sheet{i}.xml"/>')
-        wb.append(f'<sheet name="{escape(name[:31])}" sheetId="{i}" r:id="rId{i}"/>')
+        state = ' state="veryHidden"' if name == "_qa_suite" else ""
+        wb.append(f'<sheet name="{escape(name[:31])}" sheetId="{i}" r:id="rId{i}"{state}/>')
     n = len(sheets) + 1
     wb_rels.append(f'<Relationship Id="rId{n}" Type="http://schemas.openxmlformats.org/officeDocument/2006/'
                    'relationships/styles" Target="styles.xml"/></Relationships>')
@@ -523,7 +525,10 @@ def write_xlsx(path: Path, sheets: list[tuple[str, list[list], list[int]]]):
             z.writestr(f"xl/worksheets/sheet{i}.xml", _sheet_xml(rows, widths))
 
 
-def export_xlsx(tests, ext_map, h, path: Path, project: str):
+def export_xlsx(tests, ext_map, h, path: Path, project: str, document=None):
+    if isinstance(document, dict) and (type(document.get("schema_version", 1)) is not int
+                                      or document.get("schema_version", 1) != 1):
+        raise ValueError("unsupported schema_version; supported version is 1 (unversioned legacy accepted)")
     header = [h["id"], h["title"], h["reqs"], h["ext"], h["priority"], h["polarity"], h["technique"], h["pre"],
               h["data"], h["step"], h["action"], h["sdata"], h["expected"], h["tags"], h["auto"], h["status"]]
     rows = [header]
@@ -548,7 +553,18 @@ def export_xlsx(tests, ext_map, h, path: Path, project: str):
             counts[t.get(field, "-")] = counts.get(t.get(field, "-"), 0) + 1
         summary.append([key, ""])
         summary += [[f"  {k}", v] for k, v in sorted(counts.items(), key=lambda kv: -kv[1])]
-    write_xlsx(path, [(h["doc"], rows, widths), (h["sum"], summary, [30, 40])])
+    # Metadata is data, never executable. Keep exact original types, optional fields and extensions.
+    # Filter out unselected tests so partial exports do not disclose the rest of the suite.
+    snapshot = copy.deepcopy(document) if isinstance(document, dict) else {"project": project}
+    snapshot["test_cases"] = copy.deepcopy(tests)
+    payload = {"format": "qa-suite-roundtrip", "metadata_version": 1, "document": snapshot,
+               "sheet": h["doc"], "headers": header, "rows": rows[1:]}
+    packed = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    # Excel has a 32767-character cell limit; use chunks that remain safe for UTF-16 surrogate pairs.
+    chunks = [[i, packed[p:p + 12000]] for i, p in enumerate(range(0, len(packed), 12000))]
+    metadata = [["QA Suite roundtrip metadata", 1]] + chunks
+    write_xlsx(path, [(h["doc"], rows, widths), (h["sum"], summary, [30, 40]),
+                      ("_qa_suite", metadata, [12, 80])])
 
 
 # ------------------------------------------------------------------ vendor limits and pitfalls
@@ -626,6 +642,10 @@ def main() -> int:
     try:
         tc = json.loads(Path(a.tests).read_text(encoding="utf-8-sig"))
         rq = json.loads(Path(a.requirements).read_text(encoding="utf-8-sig")) if a.requirements else {}
+        for data in (tc, rq):
+            if isinstance(data, dict) and (type(data.get("schema_version", 1)) is not int
+                                           or data.get("schema_version", 1) != 1):
+                raise ValueError("unsupported schema_version; supported version is 1 (unversioned legacy accepted)")
         pmap = dict(DEFAULT_PRIORITY, **(json.loads(a.priority_map) if a.priority_map else {}))
     except (OSError, ValueError) as e:
         print(f"error: {e}", file=sys.stderr)
@@ -673,7 +693,7 @@ def main() -> int:
     elif a.format == "markdown":
         text = export_markdown(tests, ext_map, h, project)
     else:
-        export_xlsx(tests, ext_map, h, out, project)
+        export_xlsx(tests, ext_map, h, out, project, document=tc)
         text = None
     if text is not None:
         out.write_text(text, encoding="utf-8-sig" if a.bom else "utf-8", newline="")

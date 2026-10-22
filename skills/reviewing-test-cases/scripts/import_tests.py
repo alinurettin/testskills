@@ -35,7 +35,10 @@ from __future__ import annotations
 
 import argparse
 import csv
+import copy
+import hashlib
 import io
+import json
 import posixpath
 import re
 import sys
@@ -397,6 +400,170 @@ def is_xlsx(path: Path) -> bool:
     return head.startswith(b"PK")
 
 
+# ------------------------------------------------------------------ lossless QA Suite workbook updates
+def validate_document(document):
+    """Accept legacy documents; never silently interpret a future schema."""
+    if not isinstance(document, dict) or not isinstance(document.get("test_cases"), list):
+        raise ValueError("expected an object containing test_cases")
+    version = document.get("schema_version", 1)
+    if type(version) is not int or version != 1:
+        raise ValueError("unsupported schema_version; supported version is 1 (unversioned legacy accepted)")
+    seen = set()
+    for test in document["test_cases"]:
+        if not isinstance(test, dict) or not TCID.fullmatch(str(test.get("id", ""))):
+            raise ValueError("every test must have a stable TC-### ID")
+        if test["id"] in seen:
+            raise ValueError(f"duplicate test ID: {test['id']}")
+        seen.add(test["id"])
+        if not test.get("title") or not isinstance(test.get("steps"), list) or not test["steps"]:
+            raise ValueError(f"{test['id']}: title and steps are required")
+        for step in test["steps"]:
+            if not isinstance(step, dict) or not str(step.get("action", "")).strip():
+                raise ValueError(f"{test['id']}: every step needs an action")
+    return document
+
+
+def import_roundtrip(path: Path) -> dict:
+    """Recover exact source fields, applying only edited visible cells by stable ID.
+
+    Returns the candidate document plus its baseline. No source file is written.
+    Metadata is untrusted input: versions, IDs, shape and edited enums are validated.
+    """
+    sheets = read_xlsx(Path(path))
+    meta_sheet = next((s for s in sheets if s["name"] == "_qa_suite"), None)
+    if meta_sheet is None:
+        raise ValueError("no QA Suite roundtrip metadata; use the legacy compact importer for ordinary workbooks")
+    rows = [r for _, r in meta_sheet["rows"]]
+    if not rows or rows[0] != ["QA Suite roundtrip metadata", "1"]:
+        raise ValueError("unsupported or damaged workbook metadata version")
+    try:
+        chunks = rows[1:]
+        if any(len(r) != 2 or r[0] != str(i) for i, r in enumerate(chunks)):
+            raise ValueError("metadata chunks are missing or reordered")
+        meta = json.loads("".join(r[1] for r in chunks))
+    except (ValueError, TypeError) as e:
+        raise ValueError(f"invalid roundtrip metadata: {e}") from e
+    if meta.get("format") != "qa-suite-roundtrip" or type(meta.get("metadata_version")) is not int \
+            or meta["metadata_version"] != 1:
+        raise ValueError("unsupported workbook metadata version")
+    baseline = validate_document(meta.get("document"))
+    data_sheet = next((s for s in sheets if s["name"] == meta.get("sheet")), None)
+    headers = meta.get("headers")
+    if not data_sheet or not data_sheet["rows"] or len(headers or []) != 16 \
+            or data_sheet["rows"][0][1] != headers:
+        raise ValueError("workbook columns changed; retain the exported headers and ID/Step columns")
+    # Do not trust stale cached results of formulas in an edited workbook.
+    with zipfile.ZipFile(path) as z:
+        for part in z.namelist():
+            if part.startswith("xl/worksheets/") and part.endswith(".xml"):
+                if any(_local(e.tag) == "f" for e in ET.fromstring(z.read(part)).iter()):
+                    raise ValueError("formulas are not supported in roundtrip workbooks; paste literal values")
+
+    def normalized(row):
+        return [str(x) if x is not None else "" for x in row] + [""] * (16 - len(row))
+
+    def group(table):
+        grouped = OrderedDict()
+        for row in table:
+            if not any(str(v).strip() for v in row):
+                continue
+            if len(row) > 16:
+                raise ValueError("unexpected extra workbook columns")
+            row = normalized(row)
+            tid = row[0].strip()
+            if not TCID.fullmatch(tid):
+                raise ValueError("each row needs a stable TC-### ID; IDs are never renumbered")
+            if not row[9].isdigit() or int(row[9]) < 1:
+                raise ValueError(f"{tid}: Step must be a positive integer")
+            number = int(row[9])
+            bucket = grouped.setdefault(tid, {})
+            if number in bucket:
+                raise ValueError(f"{tid}: duplicate step number {number}")
+            bucket[number] = row
+        return grouped
+
+    original_rows = group(meta.get("rows", []))
+    edited_rows = group([r for _, r in data_sheet["rows"][1:]])
+    original_tests = {t["id"]: t for t in baseline["test_cases"]}
+    if set(original_rows) != set(original_tests):
+        raise ValueError("metadata test IDs do not match the baseline")
+    result = copy.deepcopy(baseline)
+    result["test_cases"] = []
+    scalar_fields = {1: "title", 2: "requirement_ids", 4: "priority", 5: "polarity", 6: "technique",
+                     7: "preconditions", 8: "test_data", 13: "tags", 14: "automation", 15: "status"}
+    allowed = {"priority": {"critical", "high", "medium", "low"},
+               "status": {"draft", "ready", "deprecated"}}
+    for tid, numbered in edited_rows.items():
+        original = original_tests.get(tid)
+        test = copy.deepcopy(original) if original else {"id": tid}
+        first = numbered[min(numbered)]
+        old_numbered = original_rows.get(tid, {})
+        old_first = old_numbered[min(old_numbered)] if old_numbered else [""] * 16
+        # Test fields belong on the first row; conflicting repeated values must not be discarded.
+        for row in numbered.values():
+            for col in scalar_fields:
+                if row is not first and row[col] and row[col] != first[col]:
+                    raise ValueError(f"{tid}: conflicting repeated field {headers[col]}")
+        if first[3] != old_first[3]:
+            raise ValueError(f"{tid}: Jira requirement keys are informational; edit requirements.json instead")
+        for col, field in scalar_fields.items():
+            if original and first[col] == old_first[col]:
+                continue
+            value = first[col]
+            if field in ("requirement_ids", "tags"):
+                value = [x.strip() for x in re.split(r"[,;\n]", value) if x.strip()]
+            elif field == "preconditions":
+                value = [BULLET.sub("", x).strip() for x in value.splitlines() if x.strip()]
+            elif field == "test_data":
+                try:
+                    value = json.loads(value) if value.strip() else {}
+                except ValueError as e:
+                    raise ValueError(f"{tid}: edited test_data must be a JSON object") from e
+                if not isinstance(value, dict):
+                    raise ValueError(f"{tid}: edited test_data must be a JSON object")
+            elif field == "automation":
+                if norm(value) not in YES_F | NO_F:
+                    raise ValueError(f"{tid}: automation candidate must be yes/no or evet/hayır")
+                auto = copy.deepcopy(test.get("automation") or {})
+                auto["candidate"] = norm(value) in YES_F
+                value = auto
+            elif field == "polarity":
+                value = {"+": "positive", "-": "negative"}.get(lookup(value, POL_F))
+                if value is None:
+                    raise ValueError(f"{tid}: invalid polarity")
+            elif field == "technique":
+                if norm(value) not in TECH_F:
+                    raise ValueError(f"{tid}: invalid technique")
+                # Keep the canonical enum, not a compact alias.
+                names = ("equivalence-partitioning", "boundary-value-analysis", "decision-table",
+                         "state-transition", "pairwise", "classification-tree", "use-case", "scenario",
+                         "crud", "error-guessing", "checklist", "exploratory", "requirements-based")
+                aliases = {TECH_F[norm(name)]: name for name in names}
+                value = aliases[TECH_F[norm(value)]]
+            if field in allowed and value not in allowed[field]:
+                raise ValueError(f"{tid}: invalid {field}: {value!r}")
+            test[field] = value
+        steps = []
+        for number, row in sorted(numbered.items()):
+            old_row = old_numbered.get(number)
+            old_step = original["steps"][number - 1] if original and number <= len(original["steps"]) else {}
+            step = copy.deepcopy(old_step)
+            for col, field in ((10, "action"), (11, "data"), (12, "expected")):
+                if old_row is not None and row[col] == old_row[col]:
+                    continue
+                step[field] = row[col]
+            steps.append(step)
+        test["steps"] = steps
+        result["test_cases"].append(test)
+    removed = sorted(set(original_tests) - set(edited_rows))
+    for tid in removed:
+        test = copy.deepcopy(original_tests[tid])
+        test["status"] = "deprecated"
+        result["test_cases"].append(test)
+    validate_document(result)
+    return {"document": result, "baseline": baseline, "removed_ids": removed}
+
+
 # ------------------------------------------------------------------ rows -> tests
 def split_numbered(cell: str) -> list[str]:
     cell = (cell or "").strip()
@@ -567,6 +734,8 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("source", help=".xlsx workbook or CSV file")
     ap.add_argument("--out")
+    ap.add_argument("--format", choices=["compact", "json"], default="compact",
+                    help="json: lossless QA Suite workbook import; compact: existing general-purpose import")
     ap.add_argument("--sheet", help="xlsx: sheet name, 1-based number, or 'all' (default: first sheet with a header)")
     ap.add_argument("--list-sheets", action="store_true", help="print the sheets and the detected header, then exit")
     ap.add_argument("--delimiter", help="CSV: default auto-detect , ; or tab")
@@ -582,6 +751,27 @@ def main() -> int:
         ap.error("--out is required (or use --list-sheets)")
     overrides = dict(p.split("=", 1) for p in a.map.split(",") if "=" in p)
     src = Path(a.source)
+    if a.format == "json" and not a.list_sheets:
+        try:
+            if a.renumber or a.map or a.sheet:
+                raise ValueError("roundtrip JSON import uses stable IDs and exported columns; omit --renumber/--map/--sheet")
+            result = import_roundtrip(src)
+            destination = Path(a.out)
+            if destination.resolve() == src.resolve():
+                raise ValueError("output must differ from the workbook")
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            destination.write_text(json.dumps(result["document"], ensure_ascii=False, indent=2) + "\n",
+                                   encoding="utf-8", newline="\n")
+            provenance = {"metadata_version": 1, "baseline": result["baseline"],
+                          "candidate_sha256": hashlib.sha256(destination.read_bytes()).hexdigest()}
+            sidecar = destination.with_name(destination.name + ".qa-baseline.json")
+            sidecar.write_text(json.dumps(provenance, ensure_ascii=False, indent=2) + "\n",
+                               encoding="utf-8", newline="\n")
+            print(f"wrote {a.out} and {sidecar.name}: lossless candidate; review with update_tests.py plan before applying")
+            return 0
+        except (OSError, ValueError, KeyError, TypeError, ET.ParseError, zipfile.BadZipFile) as e:
+            print(f"error: {e}", file=sys.stderr)
+            return 2
     try:
         if is_xlsx(src):
             sheets = read_xlsx(src)

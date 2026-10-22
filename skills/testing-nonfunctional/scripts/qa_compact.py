@@ -358,14 +358,21 @@ def main() -> int:
     ap.add_argument("--merge", action="store_true", help="keep items of an existing --out file not in the source")
     ap.add_argument("--to-compact", action="store_true", help="convert JSON -> compact text instead")
     ap.add_argument("--lenient", action="store_true", help="imports: allow steps without expected result (reported by review_tests.py)")
-    a = ap.parse_args()
+    ap.add_argument("--replace-reviewed", action="store_true", help="explicitly replace JSON updated by a reviewed plan; custom fields may be lost")
     sys.stdout.reconfigure(encoding="utf-8")
+    a = ap.parse_args()
     try:
         raw = Path(a.source).read_text(encoding="utf-8-sig")
     except OSError as e:
         print(f"error: {e}", file=sys.stderr)
         return 2
     out = Path(a.out)
+    reviewed = out.with_name(out.name + ".qa-reviewed.json")
+    if not a.to_compact and reviewed.exists() and not a.replace_reviewed:
+        print("error: reviewed JSON cannot be overwritten from a possibly stale compact source. "
+              "Use update_tests.py plan/apply, or --replace-reviewed to explicitly discard reviewed/custom fields.",
+              file=sys.stderr)
+        return 2
     out.parent.mkdir(parents=True, exist_ok=True)
     if a.to_compact:
         out.write_text(to_compact(json.loads(raw), a.kind), encoding="utf-8")
@@ -395,6 +402,8 @@ def main() -> int:
     ordered = {k: doc[k] for k in ("project", "language", "version") if k in doc}
     ordered[key] = merged
     out.write_text(json.dumps(ordered, ensure_ascii=False, indent=1), encoding="utf-8")
+    if a.replace_reviewed and reviewed.exists():
+        reviewed.unlink()
     counts = {}
     if a.kind == "tc":
         for t in merged:
