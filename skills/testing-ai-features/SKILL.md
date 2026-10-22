@@ -9,7 +9,7 @@ metadata:
 
 # Testing AI features
 
-**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
+**Status: experimental (blind trials available; field validation limited).** Historical trials exist, with mixed or ceiling-limited results. Current code hardening has not been remeasured in new blind model runs.
 
 An LLM feature gives a different answer to the same question on different runs. It can be talked out of its instructions by a user or by a document it reads, and it fails in fluent, confident sentences. Classic "expected result equals actual result" testing is not enough. This skill makes AI features testable the same way as the rest of the product:
 - explicit, numeric acceptance thresholds;

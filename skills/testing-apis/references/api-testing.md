@@ -10,6 +10,7 @@
 7. Versioning and backward compatibility
 8. GraphQL and async APIs
 9. Reporting API failures
+10. Supported schema subset and evidence privacy
 
 ---
 
@@ -104,3 +105,17 @@ These tests need **two or more test users**. Put their tokens in the environment
   - an implementation defect (the contract is right, the implementation is wrong);
   - a contract defect (the documentation is wrong or incomplete);
   - a test data problem (see §4).
+
+## 10. Supported schema subset and evidence privacy
+
+The offline generator resolves local references, preserves `allOf` and OpenAPI 3.1 `$ref` siblings, and checks candidates against the original schema. OpenAPI 3.0 Reference Object siblings are ignored per that version. External, missing or recursive/deep references become UNVERIFIED. Python request validation and TypeScript response validation support boolean schemas, type unions, enum/const, allOf/anyOf/oneOf/not, numeric bounds/exclusive bounds/multipleOf, string lengths and portable patterns, object properties/required/additionalProperties/property counts, and homogeneous arrays/items/counts/uniqueness. OpenAPI 3.0 nullable is supported; readOnly required properties are optional in requests and writeOnly required properties optional in responses.
+
+Unknown assertions (`unevaluatedProperties`, `patternProperties`, conditionals, tuple/prefixItems, dependent schemas, etc.), unknown formats and non-portable patterns are explicitly UNVERIFIED. This is not full conformance. Simple format checks cover email, UUID, date, date-time and URI; numeric/password formats are annotations. JavaScript unsafe integers are UNVERIFIED. Arbitrary regex synthesis is not attempted: provide a valid example or the operation becomes a skeleton. String/array synthesis and boundary allocation are bounded. Examples/defaults are validated rather than trusted. Negative mutations require a checked baseline; business-state isolation and error-code assertions still need review.
+
+Numeric HTTP response codes and `2XX`/`4XX` ranges are supported. Required header/cookie parameters, unsupported request media types and unverifiable fixtures become questions/skeletons. Python remains standard-library only. The generated helper needs only Playwright. Independent upstream JSON Schema Test Suite fixtures run in both languages; selected fixtures do not imply full specification coverage.
+
+Evidence uses exact dotted `API_EVIDENCE_ALLOW_FIELDS` paths, no wildcard. Headers, URL/parameter values and raw text/binary/malformed bodies are omitted by default. Secret-like fields are never opted in; `API_EVIDENCE_REDACT_KEYS` adds custom sensitive names. Known credentials and sensitive values echoed under innocent names are scrubbed. Sanitization precedes truncation. Arbitrary unknown personal data in explicitly allowed fields cannot be guaranteed safe; allow synthetic fields only. `API_EVIDENCE=off` disables attachments.
+
+Türkçe: Araç OpenAPI 3.0/3.1'in belgelenmiş bir alt kümesini işler; tam JSON Schema doğrulayıcısı değildir. Desteklenmeyen kurallar geçerli sayılmaz: UNVERIFIED soru/skeleton üretilir. Regex örneği üretilemediğinde geçerli bir example verin. İstek ve yanıt kanıtları varsayılan olarak hassas değerleri ve ham gövdeleri içermez. Yalnız sentetik, paylaşmayı amaçladığınız alanları allowlist'e alın. Dış sistemlerde gerçek koşum ve iş kuralı doğrulaması ayrıca gerekir.
+
+Primary references: [OpenAPI 3.1 Schema Object](https://spec.openapis.org/oas/v3.1.0.html#schema-object), [OpenAPI 3.0 Schema Object](https://spec.openapis.org/oas/v3.0.3.html#schema-object), [Responses Object](https://spec.openapis.org/oas/v3.1.0.html#responses-object), [JSON Schema combination](https://json-schema.org/understanding-json-schema/reference/combining).

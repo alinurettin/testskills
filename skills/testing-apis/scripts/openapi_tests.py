@@ -43,6 +43,9 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from schema_support import SampleError, sample, schema_issues, synthesis_view, validate  # noqa: E402
+
 METHODS = ("get", "post", "put", "patch", "delete")
 HTTP_METHODS = METHODS + ("head", "options", "trace")
 T = {
@@ -122,76 +125,38 @@ class Resolver:
 
     def __call__(self, node, depth=0):
         if depth > 30:
-            return {}
+            return {"x-qa-unresolved": "schema/reference depth limit"}
         if isinstance(node, dict):
             if "$ref" in node:
                 ref = node["$ref"]
                 if not ref.startswith("#/"):
-                    return {"description": f"external $ref not resolved: {ref}"}
+                    return {"x-qa-unresolved": f"external $ref not resolved: {ref}"}
                 target = self.doc
-                for part in ref[2:].split("/"):
-                    target = target[part.replace("~1", "/").replace("~0", "~")]
-                return self(copy.deepcopy(target), depth + 1)
-            if "allOf" in node:
-                merged: dict = {"type": "object", "properties": {}, "required": []}
-                for sub in node["allOf"]:
-                    s = self(sub, depth + 1)
-                    merged["properties"].update(s.get("properties", {}))
-                    merged["required"] += s.get("required", [])
-                return merged
+                try:
+                    for part in ref[2:].split("/"):
+                        target = target[part.replace("~1", "/").replace("~0", "~")]
+                except (KeyError, TypeError):
+                    return {"x-qa-unresolved": f"local $ref not found: {ref}"}
+                target = self(copy.deepcopy(target), depth + 1)
+                siblings = {k: self(v, depth + 1) for k, v in node.items() if k != "$ref"}
+                if str(self.doc.get("openapi", "3.1")).startswith("3.0") or not siblings:
+                    return target
+                if not isinstance(target, dict) or set(target) & set(siblings):
+                    return {"allOf": [target, siblings]}
+                return {**target, **siblings}
             out = {k: self(v, depth + 1) for k, v in node.items()}
-            if isinstance(out.get("type"), list):  # OpenAPI 3.1: type: ["string", "null"]
-                types = [x for x in out["type"] if x != "null"]
-                if "null" in out["type"]:
-                    out["nullable"] = True
-                out["type"] = types[0] if types else "null"
-                if len(types) > 1:
-                    out["x-other-types"] = types[1:]
             return out
         if isinstance(node, list):
             return [self(x, depth + 1) for x in node]
         return node
 
 
-def sample(schema: dict, depth=0):
-    """A valid value for the schema (example > default > enum > generated)."""
-    if not schema or depth > 8:
-        return None
-    for k in ("example", "default"):
-        if k in schema:
-            return schema[k]
-    if schema.get("examples"):
-        ex = schema["examples"]
-        return ex[0] if isinstance(ex, list) else next(iter(ex.values()), None)
-    if schema.get("enum"):
-        return schema["enum"][0]
-    t = schema.get("type")
-    if isinstance(t, list):
-        t = next((x for x in t if x != "null"), "string")
-    if "oneOf" in schema or "anyOf" in schema:
-        return sample((schema.get("oneOf") or schema.get("anyOf"))[0], depth + 1)
-    if t == "object" or "properties" in schema:
-        props = schema.get("properties", {})
-        req = schema.get("required", list(props)[:0])
-        return {k: sample(props[k], depth + 1) for k in props if k in req or depth == 0 and not req}
-    if t == "array":
-        return [sample(schema.get("items", {}), depth + 1)]
-    if t == "integer":
-        return int(schema.get("minimum", 1)) if "minimum" in schema else 1
-    if t == "number":
-        return schema.get("minimum", 1) if "minimum" in schema else 1.0
-    if t == "boolean":
-        return True
-    fmt = schema.get("format", "")
-    n = max(int(schema.get("minLength", 1)), 1)
-    return {"email": "qa.test@example.com", "date": "2026-01-15", "date-time": "2026-01-15T10:00:00Z",
-            "uuid": "00000000-0000-4000-8000-000000000001", "uri": "https://example.com"}.get(fmt, "a" * min(n, 8) if n <= 8 else "a" * n)
-
-
 def boundaries(name: str, s: dict, t: dict) -> list[tuple[str, object, bool, str]]:
     """(label, value, valid, why) boundary probes for one field."""
     out = []
     typ = s.get("type")
+    if isinstance(typ, list):
+        typ = next((x for x in typ if x != "null"), "null")
     step = 1 if typ == "integer" else 0.01
     if typ in ("integer", "number"):
         if "minimum" in s:
@@ -205,10 +170,10 @@ def boundaries(name: str, s: dict, t: dict) -> list[tuple[str, object, bool, str
         if isinstance(s.get("exclusiveMaximum"), (int, float)) and not isinstance(s.get("exclusiveMaximum"), bool):
             out.append(("xmax", s["exclusiveMaximum"], False, t["above"]))
     if typ == "string" and "pattern" not in s and "format" not in s and "enum" not in s:
-        if "minLength" in s and s["minLength"] > 0:
+        if "minLength" in s and 0 < s["minLength"] <= 1000:
             out.append(("minLen", "a" * s["minLength"], True, ""))
             out.append(("minLen-", "a" * (s["minLength"] - 1), False, t["short"]))
-        if "maxLength" in s:
+        if "maxLength" in s and s["maxLength"] < 1000:
             out.append(("maxLen", "a" * s["maxLength"], True, ""))
             out.append(("maxLen+", "a" * (s["maxLength"] + 1), False, t["long"]))
     if typ == "string" and s.get("pattern") and "enum" not in s:
@@ -231,6 +196,8 @@ def json_schema(resp):
 
 def wrong_type(s: dict):
     typ = s.get("type")
+    if isinstance(typ, list):
+        typ = next((x for x in typ if x != "null"), "null")
     return {"string": 12345, "integer": "abc", "number": "abc", "boolean": "yes", "array": "x", "object": "x"}.get(typ)
 
 
@@ -240,6 +207,13 @@ def pick(codes: list[str], prefer: tuple[str, ...], default: str) -> tuple[str, 
             return c, True
     four = sorted(c for c in codes if c.startswith("4") and c not in ("401", "403", "404"))
     return (four[0], True) if four else (default, False)
+
+
+def status_assertion(code: str) -> str:
+    if re.fullmatch(r"[1-5]XX", code):
+        lo = int(code[0]) * 100
+        return f"expect(res.status()).toBeGreaterThanOrEqual({lo}); expect(res.status()).toBeLessThan({lo + 100});"
+    return f"expect(res.status()).toBe({int(code)});"
 
 
 def ts(v) -> str:
@@ -345,7 +319,11 @@ def main() -> int:
     ap.add_argument("--spec-out", dest="spec_out", help="Playwright API spec (.spec.ts) with the same TC IDs")
     sys.stdout.reconfigure(encoding="utf-8")
     a = ap.parse_args()
-    doc = load(Path(a.spec))
+    try:
+        doc = load(Path(a.spec))
+    except (OSError, ValueError) as e:
+        print(f"error: cannot read contract: {e}", file=sys.stderr)
+        return 2
     if not str(doc.get("openapi", "")).startswith("3"):
         print("error: only OpenAPI 3.x is supported (Swagger 2.0: convert first)", file=sys.stderr)
         return 2
@@ -411,8 +389,13 @@ def main() -> int:
         cresp = json_schema(cop["responses"].get(ccodes[0])) if ccodes else None
         cbody_s = json_schema(cop.get("requestBody"))
         cex = (((cop.get("requestBody") or {}).get("content", {}) or {}).get("application/json", {}) or {}).get("example")
-        if cresp and "id" in (cresp.get("properties") or {}) and cbody_s is not None:
-            creators[cpath] = cex if cex is not None else sample(cbody_s)
+        if isinstance(cresp, dict) and "id" in (cresp.get("properties") or {}) and cbody_s is not None:
+            try:
+                candidate = cex if cex is not None else sample(cbody_s)
+                if not validate(candidate, cbody_s):
+                    creators[cpath] = candidate
+            except SampleError:
+                pass  # an unverified setup must not make downstream tests executable
 
     cur_reqs: list[str] = []  # requirement(s) of the operation being generated (see op_reqs)
     links: list[tuple[list[str], str]] = []
@@ -450,10 +433,30 @@ def main() -> int:
             ok_schema = ((op.get("responses", {}).get(ok_code) or {}).get("content", {}).get("application/json", {}) or {}).get("schema") if ok_code else None
             body_schema = (((op.get("requestBody") or {}).get("content", {}) or {}).get("application/json", {}) or {}).get("schema")
             body_example = (((op.get("requestBody") or {}).get("content", {}) or {}).get("application/json", {}) or {}).get("example")
-            body = body_example if body_example is not None else (sample(body_schema) if body_schema else None)
-            params = [p for p in params if p.get("in") in ("path", "query")]  # headers/cookies are handled by the helper
-            pvals = {p["name"]: sample(p.get("schema", {})) if "example" not in p else p["example"] for p in params}
-            secured = (op.get("security", global_sec) or []) != []
+            unverified = []
+            body = body_example
+            try:
+                if body_example is None and body_schema is not None:
+                    body = sample(body_schema)
+                if body_schema is not None:
+                    unverified += validate(body, body_schema)
+                elif op.get("requestBody"):
+                    unverified.append("UNVERIFIED request media type: only application/json is generated")
+            except SampleError as e:
+                unverified.append(str(e))
+            if any(p.get("required") and p.get("in") not in ("path", "query") for p in params):
+                unverified.append("UNVERIFIED required header/cookie parameter: supply a fixture manually")
+            params = [p for p in params if p.get("in") in ("path", "query")]
+            pvals = {}
+            for p in params:
+                try:
+                    value = p["example"] if "example" in p else sample(p.get("schema", {}))
+                    unverified += validate(value, p.get("schema", {}), f"parameter.{p['name']}")
+                    pvals[p["name"]] = value
+                except SampleError as e:
+                    unverified.append(f"parameter {p['name']}: {e}")
+            security = op.get("security", global_sec) or []
+            secured = bool(security) and all(bool(branch) for branch in security)
             err_code, documented = pick(codes, ("400", "422"), "4xx")
             has_validation = bool(op.get("requestBody")) or any(p.get("required") and p.get("in") == "query" for p in params)
             if not documented and has_validation:
@@ -472,7 +475,7 @@ def main() -> int:
             if M == "POST" and not any(p.get("in") == "header" and "idempot" in p.get("name", "").lower()
                                        for p in common_params + op.get("parameters", [])):
                 gap("g_idem")
-            if body_schema and body_schema.get("properties"):
+            if isinstance(body_schema, dict) and body_schema.get("properties"):
                 bp = body_schema["properties"]
                 free_s = [k for k, v in bp.items() if v.get("type") == "string" and not v.get("readOnly")
                           and not any(x in v for x in ("maxLength", "pattern", "format", "enum"))]
@@ -491,10 +494,22 @@ def main() -> int:
             if no_ex and not create_first:
                 gap("g_example", f=", ".join(no_ex))
             err_schema = json_schema(op.get("responses", {}).get(err_code)) if documented else None
-            err_check = f" expect(checkSchema(await res.json(), {ts(err_schema)})).toEqual([]);" if err_schema else ""
+            err_check = f" expect(checkSchema(await res.json(), {ts(err_schema)})).toEqual([]);" if err_schema is not None else ""
             tag = re.sub(r"[^a-z0-9]+", "-", (op.get("tags") or ["api"])[0].lower()).strip("-")
             opid = op.get("operationId") or f"{m}_{path}"
             spec.append(f"test.describe({ts(f'{M} {path}')}, () => {{")
+            if ok_schema is not None:
+                unverified += schema_issues(ok_schema)
+            if unverified:
+                reason = "UNVERIFIED: " + "; ".join(dict.fromkeys(unverified))
+                questions.append(f"{M} {path}: {reason}")
+                tid = add(f"{M} {path} contract fixture unverified", "h", "+", "rb",
+                          [(t["step_send"].format(m=M, p=path), None, reason)], ["api", "contract", tag],
+                          auto="no, unverified schema or fixture")
+                spec += [f"  test({ts(tid + ' contract fixture unverified')}, async () => {{",
+                         f"    test.fixme(true, {ts(reason)});", "  });", "});\n"]
+                counts["skeleton"] += 1
+                continue
             call_args = f"{ts(M)}, {ts(path)}, {ts(pvals)}"
             created_lines, read_args = [], call_args
             if create_first:
@@ -513,8 +528,8 @@ def main() -> int:
                 if create_first:
                     spec += created_lines
                 spec += [f"    const res = await api(request, {read_args}, {{ body: {ts(body)} }});",
-                         f"    expect(res.status()).toBe({int(ok_code)});"]
-                if ok_schema:
+                         f"    {status_assertion(ok_code)}"]
+                if ok_schema is not None:
                     spec.append(f"    expect(checkSchema(await res.json(), {ts(ok_schema)})).toEqual([]);")
                 spec.append("  });")
                 counts["exec"] += 1
@@ -543,23 +558,29 @@ def main() -> int:
                               [(t["step_send"].format(m=M, p=path), None, t["exp_reject"].format(code=err_code))], ["api", "validation", tag])
                     spec += [f"  test({ts(tid + ' ' + t['missing'].format(m=M, p=path, f=p['name'], code=err_code))}, {{ tag: ['@{tid}', '@api'] }}, async ({{ request }}) => {{",
                              f"    const res = await api(request, {ts(M)}, {ts(path)}, {ts(q)}, {{ body: {ts(body)} }});",
-                             f"    {'expect(res.status()).toBe(' + err_code + ');' + err_check if documented else 'expect(res.status()).toBeGreaterThanOrEqual(400); expect(res.status()).toBeLessThan(500);'}",
+                              f"    {status_assertion(err_code) + err_check if documented else 'expect(res.status()).toBeGreaterThanOrEqual(400); expect(res.status()).toBeLessThan(500);'}",
                              "  });"]
                     counts["exec"] += 1
             if body_schema and isinstance(body, dict):
-                props = body_schema.get("properties", {})
-                for f in body_schema.get("required", []):
+                body_view = synthesis_view(body_schema)
+                props = body_view.get("properties", {})
+                for f in body_view.get("required", []):
                     b2 = {k: v for k, v in body.items() if k != f}
+                    if not validate(b2, body_schema):
+                        continue  # readOnly/conditional required or another branch accepts omission
                     tid = add(t["missing"].format(m=M, p=path, f=f, code=err_code), "m", "-", "ep",
                               [(t["step_send"].format(m=M, p=path), b2, t["exp_reject"].format(code=err_code))], ["api", "validation", tag])
                     spec += [f"  test({ts(tid + ' ' + t['missing'].format(m=M, p=path, f=f, code=err_code))}, {{ tag: ['@{tid}', '@api'] }}, async ({{ request }}) => {{",
                              f"    const res = await api(request, {call_args}, {{ body: {ts(b2)} }});",
-                             f"    {'expect(res.status()).toBe(' + err_code + ');' + err_check if documented else 'expect(res.status()).toBeGreaterThanOrEqual(400); expect(res.status()).toBeLessThan(500);'}",
+                              f"    {status_assertion(err_code) + err_check if documented else 'expect(res.status()).toBeGreaterThanOrEqual(400); expect(res.status()).toBeLessThan(500);'}",
                              "  });"]
                     counts["exec"] += 1
                 for f, s in props.items():
+                    s = synthesis_view(s)
                     if s.get("readOnly"):
                         continue
+                    if any(s.get(key, 0) >= 1000 for key in ("minLength", "maxLength")):
+                        questions.append(f"{M} {path}: {f} boundary strings exceed the 1000-character fixture budget; supply bounded fixtures manually")
                     probes = boundaries(f, s, t)
                     if s.get("enum"):
                         probes.append(("enum", "__invalid__", False, "enum"))
@@ -569,12 +590,16 @@ def main() -> int:
                     for label, val, valid, why in probes:
                         b2 = dict(body)
                         b2[f] = val
+                        violations = validate(b2, body_schema)
+                        if valid and violations or not valid and not violations:
+                            questions.append(f"{M} {path}: skipped {f}/{label}; mutation does not isolate the intended validity")
+                            continue
                         if valid:
                             title = t["valid_b"].format(m=M, p=path, f=f, v=short(val))
                             exp_c = ok_code or "2xx"
                             tid = add(title, "m", "+", "bva", [(t["step_send"].format(m=M, p=path), b2, t["exp_code"].format(code=exp_c))],
                                       ["api", "boundary", tag])
-                            assertion = f"expect(res.status()).toBe({int(ok_code)});" if ok_code else "expect(res.ok()).toBeTruthy();"
+                            assertion = status_assertion(ok_code) if ok_code else "expect(res.ok()).toBeTruthy();"
                         else:
                             if label == "enum":
                                 title = t["enum"].format(m=M, p=path, f=f)
@@ -587,14 +612,14 @@ def main() -> int:
                             tid = add(title, "m", "-", "bva" if label not in ("enum", "type", "pattern") else "ep",
                                       [(t["step_send"].format(m=M, p=path), b2, t["exp_reject"].format(code=err_code))],
                                       ["api", "validation", tag])
-                            assertion = ("expect(res.status()).toBe(" + err_code + ");" + err_check) if documented else \
+                            assertion = (status_assertion(err_code) + err_check) if documented else \
                                 "expect(res.status()).toBeGreaterThanOrEqual(400); expect(res.status()).toBeLessThan(500);"
                         spec += [f"  test({ts(tid + ' ' + title)}, {{ tag: ['@{tid}', '@api'] }}, async ({{ request }}) => {{",
                                  f"    const res = await api(request, {call_args}, {{ body: {ts(b2)} }});",
                                  f"    {assertion}", "  });"]
                         counts["exec"] += 1
             # optional DAST-lite probes: one SQLi and one XSS test per operation over all free-text string fields
-            free = [f for f, v in ((body_schema or {}).get("properties") or {}).items()
+            free = [f for f, v in (synthesis_view(body_schema).get("properties") or {}).items()
                     if v.get("type") == "string" and not v.get("readOnly") and not any(k in v for k in ("enum", "format", "pattern"))]
             if a.security_probes and isinstance(body, dict) and free:
                 for kind, payload in (("sqli", "' OR '1'='1' --"), ("xss", "<script>alert(1)</script>")):
@@ -633,7 +658,7 @@ def main() -> int:
                     counts["skeleton"] += 1
                 spec += [f"    const res = await api(request, {read_args}, {{ body: {ts(body)}, as: 'other' }});",
                          "    expect([403, 404]).toContain(res.status());", "  });"]
-            props_all = (body_schema or {}).get("properties") or {}
+            props_all = synthesis_view(body_schema).get("properties") or {}
             id_fields = [f for f, v in props_all.items()
                          if ID_FIELD.search(f) and not v.get("readOnly") and isinstance(body, dict) and f in body]
             if secured and M in ("POST", "PUT", "PATCH", "DELETE"):

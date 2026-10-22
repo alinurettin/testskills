@@ -89,7 +89,7 @@ These techniques follow the ISTQB CTFL v4.0 and CTAL-TA v4.0 syllabi and ISO/IEC
 1. Choose the parameters and their **valid** values. Use EP classes rather than every raw value.
 2. Add constraints (`forbidden`) for combinations that cannot exist, for example Safari on Windows.
 3. Add must-have combinations as `seed_tests`, for example the most common production setup.
-4. Run `pairwise.py`. Check that the verification says OK. Report the reduction compared with the exhaustive number of combinations.
+4. Run `pairwise.py`. Require successful verification and no unknown tuples. Exact-search budget exhaustion is unknown, not proof of infeasibility; the CLI exits 1 for incomplete coverage. Report the reduction compared with the exhaustive number of combinations and the declared model scope.
 5. Test invalid values separately.
 
 **Pitfalls:**

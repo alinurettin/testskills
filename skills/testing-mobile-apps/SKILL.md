@@ -9,7 +9,7 @@ metadata:
 
 # Testing mobile apps
 
-**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
+**Status: experimental (blind trials available; field validation limited).** Historical trials exist, with mixed or ceiling-limited results. Current code hardening has not been remeasured in new blind model runs.
 
 Mobile apps fail in ways web apps do not: the system kills them in the background, the network drops mid-payment, users deny permissions, the OS changes every year, and a store review stands between a fix and the users. This skill turns those risks into **traceable test cases** (generated, then adapted to the app), a **device matrix based on real usage data**, and an **automation choice** that fits the team, with results mapped back by TC ID.
 

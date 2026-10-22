@@ -9,7 +9,7 @@ metadata:
 
 # Preparing test data
 
-**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
+**Status: experimental (blind trials available; field validation limited).** Historical trials exist, with mixed or ceiling-limited results. Current code hardening has not been remeasured in new blind model runs.
 
 Most "flaky" tests and many blocked test cycles are really data problems: the record was used up, another test changed it, the value missed the boundary, or nobody knew what the environment contained. This skill treats test data as a versioned test asset. **Synthetic data comes first.** It derives exactly what each test needs, generates it reproducibly from a seed, and uses masked production data only when the data owner has approved it.
 

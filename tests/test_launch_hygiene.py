@@ -203,7 +203,8 @@ class ExperimentalStatus(unittest.TestCase):
         for skill in EXPERIMENTAL:
             text = (SKILLS / skill / "SKILL.md").read_text(encoding="utf-8")
             body = text.split("\n---\n", 1)[1]
-            self.assertIn("Status: experimental (no blind trial yet)", body, skill)
+            self.assertIn("Status: experimental (blind trials available; field validation limited)", body, skill)
+            self.assertNotIn("no blind trial yet", body, skill)
             self.assertIn(f"`{skill}` **(deneysel)**", readme_tr)
             self.assertIn(f"`{skill}` **(experimental)**", readme_en)
 

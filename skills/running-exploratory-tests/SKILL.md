@@ -9,7 +9,7 @@ metadata:
 
 # Running exploratory tests
 
-**Status: experimental (no blind trial yet) for this version.** The previous version scored below the no-skill baseline in the 0.7.0 blind trial (median 81% vs 90% in one short web-app session; docs/EVALUATION.md §7). This version adds the short-session mode, the follow-the-data rule and the attack checklist below. A re-trial is pending.
+**Status: experimental (blind trials available; field validation limited).** The 0.9.0 retry improved the exploratory median on Opus/Sonnet while Haiku still lagged. These historical scores are not a general guarantee; current code hardening has not been remeasured in new blind model runs.
 
 Scripted tests check what someone already expected. Exploratory testing finds what nobody expected: the tester learns, designs and executes tests at the same time. Bugs are found while probing the product, so the paperwork is sized to the time box. A short session gets a one-line charter and inline notes. Longer and multi-session work uses **Session-Based Test Management** (SBTM): risk-ranked charters, session sheets, a debrief and a few honest metrics, with the findings fed back into the REQ → TC → RTM chain as defects and regression tests.
 

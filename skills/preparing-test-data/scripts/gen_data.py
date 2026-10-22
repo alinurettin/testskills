@@ -19,7 +19,7 @@ Field types and options (every field also takes: null_p, allow_empty, edge, desc
   seq          prefix ("{run}" is replaced by --run-tag), start, width, step
   first_name, last_name   pool (tr|en|mix; default = --lang), max_len
   full_name    pool, from ([first, last] field names), max_len
-  email        from (field names), domain (example.com|example.test), unique_suffix (true)
+  email        from (field names), pool (tr|en|mix), domain (example.com|example.test), unique_suffix (true)
   phone_tr     format (e164|display|national)       +90 5xx mobile numbers
   tckn         -    valid checksum, never starts with 0
   vkn          -    valid 10-digit tax number checksum
@@ -27,7 +27,7 @@ Field types and options (every field also takes: null_p, allow_empty, edge, desc
   int          min, max
   decimal      min, max, scale (2), decimal_sep ("." or ",")
   date         min, max (YYYY-MM-DD), format (strftime, default %Y-%m-%d; tr: %d.%m.%Y)
-  datetime     min, max (YYYY-MM-DDTHH:MM:SS), format
+  datetime     min, max (ISO datetime; both with a UTC offset or both without), format
   enum         values, weights
   bool         p (probability of true, 0.5)
   text         min_len (1), max_len (20), charset (alpha|alnum|digits|turkish|words)
@@ -64,12 +64,13 @@ import argparse
 import csv
 import difflib
 import json
+import math
 import random
 import re
 import sys
 import uuid as uuidlib
 from datetime import date, datetime, timedelta
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, ROUND_CEILING, ROUND_FLOOR, localcontext
 from pathlib import Path
 
 # ----------------------------------------------------------------------------------------------
@@ -135,7 +136,7 @@ TYPES = {
     "seq": {"prefix", "start", "width", "step"},
     "first_name": {"pool", "max_len"}, "last_name": {"pool", "max_len"},
     "full_name": {"pool", "from", "max_len"},
-    "email": {"from", "domain", "unique_suffix"},
+    "email": {"from", "pool", "domain", "unique_suffix"},
     "phone_tr": {"format"}, "tckn": set(), "vkn": set(), "iban_tr": {"bank_codes", "format"},
     "int": {"min", "max"}, "decimal": {"min", "max", "scale", "decimal_sep"},
     "date": {"min", "max", "format"}, "datetime": {"min", "max", "format"},
@@ -202,9 +203,66 @@ def _parse_dt(v, what):
 
 def _dec(v, what):
     try:
-        return Decimal(str(v))
+        result = Decimal(str(v))
     except InvalidOperation:
         raise SchemaError(f"{what}: '{v}' is not a number")
+    if not result.is_finite():
+        raise SchemaError(f"{what}: '{v}' must be a finite number")
+    return result
+
+
+def _decimal_bounds(f, where):
+    """Inclusive integer grid: never round a declared bound outwards."""
+    sc = f.get("scale", 2)
+    if type(sc) is not int or not 0 <= sc <= 10:
+        raise SchemaError(f"{where}: 'scale' must be an integer 0-10")
+    lo, hi = _dec(f.get("min", 0), where), _dec(f.get("max", 1000), where)
+    if lo > hi:
+        raise SchemaError(f"{where}: min ({lo}) is greater than max ({hi})")
+    # Scaling must not lose significant digits to the process-wide Decimal context.
+    with localcontext() as ctx:
+        ctx.prec = max(28, len(lo.as_tuple().digits) + sc + 2, len(hi.as_tuple().digits) + sc + 2)
+        lower = int(lo.scaleb(sc).to_integral_value(rounding=ROUND_CEILING))
+        upper = int(hi.scaleb(sc).to_integral_value(rounding=ROUND_FLOOR))
+    if lower > upper:
+        raise SchemaError(f"{where}: no representable decimal at scale {sc} within [{lo}, {hi}]")
+    return lower, upper
+
+
+def _decimal_from_units(units, scale):
+    # Construct exactly, including values longer than Decimal's default precision.
+    return Decimal((int(units < 0), tuple(int(c) for c in str(abs(units))), -scale))
+
+
+def _datetime_bounds(f, where):
+    lo = _parse_dt(f.get("min", "2020-01-01T00:00:00"), where)
+    hi = _parse_dt(f.get("max", "2030-12-31T23:59:59"), where)
+    if (lo.utcoffset() is None) != (hi.utcoffset() is None):
+        raise SchemaError(f"{where}: datetime bounds must both include a timezone or both omit it")
+    if lo > hi:
+        raise SchemaError(f"{where}: min ({lo}) is greater than max ({hi})")
+    # The generator's resolution is one second, including boundary candidates.
+    lower = lo.replace(microsecond=0)
+    if lo.microsecond:
+        try:
+            lower += timedelta(seconds=1)
+        except OverflowError:
+            raise SchemaError(f"{where}: no representable whole-second datetime in the interval")
+    upper = hi.replace(microsecond=0)
+    if lower > upper:
+        raise SchemaError(f"{where}: no representable whole-second datetime in the interval")
+    if lower.utcoffset() is not None:
+        try:
+            upper = upper.astimezone(lower.tzinfo)
+        except (OverflowError, ValueError):
+            raise SchemaError(f"{where}: datetime interval cannot be represented in the minimum's timezone")
+    return lower, upper
+
+
+def _format_datetime(value, f):
+    if "format" in f:
+        return value.strftime(f["format"])
+    return value.isoformat(timespec="seconds")
 
 
 def normalize_schema(schema: dict, default_name: str = "data") -> list[dict]:
@@ -233,23 +291,30 @@ def validate_schema(schema: dict, default_name: str = "data") -> list[str]:
         errors.append(f"edge_fraction must be between 0 and 1 (got {ef!r})")
     seen_tables: list[str] = []
     for ti, t in enumerate(tables):
+        if not isinstance(t, dict):
+            errors.append(f"tables[{ti}]: table must be an object")
+            continue
         tname = t.get("name") or f"tables[{ti}]"
+        if "name" in t and (not isinstance(t["name"], str) or not t["name"].strip()):
+            errors.append(f"tables[{ti}]: table name must be a non-empty string")
+        elif t.get("name") in seen_tables:
+            errors.append(f"{tname}: duplicate table name")
         if not isinstance(t.get("fields"), list) or not t["fields"]:
             errors.append(f"{tname}: 'fields' must be a non-empty list")
             continue
-        if "rows" in t and (not isinstance(t["rows"], int) or t["rows"] < 0):
+        if "rows" in t and (type(t["rows"]) is not int or t["rows"] < 0):
             errors.append(f"{tname}: 'rows' must be a non-negative integer")
         names: list[str] = []
         for fi, f in enumerate(t["fields"]):
             where = f"{tname}.fields[{fi}]"
-            if not isinstance(f, dict) or not f.get("name"):
-                errors.append(f"{where}: every field needs a 'name'")
+            if not isinstance(f, dict) or not isinstance(f.get("name"), str) or not f["name"].strip():
+                errors.append(f"{where}: every field needs a non-empty string 'name'")
                 continue
             name, typ = f["name"], f.get("type")
             where = f"{tname}.{name}"
             if name in names:
                 errors.append(f"{where}: duplicate field name")
-            if typ not in TYPES:
+            if not isinstance(typ, str) or typ not in TYPES:
                 errors.append(f"{where}: unknown type '{typ}'{_hint(str(typ), TYPES)} "
                               f"(known: {', '.join(sorted(TYPES))})")
                 names.append(name)
@@ -269,13 +334,17 @@ def validate_schema(schema: dict, default_name: str = "data") -> list[str]:
             if not isinstance(np_, (int, float)) or not 0 <= np_ <= 1:
                 errors.append(f"{where}: null_p must be between 0 and 1")
             names.append(name)
-        for u in t.get("unique", []):
+        unique = t.get("unique", [])
+        if not isinstance(unique, list):
+            errors.append(f"{tname}: 'unique' must be a list of field names or lists of field names")
+            unique = []
+        for u in unique:
             cols = [u] if isinstance(u, str) else u
             if not isinstance(cols, list) or not cols:
                 errors.append(f"{tname}: 'unique' entries are field names or lists of field names")
                 continue
             for c in cols:
-                if c not in names:
+                if not isinstance(c, str) or c not in names:
                     errors.append(f"{tname}: unique field '{c}' is not defined{_hint(str(c), names)}")
         seen_tables.append(t.get("name", ""))
     return errors
@@ -288,28 +357,28 @@ def _check_field(f: dict, typ: str, where: str, earlier: list[str], tables: list
 
     if typ == "int":
         for k in ("min", "max"):
-            if k in f and not isinstance(f[k], int):
+            if k in f and type(f[k]) is not int:
                 raise SchemaError(f"{where}: '{k}' must be an integer")
         rng_check(f.get("min", 0), f.get("max", 1000))
     elif typ == "decimal":
-        rng_check(_dec(f.get("min", 0), where), _dec(f.get("max", 1000), where))
-        sc = f.get("scale", 2)
-        if not isinstance(sc, int) or not 0 <= sc <= 10:
-            raise SchemaError(f"{where}: 'scale' must be an integer 0-10")
+        _decimal_bounds(f, where)
         if f.get("decimal_sep", ".") not in (".", ","):
             raise SchemaError(f"{where}: decimal_sep must be '.' or ','")
     elif typ == "date":
         rng_check(_parse_date(f.get("min", "2000-01-01"), where), _parse_date(f.get("max", "2030-12-31"), where))
     elif typ == "datetime":
-        rng_check(_parse_dt(f.get("min", "2020-01-01T00:00:00"), where),
-                  _parse_dt(f.get("max", "2030-12-31T23:59:59"), where))
+        _datetime_bounds(f, where)
     elif typ == "enum":
         vals = f.get("values")
         if not isinstance(vals, list) or not vals:
             raise SchemaError(f"{where}: enum needs a non-empty 'values' list")
+        if any(not isinstance(v, (str, int, float, bool, type(None))) or
+               (isinstance(v, float) and not math.isfinite(v)) for v in vals):
+            raise SchemaError(f"{where}: enum values must be finite JSON scalars")
         w = f.get("weights")
         if w is not None and (not isinstance(w, list) or len(w) != len(vals)
-                              or any(not isinstance(x, (int, float)) or x < 0 for x in w) or not sum(w)):
+                              or any(not isinstance(x, (int, float)) or not math.isfinite(x) or x < 0 for x in w)
+                              or not sum(w) or not math.isfinite(sum(w))):
             raise SchemaError(f"{where}: 'weights' must be non-negative numbers, one per value")
     elif typ == "bool":
         p = f.get("p", 0.5)
@@ -320,7 +389,7 @@ def _check_field(f: dict, typ: str, where: str, earlier: list[str], tables: list
         if not (isinstance(lo, int) and isinstance(hi, int) and 0 <= lo <= hi):
             raise SchemaError(f"{where}: need 0 <= min_len <= max_len (got {lo}, {hi})")
         cs = f.get("charset", "alpha")
-        if cs not in CHARSETS and cs != "words":
+        if not isinstance(cs, str) or (cs not in CHARSETS and cs != "words"):
             raise SchemaError(f"{where}: unknown charset '{cs}'{_hint(cs, list(CHARSETS) + ['words'])}")
     elif typ in ("first_name", "last_name", "full_name"):
         if f.get("pool", "tr") not in ("tr", "en", "mix"):
@@ -328,6 +397,8 @@ def _check_field(f: dict, typ: str, where: str, earlier: list[str], tables: list
         if "max_len" in f and (not isinstance(f["max_len"], int) or f["max_len"] < 2):
             raise SchemaError(f"{where}: max_len must be an integer >= 2")
     elif typ == "email":
+        if f.get("pool", "tr") not in ("tr", "en", "mix"):
+            raise SchemaError(f"{where}: pool must be tr, en or mix")
         if f.get("domain", "example.com") not in EMAIL_DOMAINS:
             raise SchemaError(f"{where}: domain must be one of {', '.join(EMAIL_DOMAINS)} "
                               "(reserved domains, so no real mailbox can ever receive test mail)")
@@ -357,12 +428,26 @@ def _check_field(f: dict, typ: str, where: str, earlier: list[str], tables: list
             raise SchemaError(f"{where}: format must be compact or display")
     elif typ == "seq":
         for k in ("start", "width", "step"):
-            if k in f and (not isinstance(f[k], int) or (k == "step" and f[k] == 0)):
-                raise SchemaError(f"{where}: '{k}' must be a (non-zero) integer")
+            if k in f and (type(f[k]) is not int or (k == "step" and f[k] == 0)
+                           or (k == "width" and f[k] < 0)):
+                raise SchemaError(f"{where}: '{k}' must be an integer (width >= 0, step != 0)")
     elif typ == "ref":
         src = f.get("source")
-        if not isinstance(src, str) or ":" not in src:
+        if not isinstance(src, str) or ":" not in src or not all(src.rsplit(":", 1)):
             raise SchemaError(f"{where}: ref needs 'source' like 'customers:id' or 'customers.csv:id'")
+        if "distinct" in f and not isinstance(f["distinct"], bool):
+            raise SchemaError(f"{where}: distinct must be true or false")
+    if typ in ("date", "datetime") and "format" in f:
+        if not isinstance(f["format"], str) or not f["format"]:
+            raise SchemaError(f"{where}: format must be a non-empty strftime string")
+        sample = _parse_date(f.get("min", "2000-01-01"), where) if typ == "date" else _datetime_bounds(f, where)[0]
+        try:
+            datetime.strptime(sample.strftime(f["format"]), f["format"])
+        except (ValueError, TypeError) as e:
+            raise SchemaError(f"{where}: format must be a reversible strftime format: {e}")
+    for flag in ("edge", "allow_empty", "unique_suffix"):
+        if flag in f and not isinstance(f[flag], bool):
+            raise SchemaError(f"{where}: {flag} must be true or false")
     if typ in ("full_name", "email") and "from" in f:
         src = f["from"] if isinstance(f["from"], list) else [f["from"]]
         for s in src:
@@ -429,7 +514,8 @@ def gen_value(f: dict, ctx: dict):
         return _fit(rng.choice(_pool(f, ctx, "last")), f.get("max_len"))
     if typ == "full_name":
         if "from" in f:
-            parts = [str(row.get(x) or "") for x in f["from"]]
+            sources = f["from"] if isinstance(f["from"], list) else [f["from"]]
+            parts = [str(row.get(x) or "") for x in sources]
             return _fit(" ".join(p for p in parts if p), f.get("max_len"))
         return _fit(f"{rng.choice(_pool(f, ctx, 'first'))} {rng.choice(_pool(f, ctx, 'last'))}", f.get("max_len"))
     if typ == "email":
@@ -466,17 +552,15 @@ def gen_value(f: dict, ctx: dict):
         return rng.randint(f.get("min", 0), f.get("max", 1000))
     if typ == "decimal":
         sc = f.get("scale", 2)
-        q = Decimal(10) ** sc
-        lo, hi = int(Decimal(str(f.get("min", 0))) * q), int(Decimal(str(f.get("max", 1000))) * q)
-        return _fmt_dec(Decimal(rng.randint(lo, hi)) / q, f)
+        lo, hi = _decimal_bounds(f, f["name"])
+        return _fmt_dec(_decimal_from_units(rng.randint(lo, hi), sc), f)
     if typ == "date":
         lo, hi = date.fromisoformat(str(f.get("min", "2000-01-01"))), date.fromisoformat(str(f.get("max", "2030-12-31")))
         return (lo + timedelta(days=rng.randint(0, (hi - lo).days))).strftime(f.get("format", "%Y-%m-%d"))
     if typ == "datetime":
-        lo = datetime.fromisoformat(str(f.get("min", "2020-01-01T00:00:00")))
-        hi = datetime.fromisoformat(str(f.get("max", "2030-12-31T23:59:59")))
+        lo, hi = _datetime_bounds(f, f["name"])
         v = lo + timedelta(seconds=rng.randint(0, int((hi - lo).total_seconds())))
-        return v.strftime(f.get("format", "%Y-%m-%dT%H:%M:%S"))
+        return _format_datetime(v, f)
     if typ == "enum":
         return rng.choices(f["values"], weights=f.get("weights"))[0]
     if typ == "bool":
@@ -558,10 +642,9 @@ def edge_value(f: dict, ctx: dict):
         cands = sorted({lo, min(lo + 1, hi), max(hi - 1, lo), hi} | ({0} if lo <= 0 <= hi else set()))
     elif typ == "decimal":
         sc = f.get("scale", 2)
-        step = Decimal(1).scaleb(-sc)
-        lo, hi = Decimal(str(f.get("min", 0))), Decimal(str(f.get("max", 1000)))
-        vals = {lo, min(lo + step, hi), max(hi - step, lo), hi} | ({Decimal(0)} if lo <= 0 <= hi else set())
-        cands = [_fmt_dec(v, f) for v in sorted(vals)]
+        lo, hi = _decimal_bounds(f, f["name"])
+        units = {lo, min(lo + 1, hi), max(hi - 1, lo), hi} | ({0} if lo <= 0 <= hi else set())
+        cands = [_fmt_dec(_decimal_from_units(v, sc), f) for v in sorted(units)]
     elif typ == "date":
         lo, hi = date.fromisoformat(str(f.get("min", "2000-01-01"))), date.fromisoformat(str(f.get("max", "2030-12-31")))
         vals = {lo, hi}
@@ -575,14 +658,15 @@ def edge_value(f: dict, ctx: dict):
                 break
         cands = [d.strftime(f.get("format", "%Y-%m-%d")) for d in sorted(vals)]
     elif typ == "datetime":
-        lo = datetime.fromisoformat(str(f.get("min", "2020-01-01T00:00:00")))
-        hi = datetime.fromisoformat(str(f.get("max", "2030-12-31T23:59:59")))
+        lo, hi = _datetime_bounds(f, f["name"])
         vals = {lo, hi}
-        day = lo.date() + timedelta(days=1)
-        for v in (datetime(day.year, day.month, day.day), datetime(day.year, day.month, day.day, 23, 59, 59)):
-            if lo <= v <= hi:
-                vals.add(v)
-        cands = [v.strftime(f.get("format", "%Y-%m-%dT%H:%M:%S")) for v in sorted(vals)]
+        if lo.date() < date.max:
+            day = lo.date() + timedelta(days=1)
+            for v in (datetime(day.year, day.month, day.day, tzinfo=lo.tzinfo),
+                      datetime(day.year, day.month, day.day, 23, 59, 59, tzinfo=lo.tzinfo)):
+                if lo <= v <= hi:
+                    vals.add(v)
+        cands = [_format_datetime(v, f) for v in sorted(vals)]
     elif typ == "enum":
         vals, w = f["values"], f.get("weights")
         if w:
@@ -630,8 +714,12 @@ def load_column(path: Path, column: str) -> list:
     if path.suffix.lower() == ".json":
         data = json.loads(path.read_text(encoding="utf-8-sig"))
         rows = data.get("rows", []) if isinstance(data, dict) else data
+        if not isinstance(rows, list) or any(not isinstance(r, dict) for r in rows):
+            raise SchemaError(f"{path}: reference JSON must contain a list of row objects")
         if rows and column not in rows[0]:
             raise SchemaError(f"{path}: column '{column}' not found{_hint(column, rows[0].keys())}")
+        if any(column not in r for r in rows):
+            raise SchemaError(f"{path}: column '{column}' is missing from a reference row")
         return [r[column] for r in rows if r.get(column) not in (None, "")]
     with path.open(encoding="utf-8-sig", newline="") as fh:
         sample = fh.read(4096)
@@ -643,33 +731,105 @@ def load_column(path: Path, column: str) -> list:
         return [r[column] for r in reader if r[column] != ""]
 
 
-def _ref_picker(values: list, distinct: bool, rows: int, where: str):
-    if not values:
-        raise SchemaError(f"{where}: the referenced column has no values")
-    if distinct:
-        if rows > len(values):
-            raise SchemaError(f"{where}: distinct ref needs at least {rows} parent values, found {len(values)}")
-        state = {"order": None, "i": 0}
+class _RefPicker:
+    """Reserve a parent while retrying a row; consume it only when the row commits."""
 
-        def pick(rng):
-            if state["order"] is None:
-                state["order"] = rng.sample(values, len(values))
-            v = state["order"][state["i"] % len(values)]
-            state["i"] += 1
-            return v
-        return pick
-    return lambda rng: rng.choice(values)
+    def __init__(self, values, distinct, rows, where):
+        if not values:
+            raise SchemaError(f"{where}: the referenced column has no values")
+        if any(not isinstance(v, (str, int, float, bool)) or
+               (isinstance(v, float) and not math.isfinite(v)) for v in values):
+            raise SchemaError(f"{where}: referenced values must be finite, non-null JSON scalars")
+        self.values = list(dict.fromkeys(values)) if distinct else values
+        self.allowed = set(self.values)
+        self.distinct, self.where, self.order, self.index = distinct, where, None, 0
+        if distinct and rows > len(self.values):
+            raise SchemaError(f"{where}: distinct ref needs at least {rows} distinct parent values, "
+                              f"found {len(self.values)}")
+
+    def __call__(self, rng):
+        if not self.distinct:
+            return rng.choice(self.values)
+        if self.order is None:
+            self.order = rng.sample(self.values, len(self.values))
+        if self.index >= len(self.order):
+            raise SchemaError(f"{self.where}: distinct parent values exhausted")
+        return self.order[self.index]
+
+    def commit(self):
+        if self.distinct:
+            self.index += 1
+
+
+def _ref_picker(values: list, distinct: bool, rows: int, where: str):
+    return _RefPicker(values, distinct, rows, where)
+
+
+def _validate_output(table, rows, refs):
+    """Check the actual formatted data before any file is written."""
+    name = table.get("name", "data")
+    for unique in table.get("unique", []):
+        cols = [unique] if isinstance(unique, str) else unique
+        keys = [tuple(row[c] for c in cols) for row in rows]
+        if len(set(keys)) != len(keys):
+            raise SchemaError(f"{name}: output violates unique constraint {cols}")
+    for f in table["fields"]:
+        field, typ = f["name"], f["type"]
+        values = [r[field] for r in rows if r[field] is not None]
+        where = f"{name}.{field}"
+        if typ == "ref":
+            picker = refs[field]
+            if any(v not in picker.allowed for v in values):
+                raise SchemaError(f"{where}: output contains a value absent from the parent column")
+            if picker.distinct and len(set(values)) != len(values):
+                raise SchemaError(f"{where}: output violates distinct reference constraint")
+        elif typ in ("int", "decimal", "date", "datetime"):
+            if typ == "int":
+                lower, upper = f.get("min", 0), f.get("max", 1000)
+                parsed = values
+            elif typ == "decimal":
+                lower, upper = _dec(f.get("min", 0), where), _dec(f.get("max", 1000), where)
+                parsed = [_dec(str(v).replace(",", "."), where) for v in values]
+            elif typ == "date":
+                lower, upper = _parse_date(f.get("min", "2000-01-01"), where), _parse_date(f.get("max", "2030-12-31"), where)
+                try:
+                    parsed = [datetime.strptime(v, f.get("format", "%Y-%m-%d")).date() for v in values]
+                except (ValueError, TypeError) as e:
+                    raise SchemaError(f"{where}: output date format cannot be verified: {e}")
+            else:
+                lower, upper = _datetime_bounds(f, where)
+                try:
+                    parsed = [datetime.strptime(v, f["format"]) if "format" in f else datetime.fromisoformat(v)
+                              for v in values]
+                    # An explicit presentation format may intentionally omit the offset.
+                    parsed = [v.replace(tzinfo=lower.tzinfo) if v.utcoffset() is None and lower.utcoffset() is not None
+                              else v for v in parsed]
+                except (ValueError, TypeError) as e:
+                    raise SchemaError(f"{where}: output datetime format cannot be verified: {e}")
+            if any(not lower <= v <= upper for v in parsed):
+                raise SchemaError(f"{where}: output value outside declared bounds; use a format that preserves precision")
 
 
 def generate_table(table: dict, rows: int, seed, lang: str = "en", edge_fraction: float = 0.1,
                    generated: dict | None = None, search_dirs: list[Path] | None = None,
                    run_tag: str = "", mark_edges: bool = False) -> tuple[list[str], list[dict], int]:
     """Generate one table. Returns (columns, rows, number_of_edge_rows)."""
+    errors = validate_schema(table)
+    if errors:
+        raise SchemaError("; ".join(errors))
+    if type(rows) is not int or rows < 0:
+        raise SchemaError("rows must be a non-negative integer")
+    if not isinstance(edge_fraction, (int, float)) or not 0 <= edge_fraction <= 1:
+        raise SchemaError("edge_fraction must be between 0 and 1")
+    if lang not in ("tr", "en"):
+        raise SchemaError("lang must be tr or en")
     generated = generated if generated is not None else {}
     search_dirs = search_dirs or [Path.cwd()]
     tname = table.get("name", "data")
     rng = random.Random(f"{seed}:{tname}")
     fields = table["fields"]
+    if mark_edges and any(f["name"] == "_edge" for f in fields):
+        raise SchemaError(f"{tname}: '_edge' is reserved when --mark-edges is used")
     refs = {}
     for f in fields:
         if f["type"] != "ref":
@@ -686,7 +846,10 @@ def generate_table(table: dict, rows: int, seed, lang: str = "en", edge_fraction
             if path is None:
                 raise SchemaError(f"{where}: ref source '{src}' is neither an earlier table in this schema nor a "
                                   f"file (looked in: {', '.join(str(d) for d in search_dirs)})")
-            values = load_column(path, col)
+            try:
+                values = load_column(path, col)
+            except (OSError, ValueError, csv.Error) as e:
+                raise SchemaError(f"{where}: cannot read reference source '{src}': {e}")
         refs[f["name"]] = _ref_picker(values, bool(f.get("distinct")), rows, where)
     edge_fields = [f for f in fields if f.get("edge")]
     n_edge = round(edge_fraction * rows) if edge_fields else 0
@@ -718,11 +881,15 @@ def generate_table(table: dict, rows: int, seed, lang: str = "en", edge_fraction
                               "the value domain is too small for the requested rows")
         for k, s in zip(keys, seen):
             s.add(k)
+        for field, picker in refs.items():
+            if row[field] is not None:
+                picker.commit()
         edge_count += bool(used_edge)
         if mark_edges:
             row["_edge"] = used_edge
         out_rows.append(row)
     cols = [f["name"] for f in fields] + (["_edge"] if mark_edges else [])
+    _validate_output(table, out_rows, refs)
     return cols, out_rows, edge_count
 
 
@@ -731,16 +898,18 @@ def write_rows(path: Path, cols: list[str], rows: list[dict], fmt: str, fields: 
     path.parent.mkdir(parents=True, exist_ok=True)
     ftype = {f["name"]: f for f in fields}
     if fmt == "json":
-        def conv(k, v):
+        def encode(k, v):
             f = ftype.get(k, {})
             if f.get("type") == "decimal" and isinstance(v, str) and f.get("decimal_sep") != "," and v:
-                try:
-                    return float(v) if "." in v else int(v)
-                except ValueError:
+                if re.fullmatch(r"-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?", v):
+                    # A decimal is already a valid JSON number token. Passing through
+                    # float would silently round large amounts or even produce Infinity.
                     return v
-            return v
-        data = [{k: conv(k, r.get(k)) for k in cols} for r in rows]
-        path.write_text(json.dumps(data, ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
+            return json.dumps(v, ensure_ascii=False, allow_nan=False)
+
+        encoded = [" {" + ", ".join(json.dumps(k, ensure_ascii=False) + ": " + encode(k, r.get(k))
+                                   for k in cols) + "}" for r in rows]
+        path.write_text("[\n" + ",\n".join(encoded) + "\n]\n", encoding="utf-8", newline="\n")
         return
     with path.open("w", encoding="utf-8-sig" if bom else "utf-8", newline="") as fh:
         w = csv.writer(fh, delimiter=delimiter, lineterminator="\n")
