@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "tool": null,
+  "hosting": null,
+  "tool_version": null,
+  "verified_at": null,
+  "source_file": null,
+  "source_sha256": null,
+  "field_mapping": {},
+  "steps": {
+    "initial_import": {"status": "not_run", "observed": null, "evidence": []},
+    "update_existing_test": {"status": "not_run", "observed": null, "evidence": []},
+    "repeat_import_no_duplicates": {"status": "not_run", "observed": null, "evidence": []},
+    "execution_result_mapping": {"status": "not_run", "observed": null, "evidence": []},
+    "external_id_preservation": {"status": "not_run", "observed": null, "evidence": []}
+  },
+  "note": "Template only. Allowed step statuses: not_run, passed, failed. Evidence entries need path and sha256; do not include credentials or customer data."
+}

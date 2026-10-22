@@ -1,8 +1,8 @@
-# Değerlendirme raporu: QA Suite 0.6.0
+# Değerlendirme raporu: QA Suite — sürümlere göre sonuçlar
 
 **[English →](EVALUATION.en.md)**
 
-Bu belge, paketin nasıl test edildiğini ve hangi sonuçları verdiğini **abartmadan** özetler: neyin ölçüldüğü, neyin ölçülmediği ve bulguların skill'e nasıl geri döndüğü. Tüm denemeler 29–30 Eylül 2026'da Claude (Opus sınıfı model) ile yapıldı. Tekrarlanabilmeleri için deneme dosyaları `evals/` altında duruyor.
+Bu belge sürümlere göre tarihsel sonuçları özetler. İlk denemeler 29–30 Eylül 2026'da yapıldı; 0.9.0'ın 126 koşusu 21 Ekim 2026 tarihlidir. Aşağıdaki eski sayılar ilgili sürümün kaydıdır. Sonraki kod düzeltmeleri yeni LLM deneyi anlamına gelmez. Tekrar üretilebilir yeni kayıt akışı: [EVALUATION-HARNESS.md](EVALUATION-HARNESS.md).
 
 ## Özet
 | Değerlendirme | Ne ölçer | Sonuç |
@@ -72,6 +72,8 @@ Skill'ler kaliteyi artırıyor ama daha fazla zaman ve token harcıyor. 0.2.0'da
 - CI (GitHub Actions) her push'ta şunları koşar: senkronizasyon kontrolü, skill doğrulaması (Agent Skills spesifikasyonu) ve birim testleri.
 
 ## Ölçülmeyenler (dürüstçe)
+
+Bu alt bölüm 0.6.0'ın tarihsel sınırlarını anlatır; sonraki kör denemeler §7–8'de yer alır. Yeni yerel sağlamlaştırma kontrolleri ve hâlâ ölçülmeyenler §9'dadır.
 - **Kör denemesi olmayan skill'ler:** keşif testi, yapay zekâ özellikleri, mobil ve test verisi. Bunlar yalnızca birim testleri ve script demolarıyla doğrulandı. Mobil kontrol listesi gerçek bir cihazda, AI eval puanlaması gerçek bir LLM ürününde denenmedi.
 - **Test yönetim araçlarına içe aktarma:** Xray, Zephyr, TestRail, Azure DevOps ve Qase formatları resmi dokümantasyona göre hazırlandı; gerçek bir sunucuya aktarılmadı. Önce 2–3 testlik deneme importu yapın.
 - **Yük testi:** k6 script'leri sözdizimi kontrolünden geçti, ama gerçek bir yük testi koşturulmadı.
@@ -126,6 +128,14 @@ Kör denemeyi doğru kurmak (klasörü repo dışına kopyalamak, cevap anahtar�
 - **Mobil planı incelemesi:** Fark yok; skill bu denemede katkı sağlamadı.
 - **Sınırlar (önemli):**
   - Koşu başına n=3, düşük çaba ayarı. Farkların çoğu tek koşulardaki dalgalanma sınırında; istatistiksel kanıt değil, sinyal.
-  - Puanlayıcı modeli §7'den farklı (Sonnet 5.5 yerine Opus). Bu yüzden iki değerlendirmenin keşif puanları birbiriyle karşılaştırılamaz: aynı kol (Opus, skill'siz) §7'de 90, burada 74 aldı. Karşılaştırma yalnızca bu bölümün kendi içinde (aynı puanlayıcı, aynı anahtar) geçerli.
+  - Puanlayıcı modeli §7'den farklı (eski Opus, bu tur Sonnet 5.5). Bu yüzden iki değerlendirmenin keşif puanları birbiriyle karşılaştırılamaz: aynı kol (Opus, skill'siz) §7'de 90, burada 74 aldı. Karşılaştırma yalnızca bu bölümün kendi içinde (aynı puanlayıcı, aynı anahtar) geçerli.
   - Denemeleri biz yazdırdık ve deneme verisi repoda herkese açık; aynı denemelerle yeniden ölçen biri, ajana anahtarı göstermediği sürece aynı koşulları kurabilir.
   - Yönlendirme ölçümü bu turda tekrarlanmadı (son: 84/84).
+
+## 9. Yayımlanmamış yerel sağlamlaştırma
+
+Yeni kod regresyonları tarihsel model puanlarını değiştirmez. Pairwise kapsam, şema/örnek doğruluğu, kanıt gizliliği, decimal/timezone/ref kısıtları ve Excel güncelleme yaşam döngüsü yerel fixture'larla test edilir. Tam güncel test sayısı için CI/teslim kaydına bakın; yukarıdaki 150 test 0.6.0 snapshot'ıdır. Gerçek vendor importu ve yeni ücretli/kör model koşumu yapılmış gibi sunulmaz.
+
+0.9.0 ham verisinin yeniden hesaplanmış skill/skillsiz ortalamaları: Haiku **89,25/85,42**, Sonnet **94,93/92,61**, Opus **95,20/93,34**. 126 tekrar yalnız **7 farklı görev** içerir; 50 koşu tam puandır. Migration'ın 18 koşusu da 100'dür. Medyan tablosu tüm gerilemeleri göstermez: Opus API ortalaması skill ile 96,33, skillsiz 99,67'dir. Maliyet metadata'sı bu kayıtta yoktur. Tutarlılık ve maliyet üstünlüğü ayrı ölçülmelidir; genel ortalama tek başına bunları kanıtlamaz.
+
+Yeni kayıtlar için [manifest/record/report akışı](EVALUATION-HARNESS.md) farklı model ayarı, grader ve commit gruplarını ayırır; bilinmeyen metadata'yı null tutar, kirlenmiş koşuları dışlar ve görev bazlı dağılım verir. Çalışma klasörünü kopyalamak ajan erişimini engellemez; izolasyonu runner/işletim sistemi sağlamalıdır.

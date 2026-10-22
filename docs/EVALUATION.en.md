@@ -1,8 +1,8 @@
-# Evaluation report: QA Suite 0.6.0
+# Evaluation report: QA Suite — results by version
 
 **[Türkçe →](EVALUATION.md)**
 
-This document summarises how the package was tested and what the results were, **without inflating them**: what was measured, what was not, and how the findings went back into the skills. All trials ran on 29–30 September 2026 with Claude (an Opus-class model). The trial files are in `evals/`, so every trial can be repeated.
+This document preserves historical results by version. The first trials ran on 29–30 September 2026; the 0.9.0 set of 126 runs is dated 21 October 2026. Old counts below describe their stated version. Subsequent code fixes do not constitute a new LLM evaluation. For reproducible new records see [EVALUATION-HARNESS.md](EVALUATION-HARNESS.md).
 
 ## Summary
 | Evaluation | What it measures | Result |
@@ -107,6 +107,8 @@ The skills raise quality, but they cost more time and tokens. 0.2.0 cut token us
 - CI (GitHub Actions) runs the sync check, the skill validation (Agent Skills spec) and the unit tests on every push.
 
 ## What was not measured (honestly)
+
+This subsection records the historical 0.6.0 limits, not the current absence of all later trials. Later results are versioned below; current local hardening and remaining gaps are in §9.
 - **Skills without a blind trial:** exploratory testing, AI features, mobile and test data. They were validated only by unit tests and script demos. The mobile checklist was not tried on a real device, and the AI eval scoring was not tried on a real LLM product.
 - **Imports into test-management tools:** the Xray, Zephyr, TestRail, Azure DevOps and Qase formats follow the vendors' documentation. None was imported into a real server. Do a trial import of 2–3 tests first.
 - **Load testing:** the k6 scripts pass a syntax check, but no real load test was run.
@@ -145,3 +147,11 @@ How to set up a blind trial correctly (copy the folder outside the repo, keep th
   - The grader model differs from §7 (Sonnet 5.5 instead of Opus), so exploratory scores are not comparable across the two evaluations: the same arm (Opus, without skills) scored 90 in §7 and 74 here. Comparisons are valid only within this section (same grader, same key).
   - We had the trials written and the trial data is public in the repo; anyone re-running them can set up the same conditions as long as the agent is not shown the keys.
   - Routing was not re-measured this round (last: 84/84).
+
+## 9. Unreleased local hardening
+
+New code regressions do not change historical model scores. Local fixtures test pairwise coverage, schema/sample validity, evidence privacy, decimal/timezone/reference invariants and Excel update lifecycles. See the actual CI/delivery log for the current count; the 150 tests above describe the 0.6.0 snapshot. No new paid/blind model run or live vendor import is claimed.
+
+Recomputed 0.9.0 skill/no-skill means: Haiku **89.25/85.42**, Sonnet **94.93/92.61**, Opus **95.20/93.34**. The 126 repeated runs represent **7 tasks**; 50 runs hit 100, including all 18 migration runs. Medians hide some regressions: Opus API means are 96.33 with skills versus 99.67 without. Current cost metadata is absent. Consistency and cost advantages need separate measurement; the overall mean alone does not demonstrate either.
+
+The new [manifest/record/report workflow](EVALUATION-HARNESS.md) separates model-setting, grader and commit cohorts, preserves unavailable metadata as null, excludes contaminated records and reports task-level distributions. Copying a directory does not restrict agent access; the runner/OS must enforce isolation.

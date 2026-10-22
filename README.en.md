@@ -92,8 +92,10 @@ claude plugin install qa-suite@qa-suite-marketplace
 **Other agents (Codex, Copilot, Cursor, Gemini CLI…):** the package follows the open Agent Skills standard. Copy the folders under `skills/` into your tool's skills directory.
 
 **Requirements:**
-- Python 3.9+ (the scripts use only the standard library)
-- For automation: Node.js 22, 24 or 26 (the versions Playwright supports) and `@playwright/test`
+- Python 3.12+ (the scripts use only the standard library; CI: 3.12/3.13)
+- For automation: Node.js 22.18+, 24 or 26 and `@playwright/test`
+
+Local preflight: `python tools/doctor.py --profile core`; for API/automation use `--profile api --project <project>`. It never installs packages or uses the network. For reviewed Excel updates, delta plans, bounded pairwise search and API evidence privacy see the [hardening guide](docs/HARDENING.md). Host support and workflow dependencies: [compatibility matrix](docs/COMPATIBILITY.md).
 
 ## Quick start
 ```

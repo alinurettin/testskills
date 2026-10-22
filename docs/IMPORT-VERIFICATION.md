@@ -15,6 +15,16 @@ with free or trial accounts, in roughly 30–45 minutes per tool.
 
 ---
 
+## Lifecycle evidence / Yaşam döngüsü kanıtı
+
+Local CSV/golden checks verify file structure only. Live validation must separately record initial import, update, repeated import, execution-result mapping and external-ID preservation. A successful first import does not prove idempotent updates or bidirectional synchronization. The local `update_tests.py` manifest is not a vendor update format. No live vendor validation was performed during this hardening work.
+
+Yerel golden testleri yalnız dosya biçimini denetler. Gerçek araçta ilk import, değişen testin güncellenmesi, aynı dosyanın tekrar importu, koşum sonucunun doğru teste bağlanması ve ID korunması ayrı doğrulanmalıdır. Güncelleme desteği doğrulanmadıysa gerçek veriye tekrar import etmeyin; sentetik pilotta çoğalma ve alan kaybını kontrol edin. Bu geliştirme sırasında canlı vendor hesabı kullanılmadı.
+
+For each tool, copy [verification-record.example.json](../examples/import-kit/verification-record.example.json) outside the kit and replace nulls with actual observations. Record the tool/hosting/version, source SHA-256, mapping choices, observed IDs/counts, timestamps and evidence artifact hashes. Every `passed` step needs observed results and evidence; `not_run` is not success. Re-export actual vendor files into the documented fixture directory to activate the existing compatibility test. Keep screenshots/exports free of credentials and real customer data.
+
+Her araç için şablonu kopyalayıp ürün/sürüm/ortam, kaynak dosya hash'i, alan eşlemeleri ve gözlenen sonuçları doldurun. `passed` durumunu yalnız gerçek gözlem ve kanıtla kullanın; `not_run` başarılı sayılmaz. Mevcut re-export fixture akışını kullanarak gerçek CSV'yi yerel karşılaştırmaya ekleyin.
+
 ## Türkçe
 
 ### 0. Kit

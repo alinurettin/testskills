@@ -1,5 +1,14 @@
 # Değişiklik günlüğü
 
+**Unreleased / Yayımlanmadı — correctness and local workflow hardening**
+- Pairwise: bounded exact completion, independent final coverage, explicit unknown/infeasible distinction, seed/domain validation and resource limits; incomplete coverage exits 1.
+- API: preserved schema composition/ref siblings, checked sample synthesis, explicit UNVERIFIED skeletons, HTTP code ranges, conservative response validation and safe-by-default evidence attachments. Independent upstream JSON Schema fixtures execute in Python and TypeScript.
+- Synthetic data: exact decimal scale bounds/JSON numbers, timezone-consistent edges, transactional distinct references and final invariants.
+- XLSX: versioned hidden metadata for lossless selected-test roundtrips; reviewed plan/apply with source hashes, conflict detection, migration and local delta manifests. Guard against stale compact-source regeneration after apply.
+- Local doctor, evaluation manifest/record/report tooling, task-level statistics, contamination tracking and documented host/dependency matrix. CI configured for Windows/Linux, Python 3.12/3.13 and Node 24.
+- No new paid model evaluation or live vendor lifecycle verification is claimed. Historical results are preserved. New workflows and limits: `docs/HARDENING.md`.
+- Türkçe: kapsam ve API doğruluğu, hassas kanıtların ayıklanması, test verisi kısıtları ve kayıpsız Excel güncellemeleri sağlamlaştırıldı. Yeni araçlar ve sınırlamalar belgelendi; geçmiş deney sonuçları değiştirilmedi.
+
 **0.9.0**: Keşif skill'i düzeltmesi ve 126 koşuluk yeni değerlendirme
 - 7 yeni bağımsız deneme ve cevap anahtarı; Opus, Sonnet 5.5 ve Haiku ile skill'li/skill'siz 126 koşu. Skill'ler en çok zayıf modele (Haiku) katkı sağlıyor (+3,9 puan); güçlü modellerde fark küçük. Ayrıntı: `docs/EVALUATION.md` §8.
 - Keşif testi skill'i yeniden düzenlendi (aşağıda): Opus'ta 74'e karşı 90, Haiku'da hâlâ geride.
