@@ -22,6 +22,7 @@
 
 ## 2. Method: automated + manual
 - **Automated scans** such as axe-core find roughly a third to a half of the issues: contrast, missing labels and names, lang, titles, some ARIA misuse. They are fast, repeatable and belong in CI.
+- An axe result has three lists: `violations` (fail), `passes`, and **`incomplete`** (the tool could not decide, for example contrast over an image). Review every `incomplete` item by hand; a scan with zero violations is not a conformance claim. In the EU, EN 301 549 is the harmonised standard behind the European Accessibility Act and adds requirements beyond WCAG (for example for documents, two-way voice and support services).
 - **Manual evaluation is mandatory** for the rest: keyboard operation, focus order and visibility, meaningful sequence, error handling, time limits, dragging alternatives, accessible authentication, screen-reader output.
 - `scripts/nfr_checklist.py wcag` selects the relevant criteria by feature. It emits one axe test covering the machine-checkable criteria, plus one manual test per criterion that needs judgement.
 - Test the **key user journeys**, not just single pages: login, search, product, cart, checkout, form errors, confirmation. Test each state as well: errors shown, dialogs open, menus expanded.
