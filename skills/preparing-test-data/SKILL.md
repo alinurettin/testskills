@@ -121,6 +121,7 @@ Add every dataset to the data catalog (template in §9 of the reference). For ea
 ## Files
 - `scripts/data_needs.py`: test-cases.json → data-needs report (exact vs any-valid per TC, PII-looking test data, TCs without data) and a starter schema.
 - `scripts/gen_data.py`: schema + seed → deterministic CSV/JSON (single table or related tables), with checksum-valid TCKN/VKN/IBAN, `ref` integrity, `unique`, edge rows, run tags and Excel-friendly output.
+- Re-identification: name the quasi-identifiers (birth date, postcode, gender…) in the rules file (`quasi_identifiers`, `min_k`); `mask_data.py` then reports k-anonymity and exits 1 below `min_k`.
 - `scripts/mask_data.py`: CSV extract + rules → masked CSV and a Markdown report (keyed hash, deterministic fake, generalise, redact, drop; default drop; PII warnings; refuses to run without the secret).
 - `scripts/tr_ids.py`: the suite's single TCKN/VKN/IBAN implementation (validation, synthetic generation, single-fault invalid variants), used by the scripts above.
 - `assets/schema-example.json`: customers + accounts with a reference, uniqueness and edge fields.

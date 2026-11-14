@@ -28,6 +28,11 @@ Rules (JSON):
   normalize   trim (default) | lower | digits | phone | none - applied before hash/fake so that
               " A@x.com" and "a@x.com" (lower) or "+90 532 111 22 33" and "05321112233" (phone)
               map to the same token when you want them to.
+Re-identification check: add "quasi_identifiers": ["dogum_tarihi", "posta_kodu", "cinsiyet"] (and optionally
+"sensitive": "<column>", "min_k": 5) to the rules file. After masking, the script reports k-anonymity (the
+smallest group of rows sharing those values; k = 1 means someone is unique) and l-diversity of the sensitive
+column, and exits 1 when k < min_k. A hashed column with 50 or fewer distinct values is flagged as reversible.
+
 Empty values stay empty. Values that cannot be generalized are redacted and counted.
 
 Hash and fake are keyed with a secret read from an environment variable (--secret-env, default
@@ -307,6 +312,7 @@ def mask_file(in_path: Path, rules: dict, secret: bytes | None, out_path: Path, 
         if pv:
             why = ("val", pv)
         stats[i]["pii"] = why
+        stats[i]["distinct"] = len({r[i] for r in rows if i < len(r) and r[i] != ""})
     fakes: list[dict] = [{} for _ in header]
     out_cols = [i for i, r in enumerate(col_rule) if r["rule"] != "drop"]
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -397,6 +403,22 @@ def render_report(res: dict, lang: str = "en") -> str:
     return "\n".join(lines)
 
 
+def reidentification(out_path: Path, delim: str, quasi: list, sensitive) -> dict:
+    """k-anonymity (and l-diversity) of the MASKED file over the quasi-identifier columns.
+    k = size of the smallest group of rows sharing the same quasi-identifier values; k = 1 means a
+    person is unique on those columns and can be re-identified by linking with another source."""
+    with out_path.open(encoding="utf-8-sig", newline="") as fh:
+        rows = list(csv.DictReader(fh, delimiter=delim))
+    missing = [c for c in quasi + ([sensitive] if sensitive else []) if rows and c not in rows[0]]
+    groups: dict = {}
+    for r in rows:
+        groups.setdefault(tuple(r.get(c, "") for c in quasi), []).append(r.get(sensitive, "") if sensitive else "")
+    sizes = sorted(len(v) for v in groups.values())
+    return {"quasi_identifiers": quasi, "missing_columns": missing, "groups": len(groups), "k": sizes[0] if sizes else 0,
+            "unique_rows": sum(1 for x in sizes if x == 1), "sensitive": sensitive,
+            "l": min((len(set(v)) for v in groups.values()), default=0) if sensitive else None}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--in", dest="inp", required=True, help="CSV extract (UTF-8; delimiter auto-detected)")
@@ -407,6 +429,8 @@ def main() -> int:
     ap.add_argument("--report", help="Markdown report")
     ap.add_argument("--default", choices=["keep", "drop"], help="action for columns without a rule (default: drop)")
     ap.add_argument("--delimiter", help="CSV delimiter (default: auto)")
+    ap.add_argument("--min-k", dest="min_k", type=int,
+                    help="exit 1 when k-anonymity over the rules' quasi_identifiers is below this (overrides rules min_k)")
     ap.add_argument("--lang", choices=["tr", "en"], default="en")
     sys.stdout.reconfigure(encoding="utf-8")
     a = ap.parse_args()
@@ -443,9 +467,30 @@ def main() -> int:
         print(f"error: {e}", file=sys.stderr)
         return 2
     warns, decide = findings(res, a.lang)
+    raw = json.loads(Path(a.rules).read_text(encoding="utf-8-sig"))
+    extra = ""
+    for c in res["columns"]:  # a hash of a small value set can be reversed by trying every value
+        if c["rule"] == "hash" and 0 < c.get("distinct", 0) <= 50 and c["distinct"] * 2 <= res["rows"]:
+            warns.append(f"'{c['column']}' is hashed but has only {c['distinct']} distinct values: such a hash can be "
+                         "reversed by trying every value. Generalize, keep or drop the column instead.")
+    quasi = raw.get("quasi_identifiers") or []
+    if quasi:
+        ri = reidentification(out, res["delimiter"], quasi, raw.get("sensitive"))
+        res["reidentification"] = ri
+        min_k = int(a.min_k if a.min_k is not None else raw.get("min_k", 0))
+        line = (f"k-anonymity over {', '.join(quasi)}: k = {ri['k']} ({ri['groups']} groups, {ri['unique_rows']} unique row(s))"
+                + (f"; l-diversity of '{ri['sensitive']}': l = {ri['l']}" if ri["sensitive"] else ""))
+        print(line)
+        extra = "\n## Re-identification risk\n\n" + line + "\n"
+        if ri["missing_columns"]:
+            warns.append(f"quasi-identifier column(s) not in the masked file: {', '.join(ri['missing_columns'])}")
+        if min_k and ri["k"] < min_k:
+            warns.append(f"k = {ri['k']} is below min_k = {min_k}: generalize the quasi-identifiers further "
+                         "(year instead of date, postcode prefix, wider buckets) or drop one.")
+            decide = True
     if a.report:
         Path(a.report).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.report).write_text(render_report(res, a.lang), encoding="utf-8", newline="\n")
+        Path(a.report).write_text(render_report(res, a.lang) + extra, encoding="utf-8", newline="\n")
     kept = sum(1 for c in res["columns"] if c["rule"] != "drop")
     print(f"masked {res['rows']} rows, {kept}/{len(res['columns'])} columns kept -> {out}"
           + (f"; report -> {a.report}" if a.report else ""))

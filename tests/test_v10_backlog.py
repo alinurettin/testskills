@@ -79,6 +79,34 @@ class DesignCoverageTests(unittest.TestCase):
             self.assertEqual(run(*args, "--min-coverage", 100).returncode, 1)
 
 
+class KAnonymityTests(unittest.TestCase):
+    def test_k_and_low_cardinality_hash(self):
+        import os
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            (t / "in.csv").write_text("id,dogum,il,cinsiyet,tani
+1,1980-01-05,Ankara,K,A
+2,1980-07-09,Ankara,K,B
+"
+                                      "3,1980-03-01,Ankara,K,A
+4,1991-02-02,Izmir,E,C
+", encoding="utf-8")
+            rules = {"columns": {"id": {"rule": "hash"}, "dogum": {"rule": "generalize", "to": "year"}, "il": "keep",
+                                 "cinsiyet": {"rule": "hash"}, "tani": "keep"},
+                     "quasi_identifiers": ["dogum", "il", "cinsiyet"], "sensitive": "tani", "min_k": 2}
+            (t / "r.json").write_text(json.dumps(rules), encoding="utf-8")
+            env = dict(os.environ, MASK_SECRET="0123456789abcdef0123")
+            cmd = [sys.executable, str(SK / "preparing-test-data/scripts/mask_data.py"), "--in", str(t / "in.csv"),
+                   "--rules", str(t / "r.json"), "--out", str(t / "o.csv")]
+            r = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8", env=env)
+            self.assertEqual(r.returncode, 1, r.stdout + r.stderr)
+            self.assertIn("k = 1", r.stdout)
+            self.assertIn("'cinsiyet' is hashed", r.stdout)     # 2 values over 4 rows: reversible
+            self.assertNotIn("'id' is hashed", r.stdout)        # a unique key is not low-cardinality
+            r = subprocess.run(cmd + ["--min-k", "1"], capture_output=True, text=True, encoding="utf-8", env=env)
+            self.assertNotIn("below min_k", r.stdout)
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))
