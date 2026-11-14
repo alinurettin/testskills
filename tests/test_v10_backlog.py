@@ -84,13 +84,9 @@ class KAnonymityTests(unittest.TestCase):
         import os
         with tempfile.TemporaryDirectory() as t:
             t = Path(t)
-            (t / "in.csv").write_text("id,dogum,il,cinsiyet,tani
-1,1980-01-05,Ankara,K,A
-2,1980-07-09,Ankara,K,B
-"
-                                      "3,1980-03-01,Ankara,K,A
-4,1991-02-02,Izmir,E,C
-", encoding="utf-8")
+            rows = ["id,dogum,il,cinsiyet,tani", "1,1980-01-05,Ankara,K,A", "2,1980-07-09,Ankara,K,B",
+                    "3,1980-03-01,Ankara,K,A", "4,1991-02-02,Izmir,E,C", ""]
+            (t / "in.csv").write_text(chr(10).join(rows), encoding="utf-8")
             rules = {"columns": {"id": {"rule": "hash"}, "dogum": {"rule": "generalize", "to": "year"}, "il": "keep",
                                  "cinsiyet": {"rule": "hash"}, "tani": "keep"},
                      "quasi_identifiers": ["dogum", "il", "cinsiyet"], "sensitive": "tani", "min_k": 2}
