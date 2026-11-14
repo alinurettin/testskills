@@ -9,7 +9,7 @@ metadata:
 
 # Running exploratory tests
 
-**Status: experimental.** In the 0.9.0 blind trial (docs/EVALUATION.md §8) the previous version scored, with the skill vs without it, 90 vs 74 on Opus, 79 vs 74 on Sonnet and 65 vs 74 on Haiku: it helped on Opus and Sonnet and lagged on Haiku. This revision (minimum path first, an action budget instead of minutes, every anomaly reported with a confidence) targets the Haiku result and has not been re-trialled yet.
+**Status: experimental (blind trials available; field validation limited).** In the 0.9.0 blind trial (docs/EVALUATION.md §8) the previous version scored, with the skill vs without it, 90 vs 74 on Opus, 79 vs 74 on Sonnet and 65 vs 74 on Haiku: it helped on Opus and Sonnet and lagged on Haiku. This revision (minimum path first, an action budget instead of minutes, every anomaly reported with a confidence) targets the Haiku result and has not been re-trialled yet.
 
 ## Minimum path (one session; read nothing else first)
 1. List the actions that change data (create, edit, delete, status change, pay). Order: money > access/ownership > status > the rest.

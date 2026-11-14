@@ -9,7 +9,7 @@ metadata:
 
 # Testing mobile apps
 
-**Status: experimental.** In the 0.9.0 blind trial (a hard plan review, three models) the skill made no measurable difference: 80 vs 83 on Haiku, 92 vs 91 on Sonnet and on Opus (docs/EVALUATION.md §8). The scripts add a repeatable checklist and a computed device matrix.
+**Status: experimental (blind trials available; field validation limited).** In the 0.9.0 blind trial (a hard plan review, three models) the skill made no measurable difference: 80 vs 83 on Haiku, 92 vs 91 on Sonnet and on Opus (docs/EVALUATION.md §8). The scripts add a repeatable checklist and a computed device matrix.
 
 Mobile apps fail in ways web apps do not: the system kills them in the background, the network drops mid-payment, users deny permissions, the OS changes every year, and a store review stands between a fix and the users. This skill turns those risks into **traceable test cases** (generated, then adapted to the app), a **device matrix based on real usage data**, and an **automation choice** that fits the team, with results mapped back by TC ID.
 

@@ -87,6 +87,12 @@ When all requirements come from one Jira story or epic, derived and split requir
 - Xray, Zephyr, TestRail, Azure DevOps and Qase: plain UTF-8, delimiter `,` by default. Choose UTF-8 in the importer.
 - Generic CSV for Excel: written **with a BOM** automatically, so Excel shows `ç ğ ı İ ö ş ü` correctly. Excel in a Turkish locale expects `;` as the delimiter, so use `--delimiter ";"`.
 - `.xlsx` avoids delimiter and encoding problems completely. Prefer it for humans, and CSV for importers.
+- New `.xlsx` exports include a versioned hidden `_qa_suite` sheet with selected tests' original
+  JSON and custom metadata. Keep it for lossless Excel edits; hidden does not mean private.
+  Use `reviewing-test-cases`' local plan/apply workflow before updating source JSON. See
+  `references/excel-roundtrip.md`. Partial exports do not include unselected test records.
+  Türkçe: Excel düzeltmelerinde gizli metadata sayfasını koruyun; ID ve özel alanları kaybetmeden
+  geri almak için `reviewing-test-cases` plan/uygula akışını kullanın. Vendor güncellemesi yapılmaz.
 
 ## Files
 
@@ -95,3 +101,4 @@ When all requirements come from one Jira story or epic, derived and split requir
 - `references/zephyr-scale.md`: Zephyr Scale import mapping, the two step layouts and pitfalls.
 - `references/other-tools.md`: TestRail, Azure DevOps Test Plans and Qase import mapping, what is certain and what to verify.
 - `references/data-model.md`: shared JSON schema.
+- `references/excel-roundtrip.md`: TR/EN lossless editing and local delta workflow; no vendor update claims.

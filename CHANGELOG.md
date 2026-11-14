@@ -23,6 +23,14 @@ Beş alan güncel kaynaklarla denetlendi (CTFL v4.0.1, CTAL-TA v4.0, CTAL-TM v3.
 - `shared/glossary-tr.md`: yaklaşık 85 terimin resmi Türkçe karşılığı (TTB Sözlüğü v2.0, CTFL v4.0.1 TR). Keşif skill'inin çıktıları resmi terimleri kullanıyor; diğer dosyalar henüz güncellenmedi.
 - Değerlendirme: `tools/eval_stats.py` ile güven aralıkları. Üç model birlikte +2,7 puan (%95 GA +1,0…+4,4, p = 0,014); tek tek modellerde fark ayırt edilemiyor. 0.9.0'daki "en çok zayıf modele yarıyor" ifadesi düzeltildi.
 - Testler: 282'den 387'ye.
+**0.10.0 içinde ayrıca (22 Ekim): correctness and local workflow hardening**
+- Pairwise: bounded exact completion, independent final coverage, explicit unknown/infeasible distinction, seed/domain validation and resource limits; incomplete coverage exits 1.
+- API: preserved schema composition/ref siblings, checked sample synthesis, explicit UNVERIFIED skeletons, HTTP code ranges, conservative response validation and safe-by-default evidence attachments. Independent upstream JSON Schema fixtures execute in Python and TypeScript.
+- Synthetic data: exact decimal scale bounds/JSON numbers, timezone-consistent edges, transactional distinct references and final invariants.
+- XLSX: versioned hidden metadata for lossless selected-test roundtrips; reviewed plan/apply with source hashes, conflict detection, migration and local delta manifests. Guard against stale compact-source regeneration after apply.
+- Local doctor, evaluation manifest/record/report tooling, task-level statistics, contamination tracking and documented host/dependency matrix. CI configured for Windows/Linux, Python 3.12/3.13 and Node 24.
+- No new paid model evaluation or live vendor lifecycle verification is claimed. Historical results are preserved. New workflows and limits: `docs/HARDENING.md`.
+- Türkçe: kapsam ve API doğruluğu, hassas kanıtların ayıklanması, test verisi kısıtları ve kayıpsız Excel güncellemeleri sağlamlaştırıldı. Yeni araçlar ve sınırlamalar belgelendi; geçmiş deney sonuçları değiştirilmedi.
 
 **0.9.0**: Keşif skill'i düzeltmesi ve 126 koşuluk yeni değerlendirme
 - 7 yeni bağımsız deneme ve cevap anahtarı; Opus, Sonnet 5.5 ve Haiku ile skill'li/skill'siz 126 koşu. Skill'ler en çok zayıf modele (Haiku) katkı sağlıyor (+3,9 puan); güçlü modellerde fark küçük. Ayrıntı: `docs/EVALUATION.md` §8.

@@ -4,3 +4,4 @@ __pycache__/
 evals/workspace/
 .DS_Store
 dist/
+work/

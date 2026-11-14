@@ -1,0 +1,967 @@
+[
+  {
+    "description": "oneOf",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "minimum": 2
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "first oneOf valid",
+        "data": 1,
+        "valid": true
+      },
+      {
+        "description": "second oneOf valid",
+        "data": 2.5,
+        "valid": true
+      },
+      {
+        "description": "both oneOf valid",
+        "data": 3,
+        "valid": false
+      },
+      {
+        "description": "neither oneOf valid",
+        "data": 1.5,
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with base schema",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "string",
+      "oneOf": [
+        {
+          "minLength": 2
+        },
+        {
+          "maxLength": 4
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "mismatch base schema",
+        "data": 3,
+        "valid": false
+      },
+      {
+        "description": "one oneOf valid",
+        "data": "foobar",
+        "valid": true
+      },
+      {
+        "description": "both oneOf valid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with boolean schemas, all true",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        true,
+        true,
+        true
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with boolean schemas, one true",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        true,
+        false,
+        false
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is valid",
+        "data": "foo",
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with boolean schemas, more than one true",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        true,
+        true,
+        false
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with boolean schemas, all false",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        false,
+        false,
+        false
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf complex types",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "properties": {
+            "bar": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "bar"
+          ]
+        },
+        {
+          "properties": {
+            "foo": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "foo"
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "first oneOf valid (complex)",
+        "data": {
+          "bar": 2
+        },
+        "valid": true
+      },
+      {
+        "description": "second oneOf valid (complex)",
+        "data": {
+          "foo": "baz"
+        },
+        "valid": true
+      },
+      {
+        "description": "both oneOf valid (complex)",
+        "data": {
+          "foo": "baz",
+          "bar": 2
+        },
+        "valid": false
+      },
+      {
+        "description": "neither oneOf valid (complex)",
+        "data": {
+          "foo": 2,
+          "bar": "quux"
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with empty schema",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "type": "number"
+        },
+        {}
+      ]
+    },
+    "tests": [
+      {
+        "description": "one valid - valid",
+        "data": "foo",
+        "valid": true
+      },
+      {
+        "description": "both valid - invalid",
+        "data": 123,
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with required",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "oneOf": [
+        {
+          "required": [
+            "foo",
+            "bar"
+          ]
+        },
+        {
+          "required": [
+            "foo",
+            "baz"
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "both invalid - invalid",
+        "data": {
+          "bar": 2
+        },
+        "valid": false
+      },
+      {
+        "description": "first valid - valid",
+        "data": {
+          "foo": 1,
+          "bar": 2
+        },
+        "valid": true
+      },
+      {
+        "description": "second valid - valid",
+        "data": {
+          "foo": 1,
+          "baz": 3
+        },
+        "valid": true
+      },
+      {
+        "description": "both valid - invalid",
+        "data": {
+          "foo": 1,
+          "bar": 2,
+          "baz": 3
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "oneOf with missing optional property",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "properties": {
+            "bar": true,
+            "baz": true
+          },
+          "required": [
+            "bar"
+          ]
+        },
+        {
+          "properties": {
+            "foo": true
+          },
+          "required": [
+            "foo"
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "first oneOf valid",
+        "data": {
+          "bar": 8
+        },
+        "valid": true
+      },
+      {
+        "description": "second oneOf valid",
+        "data": {
+          "foo": "foo"
+        },
+        "valid": true
+      },
+      {
+        "description": "both oneOf valid",
+        "data": {
+          "foo": "foo",
+          "bar": 8
+        },
+        "valid": false
+      },
+      {
+        "description": "neither oneOf valid",
+        "data": {
+          "baz": "quux"
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "nested oneOf, to check validation semantics",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "oneOf": [
+        {
+          "oneOf": [
+            {
+              "type": "null"
+            }
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "null is valid",
+        "data": null,
+        "valid": true
+      },
+      {
+        "description": "anything non-null is invalid",
+        "data": 123,
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/oneOf.json"
+  },
+  {
+    "description": "allOf",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {
+          "properties": {
+            "bar": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "bar"
+          ]
+        },
+        {
+          "properties": {
+            "foo": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "foo"
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "allOf",
+        "data": {
+          "foo": "baz",
+          "bar": 2
+        },
+        "valid": true
+      },
+      {
+        "description": "mismatch second",
+        "data": {
+          "foo": "baz"
+        },
+        "valid": false
+      },
+      {
+        "description": "mismatch first",
+        "data": {
+          "bar": 2
+        },
+        "valid": false
+      },
+      {
+        "description": "wrong type",
+        "data": {
+          "foo": "baz",
+          "bar": "quux"
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with base schema",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "bar": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "bar"
+      ],
+      "allOf": [
+        {
+          "properties": {
+            "foo": {
+              "type": "string"
+            }
+          },
+          "required": [
+            "foo"
+          ]
+        },
+        {
+          "properties": {
+            "baz": {
+              "type": "null"
+            }
+          },
+          "required": [
+            "baz"
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "valid",
+        "data": {
+          "foo": "quux",
+          "bar": 2,
+          "baz": null
+        },
+        "valid": true
+      },
+      {
+        "description": "mismatch base schema",
+        "data": {
+          "foo": "quux",
+          "baz": null
+        },
+        "valid": false
+      },
+      {
+        "description": "mismatch first allOf",
+        "data": {
+          "bar": 2,
+          "baz": null
+        },
+        "valid": false
+      },
+      {
+        "description": "mismatch second allOf",
+        "data": {
+          "foo": "quux",
+          "bar": 2
+        },
+        "valid": false
+      },
+      {
+        "description": "mismatch both",
+        "data": {
+          "bar": 2
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf simple types",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {
+          "maximum": 30
+        },
+        {
+          "minimum": 20
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "valid",
+        "data": 25,
+        "valid": true
+      },
+      {
+        "description": "mismatch one",
+        "data": 35,
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with boolean schemas, all true",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        true,
+        true
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is valid",
+        "data": "foo",
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with boolean schemas, some false",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        true,
+        false
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with boolean schemas, all false",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        false,
+        false
+      ]
+    },
+    "tests": [
+      {
+        "description": "any value is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with one empty schema",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {}
+      ]
+    },
+    "tests": [
+      {
+        "description": "any data is valid",
+        "data": 1,
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with two empty schemas",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {},
+        {}
+      ]
+    },
+    "tests": [
+      {
+        "description": "any data is valid",
+        "data": 1,
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with the first empty schema",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {},
+        {
+          "type": "number"
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "number is valid",
+        "data": 1,
+        "valid": true
+      },
+      {
+        "description": "string is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf with the last empty schema",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {
+          "type": "number"
+        },
+        {}
+      ]
+    },
+    "tests": [
+      {
+        "description": "number is valid",
+        "data": 1,
+        "valid": true
+      },
+      {
+        "description": "string is invalid",
+        "data": "foo",
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "nested allOf, to check validation semantics",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {
+          "allOf": [
+            {
+              "type": "null"
+            }
+          ]
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "null is valid",
+        "data": null,
+        "valid": true
+      },
+      {
+        "description": "anything non-null is invalid",
+        "data": 123,
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "allOf combined with anyOf, oneOf",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {
+          "multipleOf": 2
+        }
+      ],
+      "anyOf": [
+        {
+          "multipleOf": 3
+        }
+      ],
+      "oneOf": [
+        {
+          "multipleOf": 5
+        }
+      ]
+    },
+    "tests": [
+      {
+        "description": "allOf: false, anyOf: false, oneOf: false",
+        "data": 1,
+        "valid": false
+      },
+      {
+        "description": "allOf: false, anyOf: false, oneOf: true",
+        "data": 5,
+        "valid": false
+      },
+      {
+        "description": "allOf: false, anyOf: true, oneOf: false",
+        "data": 3,
+        "valid": false
+      },
+      {
+        "description": "allOf: false, anyOf: true, oneOf: true",
+        "data": 15,
+        "valid": false
+      },
+      {
+        "description": "allOf: true, anyOf: false, oneOf: false",
+        "data": 2,
+        "valid": false
+      },
+      {
+        "description": "allOf: true, anyOf: false, oneOf: true",
+        "data": 10,
+        "valid": false
+      },
+      {
+        "description": "allOf: true, anyOf: true, oneOf: false",
+        "data": 6,
+        "valid": false
+      },
+      {
+        "description": "allOf: true, anyOf: true, oneOf: true",
+        "data": 30,
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/allOf.json"
+  },
+  {
+    "description": "exclusiveMinimum validation",
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "exclusiveMinimum": 1.1
+    },
+    "tests": [
+      {
+        "description": "above the exclusiveMinimum is valid",
+        "data": 1.2,
+        "valid": true
+      },
+      {
+        "description": "boundary point is invalid",
+        "data": 1.1,
+        "valid": false
+      },
+      {
+        "description": "below the exclusiveMinimum is invalid",
+        "data": 0.6,
+        "valid": false
+      },
+      {
+        "description": "ignores non-numbers",
+        "data": "x",
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/exclusiveMinimum.json"
+  },
+  {
+    "description": "additionalProperties with schema",
+    "specification": [
+      {
+        "core": "10.3.2.3",
+        "quote": "The value of \"additionalProperties\" MUST be a valid JSON Schema."
+      }
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "foo": {},
+        "bar": {}
+      },
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "tests": [
+      {
+        "description": "no additional properties is valid",
+        "data": {
+          "foo": 1
+        },
+        "valid": true
+      },
+      {
+        "description": "an additional valid property is valid",
+        "data": {
+          "foo": 1,
+          "bar": 2,
+          "quux": true
+        },
+        "valid": true
+      },
+      {
+        "description": "an additional invalid property is invalid",
+        "data": {
+          "foo": 1,
+          "bar": 2,
+          "quux": 12
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/additionalProperties.json"
+  },
+  {
+    "description": "additionalProperties can exist by itself",
+    "specification": [
+      {
+        "core": "10.3.2.3",
+        "quote": "With no other applicator applying to object instances. This validates all the instance values irrespective of their property names"
+      }
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "tests": [
+      {
+        "description": "an additional valid property is valid",
+        "data": {
+          "foo": true
+        },
+        "valid": true
+      },
+      {
+        "description": "an additional invalid property is invalid",
+        "data": {
+          "foo": 1
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/additionalProperties.json"
+  },
+  {
+    "description": "additionalProperties are allowed by default",
+    "specification": [
+      {
+        "core": "10.3.2.3",
+        "quote": "Omitting this keyword has the same assertion behavior as an empty schema."
+      }
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "properties": {
+        "foo": {},
+        "bar": {}
+      }
+    },
+    "tests": [
+      {
+        "description": "additional properties are allowed",
+        "data": {
+          "foo": 1,
+          "bar": 2,
+          "quux": true
+        },
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/additionalProperties.json"
+  },
+  {
+    "description": "additionalProperties does not look in applicators",
+    "specification": [
+      {
+        "core": "10.2",
+        "quote": "Subschemas of applicator keywords evaluate the instance completely independently such that the results of one such subschema MUST NOT impact the results of sibling subschemas."
+      }
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "allOf": [
+        {
+          "properties": {
+            "foo": {}
+          }
+        }
+      ],
+      "additionalProperties": {
+        "type": "boolean"
+      }
+    },
+    "tests": [
+      {
+        "description": "properties defined in allOf are not examined",
+        "data": {
+          "foo": 1,
+          "bar": true
+        },
+        "valid": false
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/additionalProperties.json"
+  },
+  {
+    "description": "additionalProperties with null valued instance properties",
+    "specification": [
+      {
+        "core": "10.3.2.3"
+      }
+    ],
+    "schema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "additionalProperties": {
+        "type": "null"
+      }
+    },
+    "tests": [
+      {
+        "description": "allows null values",
+        "data": {
+          "foo": null
+        },
+        "valid": true
+      }
+    ],
+    "source": "https://github.com/json-schema-org/JSON-Schema-Test-Suite/blob/main/tests/draft2020-12/additionalProperties.json"
+  }
+]

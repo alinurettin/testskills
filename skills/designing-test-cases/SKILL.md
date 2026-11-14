@@ -12,7 +12,7 @@ metadata:
 A good test suite is not "many tests". It is **the smallest set of tests that exercises every meaningful partition, boundary, rule, transition and interaction, with depth proportional to risk, where every test says exactly what to observe, and where priorities let the team triage.**
 
 This skill gets there in three ways:
-- The combinatorics are computed with scripts, not guessed. The scripts cannot miss a boundary or a rule combination, and their outputs double as coverage evidence.
+- The combinatorics are computed from the explicit model with scripts. Review the model against the source requirements: omitted rules cannot be recovered by computation. Treat output as coverage evidence only when verification succeeds with no unresolved tuples.
 - Test cases are authored in a compact text format and converted to JSON by a script. That keeps the work fast and the JSON valid.
 - A deterministic calibration check catches inflated priorities and redundant tests before delivery.
 
@@ -84,6 +84,8 @@ python scripts/decision_table.py qa/design/DS-002-coupon-rules.json --out qa/des
 python scripts/state_transition.py qa/design/DS-003-order-states.json --out qa/design/DS-003-order-states.md
 python scripts/pairwise.py qa/design/DS-004-compat.json --out qa/design/DS-004-compat.md
 ```
+
+Pairwise has bounded exact completion (`--max-nodes 100000`, `--max-tuples 250000`). Proven impossible tuples are separate from unknown searches. An unknown tuple means incomplete coverage and exit 1; reduce the model or increase the budget deliberately. Seed rows must use declared domain values.
 
 Options:
 - `--lang tr|en`

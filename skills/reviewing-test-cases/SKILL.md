@@ -33,6 +33,13 @@ Write the review in the user's language (TR/EN). The script detects Turkish and 
 
 ### 1. Get the suite into QA Suite format
 - If it is already `qa/test-cases.json`, use it directly.
+- For an edited **new QA Suite XLSX export**, preserve all fields and IDs with the lossless
+  workflow in `references/workbook-updates.md`. Prefer `scripts/update_tests.py plan` directly
+  from the workbook, review add/update/deprecate/conflict changes, then explicitly apply the
+  source-hash-checked plan. Do not send this workbook through the lossy general compact importer.
+  This workflow makes JSON authoritative; do not regenerate it from a stale compact source.
+  Türkçe: yeni QA Suite Excel çıktısındaki düzeltmeler için kayıpsız plan/uygula akışını kullanın;
+  eski compact kaynaktan JSON'u yeniden üretmeyin. Ayrıntılar aynı rehberin Türkçe bölümünde.
 - If it is an Excel workbook (`.xlsx`) or a CSV export (TestRail, Xray, Zephyr, Qase, or Excel saved as CSV), import it directly. No conversion is needed for `.xlsx`:
   ```bash
   python scripts/import_tests.py suite.xlsx --list-sheets
@@ -82,6 +89,10 @@ Offer to apply the fixes. Edit `qa/test-cases.src.md`, keeping the IDs, and hand
 
 ## Files
 - `scripts/import_tests.py`: Excel `.xlsx` (read directly, several sheets, merged cells, dates) and CSV (TestRail, Xray, Zephyr, Qase exports) → compact format, with header-row detection, TR/EN column aliases and both layouts.
+- `scripts/update_tests.py`: deterministic local delta plans, conservative workbook conflicts, explicit
+  apply with source hash/advisory lock/atomic replace, and an explicit legacy-to-v1 migration candidate.
+- `references/workbook-updates.md`: TR/EN lossless workbook editing, JSON provenance sidecars,
+  schema compatibility, concurrency guarantees and vendor limitations.
 - `scripts/review_tests.py`: deterministic writing-quality checks (TR/EN), scores, suite observations. Output is Markdown or JSON.
 - `scripts/qa_compact.py`: compact ⇄ JSON (`--lenient` for imports).
 - `references/review-rubric.md`: judgement dimensions D1–D8, sampling, typical fixes, report structure.

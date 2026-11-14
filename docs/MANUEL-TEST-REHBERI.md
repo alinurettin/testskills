@@ -139,9 +139,9 @@ Token'ın size maliyeti planınıza bağlıdır; aboneliklerde kullanım limitin
 - **CSV isterseniz:** "Excel için noktalı virgüllü CSV" deyin. Türkçe bölge ayarlı Excel ayraç olarak `;` bekler. Dosya BOM'lu UTF-8 yazılır; Türkçe karakterler doğru görünür.
 - **İzlenebilirlik matrisi:** `qa/rtm.csv` virgül ayraçlıdır. Çift tıklayınca her şey tek sütunda görünürse **Veri → Metinden/CSV'den** ile açın; kodlama olarak UTF-8'i, ayraç olarak virgülü seçin.
 - **Markdown dosyaları** (`.md`: soru listesi, RTM, raporlar): Herhangi bir metin editöründe açılır. VS Code'da önizleme için `Ctrl+Shift+V`'ye basın. GitHub ve Azure DevOps wiki de bunları tablo olarak gösterir.
-- **Excel'de düzenleme:** Excel'de yaptığınız değişiklikler `qa/test-cases.json`'a kendiliğinden geri dönmez. Düzeltmeleri asistana söyleyin ("TC-014'ün beklenen sonucunu şöyle değiştir") ya da düzenlediğiniz Excel'i Kart 4 ile yeniden içe aktarın.
+- **Excel'de düzenleme:** QA Suite'in yeni XLSX çıktısı ID'leri ve ek alanları koruyan gizli metadata içerir. Düzenlenmiş dosya için `update_tests.py plan` ile değişiklikleri inceleyin, ardından `apply` ile JSON'a alın. Bu akıştan sonra JSON asıl kaynaktır; eski `.src.md`den yeniden üretmeyin. Ayrıntılar: [güncelleme rehberi](HARDENING.md).
 
 ## 6. Bilmeniz gerekenler
 - Asistan, ürününüzün gerçek mesaj metinlerini ve ekranlarını bilemez. Beklenen sonuçlardaki metinler story'den ya da onaya sunulan varsayımlardan gelir; ürünle karşılaştırın.
-- `running-exploratory-tests`, `testing-ai-features`, `testing-mobile-apps` ve `preparing-test-data` skill'leri **deneysel**dir: henüz kör denemeleri yapılmadı.
+- `running-exploratory-tests`, `testing-ai-features`, `testing-mobile-apps` ve `preparing-test-data` skill'leri **deneysel**dir: kör denemeler yapıldı, sonuçlar karışık ve saha doğrulaması sınırlı. Yeni kod düzeltmeleri henüz yeni kör model koşularıyla ölçülmedi.
 - Hata ya da içe aktarma sorunu bulursanız bir issue açın: [CONTRIBUTING.md](../CONTRIBUTING.md).

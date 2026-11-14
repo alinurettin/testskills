@@ -7,7 +7,7 @@
 Katkılarınız memnuniyetle karşılanır: hata bildirimi, içe aktarma sorunu, kör deneme raporu, sektör paketi önerisi ya da kod. Lütfen yalnızca **sentetik veya anonimleştirilmiş** veri paylaşın. Gerçek müşteri verisi, iç sistem adresi ya da gizli iş kuralı içeren issue'lar silinir.
 
 ### Kontrolleri koşturma
-Python 3.12 veya 3.13 yeterli; başka bir paket gerekmez. CI, Linux üzerinde Python 3.12 ile aynı üç adımı koşar:
+Python script'leri Python 3.12/3.13 ve standart kütüphaneyi kullanır. Dağıtılan TypeScript yardımcılarının davranış testleri Node 22.18+, 24 veya 26 gerektirir; mock testlerde Playwright kurulumu gerekmez. CI matrisi Linux/Windows, Python 3.12/3.13 ve Node 24 olarak yapılandırılmıştır:
 ```bash
 python tools/sync_shared.py          # shared/ dosyalarını skill'lere dağıtır (CI: --check)
 python tools/validate_skills.py      # Agent Skills spesifikasyonu ve paket kuralları; 0 hata olmalı
@@ -65,7 +65,7 @@ Değişiklikten sonra `python tools/validate_skills.py` ile ölçün.
 Contributions are welcome: bug reports, import problems, trial reports, domain-pack proposals and code. Please share **synthetic or anonymised** data only. Issues that contain real customer data, internal system addresses or confidential business rules will be deleted.
 
 ### Running the checks
-Python 3.12 or 3.13 is enough; no packages are needed. CI runs the same three steps with Python 3.12 on Linux:
+Python scripts use Python 3.12/3.13 and the standard library. Distributed TypeScript behavior tests need Node 22.18+, 24 or 26; the mock tests do not need Playwright installed. The CI matrix configures Linux/Windows, Python 3.12/3.13 and Node 24:
 ```bash
 python tools/sync_shared.py          # copies shared/ files into the skills (CI: --check)
 python tools/validate_skills.py      # Agent Skills spec and suite rules; must report 0 errors

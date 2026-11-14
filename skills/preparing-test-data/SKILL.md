@@ -9,7 +9,7 @@ metadata:
 
 # Preparing test data
 
-**Status: experimental.** In the 0.9.0 blind trial on a hard test-data task (docs/EVALUATION.md §8) the skill gave no measurable gain over a no-skill baseline: 98 vs 97 on Haiku, 100 vs 100 on Sonnet and on Opus. What the scripts add is deterministic generation from a seed and masking with a report.
+**Status: experimental (blind trials available; field validation limited).** In the 0.9.0 blind trial on a hard test-data task (docs/EVALUATION.md §8) the skill gave no measurable gain over a no-skill baseline: 98 vs 97 on Haiku, 100 vs 100 on Sonnet and on Opus. What the scripts add is deterministic generation from a seed and masking with a report.
 
 Most "flaky" tests and many blocked test cycles are really data problems: the record was used up, another test changed it, the value missed the boundary, or nobody knew what the environment contained. This skill treats test data as a versioned test asset. **Synthetic data comes first.** It derives exactly what each test needs, generates it reproducibly from a seed, and uses masked production data only when the data owner has approved it.
 

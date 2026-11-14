@@ -9,7 +9,7 @@ metadata:
 
 # Testing APIs
 
-APIs are where most business rules actually run, and where authorisation mistakes leak data at scale. This skill starts from the **contract** (OpenAPI). Everything the contract states becomes a traceable test case *and* an executable Playwright API test, generated deterministically. Everything the contract does not state becomes a question, or a test you design deliberately.
+This skill starts from the **contract** (OpenAPI). Supported assertions become traceable executable Playwright tests; unsupported schemas or unverified fixtures become explicit questions and skipped skeletons. This is a conservative subset, not a complete OpenAPI/JSON Schema implementation. Review the documented limits and business rules before execution.
 
 ## Language
 Match the user's language (`--lang tr|en`). HTTP methods, paths, field names and status codes stay as they are.
@@ -99,7 +99,7 @@ API_BASE_URL=http://127.0.0.1:4180 API_TOKEN=... API_TOKEN_OTHER=... npx playwri
 ```
 When `@playwright/test` is installed in another folder, run `npx playwright test -c <path>/playwright.config.ts` from that folder, so the import resolves.
 - **Keep the JSON report.** `--reporter=…` on the command line replaces the config's reporters, so the JSON report is not written; `--list` overwrites it with an empty report. Copy the report of every state-changing run before running again.
-- **Evidence is captured automatically.** `api-helpers.ts` attaches every request and response (token masked) to the Playwright report. Use those attachments in defect reports. `API_EVIDENCE=off` disables it.
+- **Sanitized evidence is captured automatically.** `api-helpers.ts` omits endpoint values, headers and raw/unknown bodies by default. `API_EVIDENCE=off` disables it. Exact dotted JSON/form field paths can be opted in with `API_EVIDENCE_ALLOW_FIELDS=ok,nested.0.state`; secret-like fields remain omitted. `API_EVIDENCE_REDACT_KEYS=customSecret` adds sensitive names. Only allow synthetic fields you intend to disclose. See the reference for limits; this is not a complete anonymizer.
 - **Clean data every run.** State-changing tests consume balance, stock and quotas. Reset or seed before each run, or use a dedicated high-balance test account. A drained account turns correct tests into false failures.
 - **When the environment cannot be reset,** budget the state before you run: add up what one full run consumes (for example the sum of all accepted transfer amounts, including the maximum-boundary test), compare it with the available balance, and run the state-changing tests once. Explore with read-only requests (`GET`) and single `curl` calls, and rerun only the failed tests (`--last-failed`). Include the maximum-boundary test in the budget: it needs a balance above the maximum. Run tests that could corrupt state (a wrong type accepted into an amount) last.
 - **Setup steps accept any 2xx.** A create step inside a business test should check `res.ok()`, not the exact code; otherwise one wrong status code (200 instead of 201) masks every business test behind it.

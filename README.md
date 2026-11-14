@@ -92,8 +92,10 @@ claude plugin install qa-suite@qa-suite-marketplace
 **Diğer araçlar (Codex, Copilot, Cursor, Gemini CLI…):** Paket açık Agent Skills standardına uyar. `skills/` altındaki klasörleri aracın skills klasörüne kopyalayın.
 
 **Gereksinimler:**
-- Python 3.9+ (script'ler yalnızca standart kütüphaneyi kullanır)
-- Otomasyon için Node.js 22, 24 veya 26 (Playwright'ın desteklediği sürümler) ve `@playwright/test`
+- Python 3.12+ (script'ler yalnızca standart kütüphaneyi kullanır; CI: 3.12/3.13)
+- Otomasyon için Node.js 22.18+, 24 veya 26 ve `@playwright/test`
+
+Yerel ön kontrol: `python tools/doctor.py --profile core`; API/otomasyon için `--profile api --project <proje>` kullanın. Komut kurulum veya ağ isteği yapmaz. Excel değişikliklerini güvenle geri alma, delta planı, pairwise kaynak sınırları ve API kanıt gizliliği: [geliştirme rehberi](docs/HARDENING.md). Host uyumluluğu ve bağımlılıklar: [uyumluluk tablosu](docs/COMPATIBILITY.md).
 
 ## Hızlı başlangıç
 ```

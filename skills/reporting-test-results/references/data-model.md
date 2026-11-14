@@ -45,6 +45,14 @@ The script prints the full syntax with `--help`. It validates the files, expands
 
 The field reference below describes the **generated JSON**. You only need it when you read JSON directly or write another tool against it.
 
+### Reviewed Excel/JSON updates / İncelenmiş Excel/JSON güncellemeleri
+
+The alternative lossless workflow is XLSX export → edited XLSX → `reviewing-test-cases/scripts/update_tests.py plan` → review → `apply`. JSON then becomes the authoritative document; the old `.src.md` is stale and does not represent arbitrary custom fields. Successful apply writes a `.qa-reviewed.json` sidecar. `qa_compact.py` refuses to overwrite this reviewed JSON unless `--replace-reviewed` explicitly discards that protection. Preserve the sidecar with the JSON. Use further plan/apply operations to retain custom metadata. Compact regeneration is not a lossless migration for arbitrary JSON.
+
+Excel üzerinden güncelleme sonrası JSON asıl kaynaktır; eski `.src.md` güncel değildir. Planı inceleyip `apply` çalıştırın; sonraki değişikliklerde yine bu akışı kullanın. `.qa-reviewed.json` korumasını JSON ile birlikte saklayın. `--replace-reviewed`, özel alanlar kaybolabileceğini kabul ederek compact kaynağın yeniden yazmasına açıkça izin verir.
+
+Test-suite documents accept legacy files without `schema_version` and explicit `schema_version: 1`; the XLSX roundtrip/update tools reject unknown versions. The business `version` field is separate and is preserved. `update_tests.py migrate` produces a versioned candidate without changing the source. Keep unknown/custom fields and external IDs intact. Vendor keys are never internal IDs. Optional `execution` metadata may record `run_id`, `commit`, `environment`, `started_at` and `finished_at`; a JSON snapshot is not an immutable audit/history store.
+
 ## ID rules
 
 - Requirements: `REQ-001`, `REQ-002` … Questions: `Q-001` … Test cases: `TC-001` … Design specs: `DS-001` …

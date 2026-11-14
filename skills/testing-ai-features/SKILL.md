@@ -9,7 +9,7 @@ metadata:
 
 # Testing AI features
 
-**Status: experimental.** One blind trial (0.7.0, Opus, 3 runs per arm) gave 65% with the skill and 59% without, and both arms missed the hard findings; it has not been re-trialled since (docs/EVALUATION.md §7). The scoring gate was hardened in 0.10.0.
+**Status: experimental (blind trials available; field validation limited).** One blind trial (0.7.0, Opus, 3 runs per arm) gave 65% with the skill and 59% without, and both arms missed the hard findings; it has not been re-trialled since (docs/EVALUATION.md §7). The scoring gate was hardened in 0.10.0.
 
 An LLM feature gives a different answer to the same question on different runs. It can be talked out of its instructions by a user or by a document it reads, and it fails in fluent, confident sentences. Classic "expected result equals actual result" testing is not enough. This skill makes AI features testable the same way as the rest of the product:
 - explicit, numeric acceptance thresholds;
