@@ -133,6 +133,7 @@ The essentials, with details in `references/test-case-standard.md`:
 - **Valid values may share a test. Invalid values never do** (single fault).
 - **Turkish IDs (TCKN, VKN, IBAN):** take valid values from the generator (`python scripts/check_ids.py tckn --generate 2 --seed 1`) and invalid ones from `--variants`. Checksum-valid values may belong to real people, so they are for test environments only, never for production or shared systems. Never copy IDs from the internet.
 - Link every test to its requirements (`req:`), set the technique (`tech:`) and the design reference (`ref: DS-001 C-07`).
+- Then measure technique coverage instead of claiming it: `python scripts/design_coverage.py --design-dir qa/design --tests qa/test-cases.json --out qa/design-coverage.md`. It lists the coverage items no test exercises and references to items that no longer exist. Cover them, or state why an item is skipped.
 - Cover functional rules with both **positive and negative** tests.
 - **Rate the priority of each test, not of the requirement.** Start one level below the requirement's risk. Only the happy-path proof and the prevention of the most damaging failure get the requirement's level. Boundary neighbours, extra representatives and message checks go lower. Error-guessing and exploratory tests are at most high.
 - **One representative per partition, plus the boundary values.** Add another value from a covered partition only for a distinct, named risk (overflow, formatting).
@@ -169,6 +170,7 @@ Tell the user:
 - `scripts/decision_table.py`: expansion, gaps, conflicts, dead rules, collapsing.
 - `scripts/state_transition.py`: state table, model defects, 0/1-switch sequences, invalid transitions.
 - `scripts/pairwise.py`: t-wise covering array with constraints and verification.
+- `scripts/design_coverage.py`: covered/total coverage items per design spec, uncovered items, stale references (`--min-coverage` as a gate).
 - `scripts/check_ids.py`: validates TCKN/VKN/IBAN test data, derives single-fault invalid variants, and generates seeded synthetic valid IDs (`--generate`; test environments only).
 - `scripts/tr_ids.py`: the suite's single TCKN/VKN/IBAN implementation used by `check_ids.py`.
 - `assets/spec-examples/`: one example spec per script.

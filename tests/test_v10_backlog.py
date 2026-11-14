@@ -45,6 +45,40 @@ class AutomationLintTests(unittest.TestCase):
         self.assertNotIn("lint", r.stdout)
 
 
+class DesignCoverageTests(unittest.TestCase):
+    def test_covered_uncovered_unknown(self):
+        d = SK / "designing-test-cases"
+        with tempfile.TemporaryDirectory() as t:
+            design = Path(t) / "design"
+            design.mkdir()
+            run(d / "scripts/decision_table.py", d / "assets/spec-examples/decision-table.json", "--out", design / "DS-002-x.md")
+            tc = [{"id": "TC-001", "design_ref": "DS-002 C-01, C-02"}, {"id": "TC-002", "objective": "DS-002 C-03: x"},
+                  {"id": "TC-003", "design_ref": "DS-002 C-99"}, {"id": "TC-004", "design_ref": "DS-002"},
+                  {"id": "TC-005", "design_ref": "DS-002 C-04", "status": "deprecated"}]
+            (Path(t) / "t.json").write_text(json.dumps({"test_cases": tc}), encoding="utf-8")
+            js = Path(t) / "c.json"
+            r = run(d / "scripts/design_coverage.py", "--design-dir", design, "--tests", Path(t) / "t.json",
+                    "--out", Path(t) / "c.md", "--json", js)
+            self.assertEqual(r.returncode, 1)  # an unknown reference is always a failure
+            res = json.loads(js.read_text(encoding="utf-8"))
+            spec = res["specs"][0]
+            self.assertEqual((spec["covered"], spec["total"]), (3, 5))
+            self.assertEqual(spec["uncovered"], ["C-04", "C-05"])  # the deprecated test does not cover C-04
+            self.assertEqual(res["unknown_references"][0]["item"], "C-99")
+            self.assertEqual(res["tests_without_item"][0]["test"], "TC-004")
+
+    def test_minimum_gate(self):
+        d = SK / "designing-test-cases"
+        with tempfile.TemporaryDirectory() as t:
+            design = Path(t) / "design"
+            design.mkdir()
+            run(d / "scripts/decision_table.py", d / "assets/spec-examples/decision-table.json", "--out", design / "DS-002-x.md")
+            (Path(t) / "t.json").write_text(json.dumps({"test_cases": [{"id": "TC-001", "design_ref": "DS-002 C-01"}]}), encoding="utf-8")
+            args = [d / "scripts/design_coverage.py", "--design-dir", design, "--tests", Path(t) / "t.json", "--out", Path(t) / "c.md"]
+            self.assertEqual(run(*args).returncode, 0)
+            self.assertEqual(run(*args, "--min-coverage", 100).returncode, 1)
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))
