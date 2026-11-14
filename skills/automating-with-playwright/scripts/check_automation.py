@@ -14,7 +14,8 @@ Static scan of the spec files (no Playwright run needed):
 
 Usage:
   python check_automation.py --tests qa/test-cases.json --specs automation/tests [--out qa/automation-coverage.md] [--strict]
---strict exits 1 when candidates are missing, skeletons remain, tags are orphaned or a test asserts nothing (CI gate).
+--strict exits 1 when candidates are missing, skeletons remain, tags are orphaned, a test asserts nothing, or the static lint finds a smell
+(waitForTimeout, test.only, force: true, raw CSS/XPath, credential literals, networkidle) (CI gate).
 """
 from __future__ import annotations
 
@@ -53,6 +54,28 @@ def asserts(block: str) -> bool:
     return bool(ASSERT.search(COMMENT.sub("", block)))
 
 
+LINT = [
+    ("WAIT_TIMEOUT", re.compile(r"\bwaitForTimeout\s*\("), "fixed sleep: wait for a state with a web-first assertion instead"),
+    ("TEST_ONLY", re.compile(r"\b(?:test|describe)\.only\s*\("), "test.only left in: the rest of the suite does not run"),
+    ("FORCE", re.compile(r"\bforce\s*:\s*true"), "force: true skips actionability checks and hides real defects"),
+    ("RAW_SELECTOR", re.compile(r"""\b(?:locator|\$\$?)\(\s*['"`](?://|xpath=|[.#][\w-]+|\w+\s*>\s*\w+)"""),
+     "raw CSS/XPath: prefer getByRole / getByLabel / getByTestId"),
+    ("CREDENTIAL", re.compile(r"""(?i)\b(?:password|passwd|secret|api[_-]?key|token)\b\s*[:=]\s*['"`][^'"`$\s]{6,}['"`]"""),
+     "credential literal: read it from the environment"),
+    ("NETWORKIDLE", re.compile(r"""['"`]networkidle['"`]"""), "networkidle is discouraged: assert on what the user sees"),
+]
+
+
+def lint(text: str, name: str) -> list[tuple[str, str, int, str]]:
+    out = []
+    for no, line in enumerate(text.splitlines(), 1):
+        code = line.split("//", 1)[0] if not line.lstrip().startswith("//") else ""
+        for rule, rx, msg in LINT:
+            if rx.search(code):
+                out.append((rule, name, no, msg))
+    return out
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--tests", required=True)
@@ -67,8 +90,10 @@ def main() -> int:
     where: dict[str, list[str]] = defaultdict(list)
     skeleton: set[str] = set()
     asserting: set[str] = set()
+    smells: list[tuple[str, str, int, str]] = []
     for f in sorted(Path(a.specs).rglob("*.ts")):
         text = f.read_text(encoding="utf-8", errors="ignore")
+        smells += lint(text, f.name)
         for m in TAG.finditer(text):
             where[m.group(1)].append(f"{f.name}:{text.count(chr(10), 0, m.start()) + 1}")
             if asserts(block_of(text, m.start())):
@@ -113,14 +138,19 @@ def main() -> int:
     section("Orphan tags", orphan)
     section("Duplicate tags", dup)
     section("Automated", sorted(automated))
+    if smells:
+        lines.extend(["## Lint findings (fix before trusting the results)", "", "| Rule | Location | Why |", "|---|---|---|"])
+        lines.extend(f"| {r} | {n}:{no} | {m} |" for r, n, no, m in smells)
+        lines.append("")
     text = "\n".join(lines) + "\n"
     if a.out:
         Path(a.out).parent.mkdir(parents=True, exist_ok=True)
         Path(a.out).write_text(text, encoding="utf-8", newline="\n")
         print(f"wrote {a.out}")
     print(f"candidates {n} · automated {len(candidates & automated)} ({pct}%) · skeletons {len(skel)} · "
-          f"missing {len(missing)} · orphan {len(orphan)} · duplicate {len(dup)} · no assertion {len(hollow)}")
-    if a.strict and (missing or skel or orphan or hollow):
+          f"missing {len(missing)} · orphan {len(orphan)} · duplicate {len(dup)} · no assertion {len(hollow)}"
+          + (f" · lint {len(smells)}" if smells else ""))
+    if a.strict and (missing or skel or orphan or hollow or smells):
         return 1
     return 0
 

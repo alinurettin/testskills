@@ -24,7 +24,8 @@ Each stage has its own skill with the detailed procedure. This file decides **wh
 3. **Compute, don't guess, combinatorics.** Boundaries, decision tables, state coverage and pairwise sets come from the scripts, and their findings count as analysis results.
 4. **Risk sets depth.** The likelihood × impact score decides the techniques and the coverage level.
 5. **Honest reporting.** Report what was covered, what was deliberately not, and what depends on open questions. Never claim "all requirements are covered" beyond what the RTM shows.
-6. **Language:** write artifacts in the user's language (Turkish or English), and keep JSON keys, IDs and enums in English.
+6. **AI output needs a human.** Everything you write (requirements, derived requirements, tests) stays `draft` until a named person reviews it; never set `ready` yourself for items that rest on open questions. Before you start, check the input for personal or confidential data (names with IDs, customer records, credentials): if you find any, stop and ask the user to anonymise it (the preparing-test-data skill can mask it).
+7. **Language:** write artifacts in the user's language (Turkish or English), and keep JSON keys, IDs and enums in English.
 
 ## Effort and cost
 
@@ -121,6 +122,7 @@ Migration (if 2c ran): reconciliation of R rows: mismatches M (by class) · sign
 Test data (if 2d ran): datasets … (fixture / synthetic / masked) · masking report … · real personal data: none (or approved decision …)
 Exploratory (if 5c ran): S sessions on C charters · defects D · new regression tests N · debrief held (yes/no)
 Automation (if stage 5 ran): A of K candidates automated · last run passed P / failed F (product defects: …) · skeletons left S
+Review: AI-generated. Computed by scripts: boundaries, tables, coverage, RTM. Judged by the model: requirement wording, risk scores, expected results. Reviewed by: <name> / not yet reviewed (items stay draft)
 Next steps: answer Q-001..; trial import into Xray; …
 ```
 Include a stage line only when that stage ran; leave out the lines of stages that did not.
