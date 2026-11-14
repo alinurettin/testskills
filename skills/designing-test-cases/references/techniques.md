@@ -37,10 +37,19 @@ These techniques follow the ISTQB CTFL v4.0 and CTAL-TA v4.0 syllabi and ISO/IEC
 **Idea:** Defects cluster at the edges of partitions (off-by-one errors, `<` versus `<=`).
 
 - **2-value BVA:** for each boundary, test the boundary value and its nearest neighbour in the adjacent partition. For 18–65 that is 17, 18, 65, 66.
-- **3-value BVA:** test the boundary value and both of its neighbours. For 18–65 that is 17, 18, 19 and 64, 65, 66. This catches more faults, such as `==` written instead of `<=`. Use it for high-risk requirements.
-- The **step** is the smallest meaningful increment: 1 for integers, 0.01 for money in TRY, 1 day for dates, 1 character for length.
+- **3-value BVA:** test each boundary value and both of its neighbours. This catches more faults, such as `==` written instead of `<=`. Use it for critical-risk requirements. Which values count depends on the reading of CTFL v4.0.1 §4.2.2, where the minimum and maximum of *every* partition are boundary values:
+  - `"bva_scope": "all"` (the script default, the literal reading): the invalid partitions' boundaries 17 and 66 get neighbours too. For 18–65 that is 16, 17, 18, 19 and 64, 65, 66, 67.
+  - `"bva_scope": "valid"`: only the boundaries of valid partitions get both neighbours. For 18–65 that is 17, 18, 19 and 64, 65, 66.
 
-**Coverage:** the boundary values exercised divided by the boundary values identified.
+  State the scope you used in the summary. Valid values may share tests, so 3-value adds few test cases.
+- The **step** is the smallest meaningful increment: 1 for integers, 0.01 for money in TRY, 1 day for dates, 1 character for length.
+- **Open borders** ("more than 1.29", "under 100"): write `min_exclusive` / `max_exclusive` in the spec. Do not convert by hand. The stated value is then the closest value *outside* the partition.
+
+**Coverage (CTFL v4.0.1 §4.2.2):**
+- 2-value: boundary values exercised ÷ boundary values identified.
+- 3-value: boundary values and their neighbours exercised ÷ boundary values and their neighbours identified.
+
+`ep_bva.py` prints both counts ("N BVA coverage items (x boundary values + y neighbours)").
 
 **Pitfalls:**
 - Boundaries hidden in the implementation, such as database column length, integer overflow, or file-size limits of middleware. Ask for them, and add them as `domain_min`/`domain_max`.
@@ -58,6 +67,12 @@ These techniques follow the ISTQB CTFL v4.0 and CTAL-TA v4.0 syllabi and ISO/IEC
 5. Write one test per collapsed column. For critical risk, write one test per full combination.
 
 **Coverage:** the feasible columns exercised divided by the total feasible columns.
+
+**What the script checks when it minimises (CTAL-TA v4.0 §3.3.1):**
+- Infeasible combinations are disregarded when columns are merged, so they do not block a merge.
+- A `-` (don't care) cell stands for several values. The test inputs rotate those values, and any condition value that no test input uses is listed as a warning.
+- A rule that another rule with the same outcome already covers is reported as redundant.
+- The checksum line must say OK: the minimised columns represent exactly the combinations that have an outcome.
 
 **Pitfalls:**
 - Treating impossible combinations as gaps. Declare them in `infeasible`.

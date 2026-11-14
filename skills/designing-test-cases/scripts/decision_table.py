@@ -45,7 +45,11 @@ T = {
            "conf": "Conflicts: rules give different outcomes for the same combination",
            "overlap": "Overlaps resolved by rule order (first match)",
            "dead": "Dead rules (match no feasible combination)", "collapsed": "Collapsed decision table",
-           "tests": "Test conditions", "cond": "Condition", "action": "Action", "rule": "Rule",
+           "redundant": "Redundant rules (another rule with the same outcome already covers them)",
+           "untested": "Condition values no test input uses (add a test or use --coverage full)",
+           "checksum": "Checksum: minimised columns represent {m} combinations = {k} with an outcome + {a} infeasible "
+                       "absorbed as don't care; full table {f} = {k} + {g} gaps + {c} conflicts + {i} infeasible → {ok}",
+           "tests": "Coverage items → test inputs", "cond": "Condition", "action": "Action", "rule": "Rule",
            "none": "none", "undetermined": "UNDEFINED", "conflict": "CONFLICT", "col": "Column",
            "id": "ID", "values": "Condition values", "expected": "Expected outcome", "covers": "Covers"},
     "tr": {"title": "Karar tablosu", "summary": "Kombinasyon: {total} (olası {feas}) · kural: {rules} · "
@@ -54,7 +58,11 @@ T = {
            "conf": "Çelişkiler: aynı kombinasyon için kurallar farklı sonuç veriyor",
            "overlap": "Kural sırası ile çözülen örtüşmeler (ilk eşleşen)",
            "dead": "Ölü kurallar (hiçbir olası kombinasyonla eşleşmiyor)", "collapsed": "Sadeleştirilmiş karar tablosu",
-           "tests": "Test koşulları", "cond": "Koşul", "action": "Aksiyon", "rule": "Kural",
+           "redundant": "Gereksiz kurallar (aynı sonucu veren başka bir kural zaten kapsıyor)",
+           "untested": "Hiçbir test girdisinin kullanmadığı koşul değerleri (test ekleyin veya --coverage full kullanın)",
+           "checksum": "Sağlama: sadeleştirilmiş kolonlar {m} kombinasyonu temsil ediyor = sonucu olan {k} + önemsiz "
+                       "sayılan {a} olanaksız; tam tablo {f} = {k} + {g} boşluk + {c} çelişki + {i} olanaksız → {ok}",
+           "tests": "Kapsam öğeleri → test girdileri", "cond": "Koşul", "action": "Aksiyon", "rule": "Kural",
            "none": "yok", "undetermined": "TANIMSIZ", "conflict": "ÇELİŞKİ", "col": "Kolon",
            "id": "ID", "values": "Koşul değerleri", "expected": "Beklenen sonuç", "covers": "Kapsadığı"},
 }
@@ -82,9 +90,24 @@ def validate(spec: dict) -> None:
                 raise ValueError(f"rule {r.get('id')}: value '{v}' not in {vals[k]} for '{k}'")
 
 
-def collapse(rows: list[dict], conds: list[dict]) -> list[dict]:
-    """Merge rows with identical outcome whose values for one condition cover its whole domain."""
+def collapse(rows: list[dict], conds: list[dict], feasible_ids: dict | None = None) -> list[dict]:
+    """Merge rows with identical outcome that differ in one condition only.
+
+    A merge needs every value of that condition to be either present in the group or impossible:
+    infeasible combinations are disregarded (treated as don't care), as CTAL-TA v4.0 section 3.3.1
+    recommends. feasible_ids maps each feasible combination (tuple of values in condition order)
+    to its row ID; without it only a group that covers the whole domain is merged.
+    """
     rows = [dict(r, values=dict(r["values"]), covers=list(r["covers"])) for r in rows]
+    names = [c["name"] for c in conds]
+    domains = {c["name"]: c["values"] for c in conds}
+
+    def cube_has_feasible(values: dict) -> bool:
+        if feasible_ids is None:
+            return True
+        axes = [domains[n] if values[n] == DASH else [values[n]] for n in names]
+        return any(combo in feasible_ids for combo in itertools.product(*axes))
+
     changed = True
     while changed:
         changed = False
@@ -97,7 +120,9 @@ def collapse(rows: list[dict], conds: list[dict]) -> list[dict]:
                 key = (r["outcome"], tuple((k, v) for k, v in sorted(r["values"].items()) if k != name))
                 groups.setdefault(key, []).append(r)
             for key, grp in groups.items():
-                if {r["values"][name] for r in grp} >= set(domain) and len(grp) >= len(domain):
+                present = {r["values"][name] for r in grp}
+                missing = [v for v in domain if v not in present]
+                if all(not cube_has_feasible(dict(grp[0]["values"], **{name: v})) for v in missing):
                     merged = dict(grp[0], values=dict(grp[0]["values"]), covers=[])
                     merged["values"][name] = DASH
                     merged["rules"] = sorted({x for r in grp for x in r["rules"]})
@@ -167,20 +192,69 @@ def run(spec: dict, coverage: str, lang: str) -> dict:
                           "status": "ok", "covers": [cid]})
     dead = [r["id"] for r in rules if r["id"] not in used_rules]
 
+    # redundant rules: every feasible combination a rule matches is also matched by one other rule with the
+    # same outcome (of two identical rules the later one is reported)
+    feasible_rows = [t for t in table]
+    match_ids = {r["id"]: {t["id"] for t in feasible_rows if matches(r["when"], t["values"])} for r in rules}
+    redundant = []
+    for i, a in enumerate(rules):
+        if not match_ids[a["id"]] or a["id"] in dead:
+            continue
+        for j, b in enumerate(rules):
+            if i == j or outcome_key(a["then"], actions) != outcome_key(b["then"], actions):
+                continue
+            if match_ids[a["id"]] < match_ids[b["id"]] or (match_ids[a["id"]] == match_ids[b["id"]] and j < i):
+                redundant.append({"rule": a["id"], "subsumed_by": b["id"]})
+                break
+
     ok_rows = [r for r in table if r["status"] == "ok"]
-    collapsed = collapse(ok_rows, conds)
+    feasible_ids = {tuple(t["values"][n] for n in names): t["id"] for t in table}
+    collapsed = collapse(ok_rows, conds, feasible_ids)
     for i, r in enumerate(collapsed, 1):
         r["column"] = f"D{i:02d}"
 
+    # checksum (CTAL-TA v4.0 section 3.3.1): each "-" multiplies a column's score by the number of values
+    by_id = {t["id"]: t for t in table}
+    score = 0
+    for r in collapsed:
+        n = 1
+        for c in conds:
+            if r["values"][c["name"]] == DASH:
+                n *= len(c["values"])
+        score += n
+    absorbed = score - len(ok_rows)
+    covered_ids = [x for r in collapsed for x in r["covers"]]
+    exact = True   # every column represents exactly its own feasible combinations, none twice
+    for r in collapsed:
+        inside = {t["id"] for t in table if all(r["values"][n] in (DASH, t["values"][n]) for n in names)}
+        exact = exact and inside == set(r["covers"])
+    infeasible_n = len(combos) - feasible
+    checksum = {"minimised": score, "with_outcome": len(ok_rows), "infeasible_absorbed": absorbed,
+                "full_table": len(combos), "gaps": len(gaps), "conflicts": len(conflicts),
+                "infeasible": infeasible_n,
+                "ok": (exact and len(covered_ids) == len(set(covered_ids)) == len(ok_rows) and 0 <= absorbed <= infeasible_n
+                       and len(combos) == len(ok_rows) + len(gaps) + len(conflicts) + infeasible_n)}
+
     source = collapsed if coverage == "collapsed" else ok_rows
     tests = []
+    seen_pairs = {(n, r["values"][n]) for r in source for n in names if r["values"][n] != DASH}
     for i, r in enumerate(source, 1):
-        # "-" cells take their value from the first real combination this column covers
-        first = next(t for t in table if t["id"] == r["covers"][0])
-        concrete = dict(first["values"])
+        # "-" cells rotate: take the covered combination that shows the most condition values no test has
+        # used yet (the first one on a tie), so a feasible value is not left untested by the collapsing
+        best, best_gain = None, -1
+        for cid in r["covers"]:
+            vals = by_id[cid]["values"]
+            gain = sum(1 for n in names if r["values"][n] == DASH and (n, vals[n]) not in seen_pairs)
+            if gain > best_gain:
+                best, best_gain = vals, gain
+        concrete = dict(best)
+        seen_pairs |= set(concrete.items())
         tests.append({"id": f"C-{i:02d}", "values": concrete,
                       "expected": dict(zip(actions, r["outcome"])),
                       "column": r.get("column", r["id"]), "covers": r["covers"]})
+    testable = {(n, t["values"][n]) for t in ok_rows for n in names}
+    untested = [{"condition": n, "value": v} for c in conds for n in [c["name"]] for v in c["values"]
+                if (n, v) in testable and (n, v) not in seen_pairs]
     for g in gaps + conflicts + overlaps:
         g["values"] = g.pop("combo")
     return {
@@ -188,8 +262,10 @@ def run(spec: dict, coverage: str, lang: str) -> dict:
         "conditions": conds, "actions": actions, "first_match": first_match,
         "summary": {"combinations": len(combos), "feasible": feasible, "rules": len(rules), "gaps": len(gaps),
                     "conflicts": len(conflicts), "overlaps": len(overlaps), "dead_rules": len(dead),
-                    "collapsed_columns": len(collapsed), "test_conditions": len(tests)},
+                    "collapsed_columns": len(collapsed), "test_conditions": len(tests),
+                    "redundant_rules": len(redundant), "untested_values": len(untested)},
         "gaps": gaps, "conflicts": conflicts, "overlaps": overlaps, "dead_rules": dead,
+        "redundant_rules": redundant, "checksum": checksum, "untested_values": untested,
         "collapsed": [{"column": r["column"], "values": r["values"], "outcome": dict(zip(actions, r["outcome"])),
                        "rules": r["rules"], "covers": r["covers"]} for r in collapsed],
         "full_table": [{"id": r["id"], "values": r["values"], "status": r["status"], "rules": r["rules"],
@@ -223,6 +299,15 @@ def to_md(res: dict, lang: str) -> str:
                                              f"{', '.join(x['rules'])} → {x['winner']}" for x in res["overlaps"]] + [""]
     if res["dead_rules"]:
         o += [f"## {t['dead']}", "", "- " + ", ".join(res["dead_rules"]), ""]
+    if res.get("redundant_rules"):
+        o += [f"## {t['redundant']}", ""] + [f"- {x['rule']} ⊆ {x['subsumed_by']}" for x in res["redundant_rules"]] + [""]
+    if res.get("untested_values"):
+        o += [f"## ⚠ {t['untested']}", ""] + [f"- {x['condition']}={x['value']}" for x in res["untested_values"]] + [""]
+    ck = res.get("checksum")
+    if ck:
+        o += [t["checksum"].format(m=ck["minimised"], k=ck["with_outcome"], a=ck["infeasible_absorbed"],
+                                   f=ck["full_table"], g=ck["gaps"], c=ck["conflicts"], i=ck["infeasible"],
+                                   ok="OK" if ck["ok"] else "MISMATCH"), ""]
     cols = res["collapsed"]
     if cols:
         o += [f"## {t['collapsed']}", "", "| | " + " | ".join(c["column"] for c in cols) + " |",
@@ -250,6 +335,7 @@ def main() -> int:
     ap.add_argument("--format", choices=["md", "json"], default="md")
     ap.add_argument("--out")
     ap.add_argument("--max-combinations", type=int, help=f"guard against combinatorial explosion (default {MAX_COMBINATIONS})")
+    sys.stdout.reconfigure(encoding="utf-8")
     a = ap.parse_args()
     try:
         spec = json.loads(Path(a.spec).read_text(encoding="utf-8-sig"))
@@ -264,10 +350,9 @@ def main() -> int:
     text = json.dumps(res, ensure_ascii=False, indent=2) if a.format == "json" else to_md(res, lang)
     if a.out:
         Path(a.out).parent.mkdir(parents=True, exist_ok=True)
-        Path(a.out).write_text(text, encoding="utf-8")
+        Path(a.out).write_text(text, encoding="utf-8", newline="\n")
         print(f"wrote {a.out}")
     else:
-        sys.stdout.reconfigure(encoding="utf-8")
         print(text)
     return 0
 

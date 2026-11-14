@@ -252,18 +252,24 @@ class GuidanceStructureTests(unittest.TestCase):
             for group in re.findall(r"\bsections? (\d+(?:(?:, | and )\d+)*)", text):
                 for n in map(int, re.findall(r"\d+", group)):
                     self.assertIn(n, heads, f"{path.name}: section {n}")
-        # The short-session reading plan in SKILL.md names sections 2, 5 and 6.
+        # SKILL.md names sections 5, 6, 13 and 17 by number.
         self.assertIn("Short sessions", heads[2])
         self.assertIn("Follow the data", heads[5])
         self.assertIn("attack checklist", heads[6])
         self.assertIn("AI-agent", heads[13])
+        self.assertIn("Full SBTM", heads[17])
 
-    def test_short_mode_and_checklist_are_in_the_skill_body(self):
+    def test_minimum_path_leads_a_lean_skill_body(self):
+        # 0.10: the body was restructured for weak models (audit finding 1): the minimum path comes first,
+        # Full SBTM lives in reference section 17, and the body stays at 900 words or fewer.
         body = (SKILL / "SKILL.md").read_text(encoding="utf-8").split("\n---\n", 1)[1]
-        for needle in ("## Choose the mode", "## The core loop", "### Attack checklist", "## Short session",
-                       "Double submit and replay", "Follow the data", "≥ 75%"):
+        first_h2 = re.search(r"^## (.+)$", body, re.M).group(1)
+        self.assertTrue(first_h2.startswith("Minimum path"), first_h2)
+        self.assertLessEqual(len(body.split()), 900, "keep SKILL.md lean; move detail to the reference")
+        for needle in ("Status: experimental", "seen once", "NOT covered", "action budget"):
             self.assertIn(needle, body)
-        self.assertLess(body.count("\n"), 250, "keep SKILL.md lean; move detail to the reference")
+        for gone in ("≥ 75%", "≤ 10%", "Check the time at every note", "otherwise write a QUESTION or NOTE"):
+            self.assertNotIn(gone, body)
 
 
 if __name__ == "__main__":

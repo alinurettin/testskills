@@ -1,6 +1,6 @@
 # QA Suite: professional software-testing skills for AI agents
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.9.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.10.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[Türkçe README →](README.md)**
 
@@ -49,7 +49,7 @@ In each trial the agent got only what a tester would get (a story, an OpenAPI do
 
 Proxy routing across all 17 skills: **84/84** requests routed correctly, including 5 near-misses that need no skill. There are over 280 unit tests.
 
-**With vs without skills (126 runs, 7 independent trials, 3 models):** the skills help most on the weakest model. On Haiku the mean rose from 85.4 to 89.3 (test design 86 → 100); on Sonnet 5.5 and Opus the gap is small (about +2) and several trials hit the ceiling. The skills tie or lose on mobile plan review and on exploratory testing with Haiku. Each cell has 3 runs: a signal, not statistical proof.
+**With vs without skills (126 runs, 7 independent trials, 3 models):** pooled over the three models, the skills raised the mean from 90.5 to 93.1 (+2.7 points, 95% CI +1.0 to +4.4, permutation test p = 0.014). For each model alone the gap cannot be told apart from noise (Haiku +3.8, Sonnet 5.5 +2.3, Opus +1.9; the intervals overlap), so the data does not show that weaker models benefit more. The skills tie or lose on mobile plan review and on exploratory testing with Haiku. Computed with `python tools/eval_stats.py evals/results/trials-0.9.0.json`.
 
 Methodology, costs and what was *not* measured: **[docs/EVALUATION.en.md](docs/EVALUATION.en.md)**. The real outputs of each trial are in [examples/](examples/). They are in Turkish.
 

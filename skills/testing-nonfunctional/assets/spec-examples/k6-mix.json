@@ -1,0 +1,28 @@
+{
+  "id": "DS-011",
+  "title": "Sepet ve kupon: operasyonel profil",
+  "requirement_ids": ["REQ-006"],
+  "test_id": "TC-028",
+  "base_url": "https://staging.example.com",
+  "profile": "load",
+  "target": {"type": "arrival-rate", "rate": 120, "unit": "requests"},
+  "duration": "15m",
+  "ramp": "3m",
+  "thresholds": {"p95_ms": 1000, "p99_ms": 2000, "error_rate": 0.01},
+  "auth": {"type": "bearer", "data_field": "token"},
+  "assumptions": ["80/20 browse/buy mix taken from last month's access log (Q-014 asks the product owner to confirm)"],
+  "mix": [
+    {"name": "browse", "weight": 80, "data": {"file": "data/users.csv", "pick": "per-vu"},
+     "requests": [
+       {"name": "get_cart", "method": "GET", "path": "/api/cart/{{cart_id}}", "think_time_s": [2, 6]},
+       {"name": "list_coupons", "method": "GET", "path": "/api/coupons"}
+     ]},
+    {"name": "buy", "weight": 20, "data": {"file": "data/coupons.csv", "pick": "unique"},
+     "requests": [
+       {"name": "apply_coupon", "method": "POST", "path": "/api/cart/{{cart_id}}/coupon", "json": {"code": "{{code}}"},
+        "expect_status": 200, "thresholds": {"p95_ms": 800}, "think_time_s": [1, 3]},
+       {"name": "reuse_coupon", "method": "POST", "path": "/api/cart/{{cart_id}}/coupon", "json": {"code": "{{code}}"},
+        "expect_status": 422}
+     ]}
+  ]
+}

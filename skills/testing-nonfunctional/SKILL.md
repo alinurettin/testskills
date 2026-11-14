@@ -4,7 +4,7 @@ description: Designs non-functional tests traced to requirements. Generates k6 p
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Testing non-functional requirements
@@ -52,15 +52,16 @@ If a target is missing, raise a question with a proposed default. Do not test ag
 
 ### 3. Generate drafts
 **Performance (k6).** Write a spec such as `assets/spec-examples/k6-perf.json` to `qa/design/DS-###-perf.json`:
-- the requests of the journey,
-- the load target,
+- the requests of the journey (or a weighted `mix` of journeys),
+- the load target: journeys or requests per second (open model), or concurrent users with think time or pacing (closed model),
 - the profile,
-- the thresholds from the requirement.
+- the thresholds from the requirement, including the error rate.
 
 Then:
 ```bash
 python scripts/generate_k6.py qa/design/DS-010-perf.json --out perf/DS-010.k6.js
 ```
+The script prints the workload model. Exit 2 means the requirement lacks an input (target, error budget, think time): ask, do not guess. Pass each `QUESTION` line on to the user.
 Create one QA test case for each performance requirement (category `performance`). Its step runs the k6 script, and its expected result names the thresholds.
 
 **Map areas to requirements before generating WCAG and ASVS drafts; one REQ for everything hides gaps.** A single `--req` hangs dozens of tests off one REQ, so coverage looks complete and the RTM cannot show which accessibility or security requirement is thin. Put an `areas` section into `qa/req-map.json`:
@@ -80,7 +81,7 @@ This produces one automated axe test (the machine-checkable criteria) plus one m
 ```bash
 python scripts/nfr_checklist.py asvs --features auth,authz,api,payment --level L2 --req-map qa/req-map.json --tests qa/test-cases.json --lang tr --out qa/design/security.src.md
 ```
-This produces one test per test idea of the chapters matching the features, with polarity negative and category `security`. Add `--baseline` once per release to include the general chapters that apply to every application (V12 TLS, V13 configuration, V15 architecture, V16 logging).
+This produces one test per test idea of the chapters matching the features, with polarity negative and category `security`. Add `--baseline` once per release to include the general chapters that apply to every application (V12 TLS, V13 configuration, V15 architecture and dependencies, V16 logging).
 
 ### 4. Review and merge
 The drafts are generic by design. For each test:
@@ -91,16 +92,17 @@ The drafts are generic by design. For each test:
 Then append the tests to `qa/test-cases.src.md`, run `qa_compact.py`, and re-run the RTM. Generate one draft at a time with `--tests`, so the TC numbers continue and do not collide.
 
 ### 5. Run and record
-- **Performance:** `k6 run ...`. Exit code 0 means passed; exit code 99 means a threshold failed.
+- **Performance:** `k6 run ...` (exit code 99 means a threshold failed), then `python scripts/k6_results.py <spec id>-summary.json --out qa/results.json --tests qa/test-cases.json`. A smoke run is recorded as not-run, an incomplete run as blocked.
 - **Accessibility:** the axe test runs in the Playwright suite; the manual criteria are assessed by a person with the toolkit in `references/accessibility.md`.
 - **Security:** API-level checks can be automated with Playwright's `request` fixture; the rest are manual.
 
 Record each result in `qa/results.json`. Findings become defect reports through the `reporting-test-results` skill. For WCAG findings add the criterion; for security findings add the ASVS IDs, and mark them confidential.
 
 ## Files
-- `scripts/generate_k6.py`: k6 script from a performance spec (thresholds, profiles, open or closed model, auth from the environment).
+- `scripts/generate_k6.py`: k6 script and workload model from a performance spec (open or closed model, journey mix, data file, steady-state thresholds, auth from the environment).
+- `scripts/k6_results.py`: k6 summary → verdict in `qa/results.json` under the test case.
 - `scripts/nfr_checklist.py`: WCAG 2.2 A/AA and ASVS 5.0 test-case drafts in compact format (TR/EN), selected by feature, with REQ links per criterion, chapter or feature (`--req-map`).
 - `assets/wcag22-aa.json`: the 55 A/AA success criteria with features, automated or manual method, and checks (TR/EN).
 - `assets/asvs5-chapters.json`: ASVS 5.0 chapters V1–V17 with feature triggers and test ideas (TR/EN).
-- `assets/spec-examples/k6-perf.json`: example performance spec.
+- `assets/spec-examples/k6-perf.json`, `assets/spec-examples/k6-mix.json`: example performance specs (one journey; weighted mix with test data).
 - `references/performance.md`, `references/accessibility.md`, `references/security.md`.

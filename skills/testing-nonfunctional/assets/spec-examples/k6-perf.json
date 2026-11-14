@@ -5,7 +5,7 @@
   "test_id": "TC-027",
   "base_url": "https://staging.example.com",
   "profile": "load",
-  "target": {"type": "arrival-rate", "rate": 50},
+  "target": {"type": "arrival-rate", "rate": 50, "unit": "iterations"},
   "duration": "10m",
   "ramp": "2m",
   "thresholds": {"p95_ms": 1000, "p99_ms": 2000, "error_rate": 0.01, "checks_rate": 0.99},

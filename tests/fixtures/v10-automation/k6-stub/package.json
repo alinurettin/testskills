@@ -1,0 +1,14 @@
+{
+  "name": "k6",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline stand-in for the k6 runtime modules, used by tests/test_v10_automation.py (not k6 itself).",
+  "exports": {
+    ".": "./index.js",
+    "./http": "./http.js",
+    "./execution": "./execution.js",
+    "./metrics": "./metrics.js",
+    "./data": "./data.js"
+  }
+}

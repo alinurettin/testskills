@@ -4,7 +4,7 @@ description: Writes a risk-based test plan for a release or feature (ISO/IEC/IEE
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Planning tests
@@ -32,14 +32,14 @@ Write the plan in the user's language (TR/EN). Keep IDs and the keys of `exit-cr
 
 ### 1. Gather facts
 ```bash
-python scripts/plan_facts.py --qa qa [--min-per-step 2 --min-per-test 5 --cycles 2]
+python scripts/plan_facts.py --qa qa [--min-per-step 2 --min-per-test 5 --cycles 2 --retest-share 0.5 --configurations 1]
 ```
 It computes:
 - the scope, the risk distribution and the top risks;
 - the tests by priority, technique and category, and the automation candidates;
 - the environment matrix from the pairwise specs;
-- the open and blocking questions;
-- the effort estimate.
+- the open and blocking questions, and the entry readiness (requirements ready, blocking questions open, high/critical requirements without tests);
+- a three-point effort estimate (optimistic / most likely / pessimistic, E ± SD) with every assumption named, and the automation build effort as a separate line.
 
 If `qa/` does not exist yet, the plan can still be written from the requirements. Say that the numbers are estimates, and recommend running `analyzing-requirements` and `designing-test-cases` first. Ask the user only for what the artifacts cannot know: release dates, team, environments that exist, tools. Do not invent these; mark them as `{{to confirm}}`.
 
@@ -59,7 +59,7 @@ Write entry, exit and suspension criteria that can be **measured from the artifa
 List the environments with their configurations (the pairwise matrix from the facts), the test accounts per role, the test data and who owns it, and the privacy rules. Turn every testability need into a **dependency with an owner**: stubs, seed APIs, clock control, `data-testid`.
 
 ### 5. Schedule and effort
-Use the facts' estimate. Add the cycles, the defect verification, the environment and data setup, the automation effort and a buffer. Give a **range** with its assumptions. Put milestones in the release calendar.
+Use the facts' three-point estimate: it already holds the cycles, the configurations and defect handling. Replace its assumptions with the team's own figures where they exist, and add what it names as not included (design, environment and data setup, automation build). Give the **range** with its assumptions, never one number. Put milestones in the release calendar.
 
 ### 6. Write and summarise
 Write `qa/test-plan.md` from the template. Omit sections that do not apply rather than filling them with boilerplate. In chat, summarise:

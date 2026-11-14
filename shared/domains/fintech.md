@@ -16,7 +16,7 @@ Use this pack in requirements analysis (completeness walk) and test design when 
 | Area | What it usually drives in requirements and tests |
 |---|---|
 | Banking regulation and IT rules (in Türkiye: BDDK regulations on information systems and electronic banking) | Authentication strength, session rules, audit trails, change control, outsourcing, business continuity |
-| Payment services and e-money (in Türkiye: Law No. 6493 and TCMB regulations; in the EU: PSD2/PSD3) | Strong customer authentication, transaction limits, consent, dispute and refund flows |
+| Payment services and e-money (in Türkiye: Law No. 6493 and TCMB regulations; in the EU: PSD2, with PSD3 and the Payment Services Regulation agreed but not yet in the Official Journal in November 2026) | Strong customer authentication, transaction limits, consent, dispute and refund flows. In Türkiye the reference time for the funds to be safeguarded moved from 15:00 to 16:30 (half days: 11:00 to 12:00) with the amendment in Official Gazette 19.03.2026/33201: test both sides of the new time |
 | AML/CFT (in Türkiye: MASAK) | KYC at onboarding, suspicious-transaction flags, sanctions screening, record keeping |
 | Personal data (KVKK / GDPR) | Consent, minimisation, masking, retention, data subject requests |
 | Card data (PCI DSS v4.x) | No storage of CVV or full PAN in logs or UI, tokenisation, network segmentation (scope) |
@@ -80,7 +80,7 @@ Ask each question. When the specification does not answer it, record a question 
 - **Performance:** peaks on salary days, month and year end, and campaign days. Set thresholds per critical API.
 - **Availability and recovery:** RTO and RPO; behaviour during partial outages (core banking down → a graceful message, no money moved).
 - **Security:** ASVS L2 as the minimum, L3 for high-value flows. Audit and logging (V16). Data protection (V14).
-- **Accessibility:** banking is in scope of the European Accessibility Act in the EU. Test OTP and timeout flows against WCAG 2.2.2.1 and 3.3.8.
+- **Accessibility:** banking is in scope of the European Accessibility Act in the EU. In Türkiye, banks fall under Presidential Circular 2025/10 (WCAG 2.2, A-level checklist, due by 21.06.2026). Test OTP and timeout flows against WCAG 2.2 SC 2.2.1 and 3.3.8.
 
 ## 6. Defects typically found
 - Limits checked per request but not cumulatively, or bypassed through another channel or the API.

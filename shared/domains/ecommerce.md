@@ -15,13 +15,13 @@ Use this pack for catalogue, cart, campaign, checkout, payment, order, shipping 
 ## 1. Regulations and standards to check
 | Area | What it usually drives |
 |---|---|
-| Distance contracts (in Türkiye: Mesafeli Sözleşmeler Yönetmeliği; in the EU: the Consumer Rights Directive) | Pre-information form and contract shown before payment, right of withdrawal (14 days, with exceptions), refund timelines |
+| Distance contracts (in Türkiye: Mesafeli Sözleşmeler Yönetmeliği; in the EU: the Consumer Rights Directive) | Pre-information form and contract shown before payment, right of withdrawal (14 days, with exceptions), refund timelines. In Türkiye since 01.01.2026 (amendment in Official Gazette 24.05.2025/32909): the form names the carrier for returns and the dispute route (arbitration committee or court, with mandatory mediation); a return sent with that carrier costs the consumer nothing; the withdrawal exception for delivered phones, tablets and computers is repealed |
 | Price display and discount announcements | Prices shown with VAT (KDV) included; rules on how a "discount" may reference a previous price. Confirm the current rule. |
 | Commercial electronic messages (in Türkiye: İYS) | Consent before marketing SMS/e-mail; opt-out handling |
-| E-invoice and e-archive invoice | Invoice generation, cancellation and return documents |
+| E-invoice and e-archive invoice (in Türkiye: e-archive invoices are issued regardless of the amount since 01.01.2026, VUK General Communiqué 509 as amended by 573) | Invoice generation with no amount threshold, cancellation and return documents |
 | Payments (PCI DSS, 3-D Secure, the provider's rules) | No card data on your servers when a hosted/tokenised flow is used; 3DS challenge flows; installment rules (legal limits per product category may apply) |
 | Personal data (KVKK / GDPR), cookies | Consent banner, minimisation, retention, guest vs account data |
-| Accessibility (the European Accessibility Act for EU e-commerce) | WCAG 2.2 AA on the key journeys: search, product, cart, checkout |
+| Accessibility (the European Accessibility Act for EU e-commerce; in Türkiye: Presidential Circular 2025/10, Official Gazette 21.06.2025/32933, requires WCAG 2.2 measured with the Ministry of Family and Social Services' A-level checklist, with e-commerce service providers under Law No. 6563 due by 21.06.2027) | WCAG 2.2 AA on the key journeys: search, product, cart, checkout; in Türkiye the A-level checklist is the legal minimum |
 
 ## 2. Implicit requirements checklist
 - **Price:**

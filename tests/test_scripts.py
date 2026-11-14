@@ -435,7 +435,9 @@ class CheckAutomationTests(unittest.TestCase):
             spec = next((tmp / "tests").glob("*.spec.ts"))
             spec.write_text(re.sub(r".*QA Suite skeleton.*\n", "", spec.read_text(encoding="utf-8")), encoding="utf-8")
             r = run_py(PW / "check_automation.py", "--tests", tc, "--specs", tmp / "tests", "--strict")
-            self.assertIn("automated 3 (75.0%) · skeletons 0 · missing 1", r.stdout)
+            # the fixme lines are gone but nothing asserts: not automated (0.10.0, was counted as 3 automated)
+            self.assertIn("automated 0 (0.0%) · skeletons 0 · missing 1", r.stdout)
+            self.assertIn("no assertion 3", r.stdout)
             self.assertEqual(r.returncode, 1)  # TC-004 still missing
 
 
@@ -622,9 +624,10 @@ class GenerateK6Tests(unittest.TestCase):
             self.assertEqual(r.returncode, 0, r.stderr)
             js = out.read_text(encoding="utf-8")
             self.assertIn("executor: 'ramping-arrival-rate'", js)
-            self.assertIn('"http_req_duration{name:apply_coupon}": ["p(95)<800", "p(99)<2000"]', js)
-            self.assertIn('"http_req_duration{name:get_cart}": ["p(95)<1000", "p(99)<2000"]', js)
-            self.assertIn('"http_req_failed": ["rate<0.01"]', js)
+            # 0.10.0: thresholds are measured on the steady state and on successful responses only
+            self.assertIn('"qa_steady_ms_apply_coupon": ["p(95)<800", "p(99)<2000"]', js)
+            self.assertIn('"qa_steady_ms_get_cart": ["p(95)<1000", "p(99)<2000"]', js)
+            self.assertIn('"qa_steady_failed": ["rate<0.01"]', js)
             self.assertIn("__ENV.K6_TOKEN", js)
             node = shutil.which("node")
             if node:
@@ -898,12 +901,12 @@ class OpenApiTests(unittest.TestCase):
 class RegressionSelectionTests(unittest.TestCase):
     SCRIPT = SK / "tracing-requirements" / "scripts" / "select_regression.py"
 
-    def run_sel(self, d, *extra):
+    def run_sel(self, d, *extra, expect=0):
         out, js = Path(d) / "r.md", Path(d) / "r.json"
         r = subprocess.run([sys.executable, str(self.SCRIPT), "--requirements", str(FIX / "requirements.json"),
                             "--tests", str(FIX / "test-cases.json"), "--results", str(FIX / "results.json"),
                             "--out", str(out), "--json", str(js), *extra], capture_output=True, text=True, encoding="utf-8")
-        self.assertEqual(r.returncode, 0, r.stderr)
+        self.assertEqual(r.returncode, expect, r.stderr)
         return json.loads(js.read_text(encoding="utf-8")), out.read_text(encoding="utf-8"), r
 
     def test_changed_requirement_tests_are_must(self):
@@ -915,7 +918,9 @@ class RegressionSelectionTests(unittest.TestCase):
 
     def test_budget_keeps_must_first_and_reports_residual_risk(self):
         with tempfile.TemporaryDirectory() as d:
-            data, md, _ = self.run_sel(d, "--changed", "REQ-001", "--level", "could", "--budget", "2")
+            # 0.10.0: three must tests do not fit a budget of 2, so the script now exits 1 and says so
+            data, md, r = self.run_sel(d, "--changed", "REQ-001", "--level", "could", "--budget", "2", expect=1)
+            self.assertIn("MUST tier exceeds budget", r.stderr)
             self.assertEqual(len(data["selected"]), 2)
             self.assertTrue(all(x["tier"] == "must" for x in data["selected"]))
             self.assertGreater(len(data["left_out"]), 0)

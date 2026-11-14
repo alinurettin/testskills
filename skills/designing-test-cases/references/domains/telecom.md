@@ -16,10 +16,11 @@ Use this pack in requirements analysis (completeness walk) and test design when 
 | Area | What it usually drives in requirements and tests |
 |---|---|
 | Electronic communications law and regulator (in Türkiye: Law No. 5809, regulated by BTK; in the EU: the European Electronic Communications Code, EECC) | Contract information, tariff transparency, contract duration and termination, consumer complaints, quality-of-service reporting |
-| Subscriber identification and SIM activation (in Türkiye: BTK rules on subscriber verification, e-signature or in-store checks) | Identity verification before activation, limits per person, SIM swap and SIM replacement controls |
+| Subscriber identification and SIM activation (in Türkiye: BTK rules on subscriber verification, amended in Official Gazette 11.06.2026/33277 and in force since 25.06.2026) | Identity verification before activation with electronically verifiable ID only (chip ID card; no driving licence or old ID card); mobile lines per person at one operator capped at 6 (T.C. ID number), 3 (foreigner ID number) and 1 (passport only) by a BTK Board decision (confirm the current caps); re-verification of all subscribers every three months; SIM swap and SIM replacement controls |
 | Number portability | Porting windows, validation with the donor operator, rejection reasons, service continuity, rollback |
 | Personal data and traffic data (KVKK / GDPR, sector rules on electronic communications data, ePrivacy in the EU) | Consent for location and traffic data use, retention periods, masking of call detail records |
 | Roaming (in the EU: Roam-Like-at-Home and fair-use rules) | Zone detection, fair-use thresholds, welcome and threshold SMS, cost caps |
+| Internet domain names and internet publications (in Türkiye: Law No. 7590, Official Gazette 31.07.2026/33326, moved domain-name regulation and most Law No. 5651 duties from BTK to the Cybersecurity Directorate) | Which authority receives notifications and reports; update contact points, report formats and legal texts |
 | Open internet / net neutrality (in the EU: the Open Internet Regulation) | Zero-rating and traffic management rules in bundles |
 | Taxes (in Türkiye: special communication tax ÖİV and VAT; rates change, so confirm them) | Tax base, rounding, tax per line vs per invoice, exemptions |
 | Industry standards (3GPP, TM Forum Open APIs and SID, ETSI) | Interface contracts for ordering, product catalogue, usage and billing integrations |
@@ -69,7 +70,7 @@ Ask each question. When the specification does not answer it, record a question 
 - **Accuracy:** revenue assurance, where usage in equals rated usage out. Reconcile the counts and totals between network, mediation, rating and billing (see the testing-data-migrations skill for reconciliation techniques).
 - **Availability:** 99.9% and higher for charging and activation; degraded modes when the online charging system is down (and whose revenue risk that is).
 - **Security:** SIM swap controls, OTP delivery, self-care authorisation, API security for partner APIs (TM Forum Open APIs), ASVS L2 as the minimum.
-- **Accessibility:** self-care apps and IVR menus; WCAG 2.2 for web and app; in the EU, the European Accessibility Act covers electronic communications services.
+- **Accessibility:** self-care apps and IVR menus; WCAG 2.2 for web and app; in Türkiye, operators with more than 200,000 subscribers fall under Presidential Circular 2025/10 (A-level checklist, due by 21.06.2026); in the EU, the European Accessibility Act covers electronic communications services.
 
 ## 6. Defects typically found
 - A charge rounded in the wrong direction or unit, visible only in aggregated volumes.

@@ -4,7 +4,7 @@ description: Builds a requirements traceability matrix (RTM) from QA artifacts, 
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Tracing requirements
@@ -71,7 +71,7 @@ If the user only has a spreadsheet or a list, convert it into these files first.
    - **should:** the same functional area (shared tags), high risk (L × I ≥ 12), and flaky tests.
    - **could:** everything else, ordered by risk.
 
-   With a budget, the set is filled tier by tier. The tests that are left out are listed as **residual risk**, so the cut is a decision someone can sign off, not an accident. The report ends with a `npx playwright test --grep "@TC-…"` command for the automated tests and a list of the manual ones. Ask for the changed requirements if the user describes the change only in words. Map the description to REQ IDs and confirm the mapping.
+   With a budget, the set is filled tier by tier, and breadth-first inside a tier: one test per requirement before any second test (`--order depth` keeps plain risk order). The tests that are left out, with the reason, and the requirements left with no selected test are listed as **residual risk**, so the cut is a decision someone can sign off, not an accident. **Exit code 1 means the must tier does not fit the budget**: do not present that set as a safe regression run; raise the budget or get the cut accepted. The report ends with a `npx playwright test --grep "@TC-…"` command for the Playwright tests, the tests automated with another runner, and the manual ones. Ask for the changed requirements if the user describes the change only in words. Map the description to REQ IDs and confirm the mapping.
 
 6. **Report to the user:**
    - Coverage % (covered in-scope requirements divided by all in-scope requirements).
@@ -99,7 +99,7 @@ Playwright uses `pw_results.py` from the automating-with-playwright skill instea
 
 - `deferred` and `deprecated` requirements are listed but excluded from the coverage denominator.
 - Deprecated tests are excluded from coverage and from duplicate checks.
-- When no L×I risk score exists, the risk level falls back to priority.
+- When no L×I risk score exists, the risk level falls back to priority. Impact 5 is at least high risk, and critical with likelihood 3 or more.
 - Execution roll-up per requirement:
   - `failed` if any linked test failed.
   - Otherwise `blocked` if any is blocked.

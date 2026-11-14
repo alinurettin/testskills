@@ -1,5 +1,29 @@
 # Değişiklik günlüğü
 
+**0.10.0**: Uzman denetimi (ISTQB müfredatları ve standartlarla karşılaştırma) ve yanlış sonuç veren script'lerin düzeltilmesi
+Beş alan güncel kaynaklarla denetlendi (CTFL v4.0.1, CTAL-TA v4.0, CTAL-TM v3.0, CT-AI v2.0, CT-TAE, CT-PT, ASVS 5.0, TTB Sözlüğü v2.0). Raporlar ve yapılan/ertelenen listesi: `docs/audit-2026-11/`.
+
+**Davranış değişiklikleri (önce bunları okuyun):**
+- `completion_report.py`: bloke testler artık koşulmuş sayılmıyor (koşulan = geçen + kalan). Açık bir hatanın geçerli önem derecesi yoksa ya da `results.json`'daki hata anahtarı kayıtta yoksa açık hata kriterleri "bilinmiyor" olur. Yanlış yazılmış kriter adı yok sayılmaz, "bilinmiyor" olur. `automation_pct` artık otomatize edilen ÷ otomasyon hedefi; eski değer `automated_of_executed_pct`.
+- Risk seviyesi (dört script'te aynı kural): etkisi 5 olan gereksinim en az "yüksek", olasılığı da 3 veya üstüyse "kritik".
+- `select_regression.py`: zorunlu (must) testler bütçeye sığmazsa çıkış kodu 1; bütçe gereksinimlere yayılarak doldurulur (`--order breadth|depth`).
+- `ai_eval.py score`: karar artık GEÇTİ / KALDI / EKSİK. Koşulmamış ya da değerlendirilemeyen vaka, 3'ten az koşu (kritikte 5), taslak vaka veya bekleyen puanlama varsa EKSİK (çıkış kodu 1). Gevşetmek için `--min-runs`, `--min-runs-critical`, `--allow-draft`, `--allow-pending`. Puanlama bekleyen vakalar oranlara girmez.
+- `generate_k6.py`: hedef yük, hata oranı eşiği ya da (kapalı modelde) düşünme süresi verilmemişse uydurma varsayılan kullanmaz, çıkış kodu 2 verir. Eşikler kararlı durumdaki başarılı yanıtlar üzerinden hesaplanır.
+- `check_automation.py`: içinde doğrulama (`expect`) olmayan test otomatize sayılmaz.
+- `decision_table.py`: `infeasible` kullanılan sadeleştirilmiş tablolarda kolon sayısı ve `-` hücreleri için seçilen değerler değişebilir. `ep_bva.py` ve `decision_table.py` çıktılarında başlık "Kapsam öğeleri → test girdileri" oldu.
+
+**Düzeltmeler ve eklemeler:**
+- Test yönetimi: feragat (waiver) durumu (onaylayan, gerekçe, son tarih; ajan kendi yazamaz), risk seviyesine göre kapsam tablosu ve `min_requirements_passed_pct`, "bilinen hatalarla yayın" listesi, durum raporunda önceki döneme göre fark ve askıya alma kontrolü, üç noktalı tahmin (aralık ve varsayımlarla).
+- Test tasarımı: 3 değerli sınır değer analizi referans ve script'te tutarlı (`bva_scope`), açık aralık sınırları (`min_exclusive`/`max_exclusive`) artık işleniyor, karar tablosunda olanaksız kombinasyonlar birleştirmeyi engellemiyor, kullanılmayan koşul değerleri ve kapsanan gereksiz kurallar raporlanıyor.
+- Yük testi: açık/kapalı yük modeli, işlem karışımı, test verisi parametreleri, `dropped_iterations` eşiği, beklenen 4xx'in hata sayılmaması; yeni `k6_results.py` sonuçları `qa/results.json`'a yazar. **k6 kurulu olmadığı için üretilen script'ler gerçek k6'da koşturulmadı**; yalnızca sözdizimi kontrolünden ve bir Node benzetiminden geçti.
+- Güvenlik: ASVS 5.0.0 bölüm eşlemesi düzeltildi (oran sınırlama V2, HSTS V3, tarayıcı depolama V14, SCA ve mass assignment V15).
+- Yapay zekâ: oranların yanında %95 Wilson güven aralığı; değerlendirilemeyen kontrolü olan koşu artık geçmiş sayılmıyor.
+- Keşif testi: küçük modeller için yeniden yazıldı (en üstte "asgari yol", gövde 889 kelime); yeniden üretilemeyen hata soruya indirilmiyor, `confidence: seen once` ile raporlanıyor. **Bu sürüm henüz yeniden denenmedi.**
+- Sektör paketleri: 2024–2026 mevzuat değişiklikleri işlendi (Siber Güvenlik Başkanlığı, 2025/10 erişilebilirlik genelgesi, BTK kimlik doğrulama, mesafeli sözleşmeler, e-arşiv, BES devlet katkısı %20 ve diğerleri); 11 yeni kayıt `docs/volatile-facts.json`'da. İki madde tek ikincil kaynağa dayanıyor (e-arşiv, sağlık verisi yönetmeliği).
+- `shared/glossary-tr.md`: yaklaşık 85 terimin resmi Türkçe karşılığı (TTB Sözlüğü v2.0, CTFL v4.0.1 TR). Keşif skill'inin çıktıları resmi terimleri kullanıyor; diğer dosyalar henüz güncellenmedi.
+- Değerlendirme: `tools/eval_stats.py` ile güven aralıkları. Üç model birlikte +2,7 puan (%95 GA +1,0…+4,4, p = 0,014); tek tek modellerde fark ayırt edilemiyor. 0.9.0'daki "en çok zayıf modele yarıyor" ifadesi düzeltildi.
+- Testler: 282'den 387'ye.
+
 **0.9.0**: Keşif skill'i düzeltmesi ve 126 koşuluk yeni değerlendirme
 - 7 yeni bağımsız deneme ve cevap anahtarı; Opus, Sonnet 5.5 ve Haiku ile skill'li/skill'siz 126 koşu. Skill'ler en çok zayıf modele (Haiku) katkı sağlıyor (+3,9 puan); güçlü modellerde fark küçük. Ayrıntı: `docs/EVALUATION.md` §8.
 - Keşif testi skill'i yeniden düzenlendi (aşağıda): Opus'ta 74'e karşı 90, Haiku'da hâlâ geride.

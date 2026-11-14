@@ -40,7 +40,7 @@ Adjust the paths to where the skills are installed.
   - `PublishTestResults@2` with `test-results/junit.xml`
   - `PublishPipelineArtifact` for `playwright-report`
 - **Speed:** use `--shard=1/4` in a matrix for large suites. Run `@smoke` on every pull request and the full regression suite nightly.
-- **Quality gate:** `check_automation.py --strict` fails if automation candidates are missing or skeletons remain. Use it on the release branch, not on every pull request.
+- **Quality gate:** `check_automation.py --strict` fails if automation candidates are missing, skeletons remain or a tagged test contains no assertion. Use it on the release branch, not on every pull request.
 
 ## 4. Playwright Test Agents and AI helpers
 - Since Playwright 1.56, `npx playwright init-agents --loop=claude` (or `vscode`, `codex`, `opencode`) installs three agents:

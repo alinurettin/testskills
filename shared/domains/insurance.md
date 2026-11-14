@@ -19,7 +19,7 @@ Use this pack in requirements analysis (completeness walk) and test design when 
 | Distribution (in the EU: the Insurance Distribution Directive, IDD) | Demands-and-needs test, suitability for investment-based products, product information documents, commission disclosure |
 | Compulsory products (in Türkiye: traffic liability insurance, DASK earthquake insurance) | Regulated tariffs, caps and step systems (confirm the current values), mandatory data exchange with central systems, policy-before-registration rules |
 | Central data exchange (in Türkiye: SBM, the insurance information and monitoring centre) | Querying claim history and no-claims steps, policy registration, handling of timeouts and mismatches |
-| Private pensions (in Türkiye: Law No. 4632 BES and auto-enrolment OKS) | Contribution and state-contribution rules, vesting periods, fund switches per year, transfers between companies, opt-out windows |
+| Private pensions (in Türkiye: Law No. 4632 BES and auto-enrolment OKS) | Contribution and state-contribution rules (the rate is set by presidential decision and changes: it fell from 30% to 20% on 01.01.2026, so keep it configurable and test the change date), vesting periods, fund switches per year, transfers between companies, opt-out windows |
 | Accounting (IFRS 17) | Premium recognition, contract boundaries, reporting data; usually tested in finance systems |
 | Personal and health data (KVKK / GDPR; special-category data) | Explicit consent for health data, minimisation, retention after claims, access control for medical documents |
 | Operational resilience (in the EU: DORA, applies to insurers from 2025) | ICT incident handling, third-party risk, resilience testing |

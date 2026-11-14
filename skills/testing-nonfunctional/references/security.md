@@ -20,7 +20,7 @@
 - Handle findings confidentially: do not paste real secrets or personal data into reports.
 
 ## 2. Choosing the ASVS level
-- **L1:** baseline for every application. Mostly verifiable with black-box testing.
+- **L1:** the first layer of defence and the starting point for every application (about a fifth of the requirements). ASVS 5.0 no longer describes L1 as penetration-testable from outside: some items need documentation or code access.
 - **L2:** the default for business applications that handle personal, financial or health data, which covers most e-commerce, banking and HR systems.
 - **L3:** critical applications (high-value finance, health, infrastructure). Needs architecture and code review, not only testing.
 
@@ -32,16 +32,18 @@ Record the chosen level in the test plan. Cite exact ASVS 5.0 requirement IDs fr
 | Feature in the requirements | Chapters |
 |---|---|
 | Forms and inputs echoed back | V1 Encoding and Sanitization, V2 Validation and Business Logic |
+| Rate limiting and anti-automation | **V2** (V2.4), not V4 |
 | Prices, discounts, limits, multi-step flows | **V2** (server-side recalculation, sequence, concurrency) |
-| Browser front-end | V3 Web Frontend Security (headers, cookies, CSRF) |
-| REST/GraphQL | V4 API and Web Service, **V8 Authorization** (BOLA), V2 |
+| Browser front-end | V3 Web Frontend Security (headers including HSTS, cookies, CSRF, CORS) |
+| REST/GraphQL | V4 API and Web Service, **V8 Authorization** (BOLA), V2, V15 (mass assignment, V15.3) |
 | File upload/download | V5 File Handling |
 | Login, registration, password reset, MFA | **V6 Authentication**, V7 Session Management |
 | Roles, multi-tenant data, "only my orders" | **V8 Authorization** |
 | JWT or other self-contained tokens | V9 |
 | SSO / OAuth / OIDC | V10 |
-| Payments, personal data (TCKN, IBAN, health) | V11 Cryptography, **V14 Data Protection**, V12 Secure Communication |
+| Payments, personal data (TCKN, IBAN, health) | V11 Cryptography, **V14 Data Protection** (also data in URLs and browser storage), V12 Secure Communication |
 | Deployment and configuration | V13 Configuration |
+| Third-party components (SCA) | V15 Secure Coding and Architecture (V15.1, V15.2) |
 | Logging, error pages | V16 Security Logging and Error Handling |
 
 Map these to the OWASP Top 10:2025 for communication:

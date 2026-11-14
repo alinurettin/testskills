@@ -225,10 +225,11 @@ class ScoreTests(unittest.TestCase):
             self.assertEqual(st["AI-005"], "failed")         # hallucinated price in every run
             self.assertEqual(st["AI-006"], "needs_grading")  # rubric only: never auto-passed
             self.assertEqual(st["AI-011"], "not_run")
-            for cid in ("AI-003", "AI-007", "AI-008", "AI-009", "AI-010"):
+            for cid in ("AI-003", "AI-007", "AI-009", "AI-010"):
                 self.assertEqual(st[cid], "passed", cid)
+            self.assertEqual(st["AI-008"], "not_evaluated")  # 0.10: latency check not evaluable -> not a pass, not rated
             s = rep["summary"]
-            self.assertAlmostEqual(s["overall_rate"], round((6 + 2 / 3 + 2 / 3 + 0) / 9, 4), places=4)
+            self.assertAlmostEqual(s["overall_rate"], round((5 + 2 / 3 + 2 / 3 + 0) / 8, 4), places=4)
             self.assertEqual(s["unknown_output_ids"], ["AI-999"])
             self.assertEqual(s["latency_samples"], 25)
             self.assertEqual(s["latency_p95_ms"], 1400)
@@ -263,16 +264,17 @@ class ScoreTests(unittest.TestCase):
         outs = [{"id": "AI-001", "run": i, "output": "no", "latency_ms": 100 * i, "tokens": 10} for i in range(1, 4)]
         outs += [{"id": "AI-002", "run": 1, "output": "short", "latency_ms": 200, "tokens": 10},
                  {"id": "AI-002", "run": 2, "output": "far too long output", "latency_ms": 200, "tokens": 10}]
-        rep = ai.score(cases, outs, 0.7)
+        few = {"min_runs": 2, "min_runs_critical": 3}   # 0.10: the default minimum (3, critical 5) makes this INCOMPLETE
+        rep = ai.score(cases, outs, 0.7, **few)
         self.assertTrue(rep["gate"]["passed"], rep["gate"])
         self.assertEqual(rep["summary"]["overall_rate"], 0.75)
-        self.assertFalse(ai.score(cases, outs, 0.8)["gate"]["passed"])
-        self.assertFalse(ai.score(cases, outs, 0.7, max_p95=250)["gate"]["passed"])
-        self.assertFalse(ai.score(cases, outs, 0.7, max_mean_tokens=5)["gate"]["passed"])
+        self.assertFalse(ai.score(cases, outs, 0.8, **few)["gate"]["passed"])
+        self.assertFalse(ai.score(cases, outs, 0.7, max_p95=250, **few)["gate"]["passed"])
+        self.assertFalse(ai.score(cases, outs, 0.7, max_mean_tokens=5, **few)["gate"]["passed"])
         cases[1]["min_pass_rate"] = 0.9
-        self.assertFalse(ai.score(cases, outs, 0.7)["gate"]["passed"])
+        self.assertFalse(ai.score(cases, outs, 0.7, **few)["gate"]["passed"])
         errored = outs + [{"id": "AI-001", "run": 4, "error": "timeout"}]
-        self.assertFalse(ai.score(cases[:1], errored, 0.5)["gate"]["passed"])   # an error run fails a critical case
+        self.assertFalse(ai.score(cases[:1], errored, 0.5, **few)["gate"]["passed"])   # an error run fails a critical case
 
     def test_invalid_input_exit_2(self):
         with tempfile.TemporaryDirectory() as d:

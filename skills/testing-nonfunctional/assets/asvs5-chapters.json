@@ -1,7 +1,7 @@
 {
- "source": "OWASP ASVS 5.0.0 chapter structure (V1–V17). Test ideas are QA Suite paraphrases for verifying YOUR OWN application in a test environment; cite exact ASVS requirement IDs from the official document when reporting.",
+ "source": "OWASP ASVS 5.0.0 chapter structure (V1–V17). Test ideas are QA Suite paraphrases for verifying YOUR OWN application in a test environment; cite exact ASVS requirement IDs from the official document when reporting. Idea placement checked against ASVS 5.0.0 on 2026-11-15: anti-automation V2.4, HSTS V3.4, sensitive data in URLs and browser storage V14.2/V14.3, dependencies V15.1-V15.2, mass assignment V15.3.",
  "levels": {
-  "L1": "baseline for all applications; mostly verifiable with black-box testing",
+  "L1": "the first layer of defence and the starting point for every application; not necessarily verifiable by an external penetration test alone",
   "L2": "applications handling sensitive data (personal, financial, health) - the recommended default for most business apps",
   "L3": "high-assurance (critical infrastructure, high-value finance, safety); needs design review and code access"
  },
@@ -49,6 +49,7 @@
    "id": "V2",
    "name": "Validation and Business Logic",
    "features": [
+    "api",
     "input",
     "payment",
     "all"
@@ -57,13 +58,15 @@
     "Replay or reorder steps of a multi-step flow (e.g. pay before cart validation) directly via API; verify the server enforces the sequence.",
     "Tamper with prices, discounts, quantities or limits in requests; verify the server recalculates and rejects manipulated values.",
     "Submit the same business action concurrently (double coupon use, double transfer); verify limits hold (idempotency, locking).",
-    "Verify server-side validation exists for every client-side rule (length, range, format, allowed values)."
+    "Verify server-side validation exists for every client-side rule (length, range, format, allowed values).",
+    "Verify rate limiting / throttling on expensive or sensitive endpoints (429 with retry information)."
    ],
    "ideas_tr": [
     "Çok adımlı akışın adımlarını API üzerinden tekrarla veya sırasını boz (sepet doğrulamadan ödeme gibi); sıranın sunucuda zorlandığını doğrula.",
     "İsteklerde fiyat, indirim, adet veya limitleri değiştir; sunucunun yeniden hesapladığını ve manipüle değerleri reddettiğini doğrula.",
     "Aynı iş işlemini eşzamanlı gönder (çift kupon kullanımı, çift transfer); limitlerin korunduğunu doğrula (idempotency, kilitleme).",
-    "Her istemci tarafı kural (uzunluk, aralık, biçim, izinli değerler) için sunucu tarafı doğrulama olduğunu kontrol et."
+    "Her istemci tarafı kural (uzunluk, aralık, biçim, izinli değerler) için sunucu tarafı doğrulama olduğunu kontrol et.",
+    "Pahalı veya hassas uç noktalarda hız sınırlaması olduğunu doğrula (retry bilgisiyle 429)."
    ],
    "name_tr": "Doğrulama ve İş Mantığı"
   },
@@ -74,16 +77,14 @@
     "web"
    ],
    "ideas": [
-    "Check security headers: Content-Security-Policy, X-Content-Type-Options, frame-ancestors / X-Frame-Options, Referrer-Policy.",
+    "Check security headers: Strict-Transport-Security (HSTS), Content-Security-Policy, X-Content-Type-Options, frame-ancestors, Referrer-Policy.",
     "Verify cookies set Secure, HttpOnly and an appropriate SameSite value.",
-    "Verify state-changing requests are protected against cross-site request forgery (SameSite and/or tokens, no GET for changes).",
-    "Verify no sensitive data is stored in localStorage/sessionStorage or exposed in URLs."
+    "Verify state-changing requests are protected against cross-site request forgery (SameSite and/or tokens, no GET for changes)."
    ],
    "ideas_tr": [
-    "Güvenlik başlıklarını kontrol et: Content-Security-Policy, X-Content-Type-Options, frame-ancestors / X-Frame-Options, Referrer-Policy.",
+    "Güvenlik başlıklarını kontrol et: Strict-Transport-Security (HSTS), Content-Security-Policy, X-Content-Type-Options, frame-ancestors, Referrer-Policy.",
     "Çerezlerin Secure, HttpOnly ve uygun SameSite değeriyle ayarlandığını doğrula.",
-    "Durum değiştiren isteklerin CSRF'ye karşı korunduğunu doğrula (SameSite ve/veya token; değişiklik için GET yok).",
-    "Hassas verinin localStorage/sessionStorage'da tutulmadığını ve URL'de görünmediğini doğrula."
+    "Durum değiştiren isteklerin CSRF'ye karşı korunduğunu doğrula (SameSite ve/veya token; değişiklik için GET yok)."
    ],
    "name_tr": "Web Ön Yüz Güvenliği"
   },
@@ -95,12 +96,10 @@
    ],
    "ideas": [
     "Call endpoints with unexpected methods, content types and extra/unknown fields; verify strict handling and consistent error bodies.",
-    "Verify rate limiting / throttling on expensive or sensitive endpoints (429 with retry information).",
     "For GraphQL: verify introspection is disabled in production and query depth/complexity is limited."
    ],
    "ideas_tr": [
     "Uç noktaları beklenmeyen metot, içerik tipi ve bilinmeyen alanlarla çağır; katı işlendiğini ve hata gövdelerinin tutarlı olduğunu doğrula.",
-    "Pahalı veya hassas uç noktalarda hız sınırlaması olduğunu doğrula (retry bilgisiyle 429).",
     "GraphQL için: üretimde introspection kapalı, sorgu derinliği/karmaşıklığı sınırlı olmalı."
    ],
    "name_tr": "API ve Web Servisi"
@@ -171,13 +170,11 @@
    ],
    "ideas": [
     "Access another user's object by changing its ID in URL/body (BOLA / IDOR); verify 403/404 and no data leak.",
-    "Call admin-only functions with a normal user's session directly via API; verify rejection (function-level authorization).",
-    "Verify field-level rules: a user cannot set properties they may not change (e.g. role, price) via mass assignment."
+    "Call admin-only functions with a normal user's session directly via API; verify rejection (function-level authorization)."
    ],
    "ideas_tr": [
     "URL/gövdedeki kimliği değiştirerek başka kullanıcının nesnesine eriş (BOLA/IDOR); 403/404 döndüğünü ve veri sızmadığını doğrula.",
-    "Yalnızca yöneticiye açık işlevleri normal kullanıcı oturumuyla doğrudan API'den çağır; reddedildiğini doğrula (işlev düzeyi yetkilendirme).",
-    "Alan düzeyi kuralları doğrula: kullanıcı değiştirmemesi gereken özellikleri (rol, fiyat) toplu atama ile ayarlayamamalı."
+    "Yalnızca yöneticiye açık işlevleri normal kullanıcı oturumuyla doğrudan API'den çağır; reddedildiğini doğrula (işlev düzeyi yetkilendirme)."
    ],
    "name_tr": "Yetkilendirme"
   },
@@ -241,11 +238,11 @@
     "all"
    ],
    "ideas": [
-    "Verify HTTPS everywhere with HSTS, no mixed content, TLS 1.2+ only (e.g. with a TLS scanner on the test host).",
+    "Verify HTTPS everywhere, no mixed content, TLS 1.2+ only (e.g. with a TLS scanner on the test host).",
     "Verify service-to-service calls (payment, SMS, BIN) use TLS with certificate validation."
    ],
    "ideas_tr": [
-    "Her yerde HSTS'li HTTPS, karışık içerik yok, yalnızca TLS 1.2+ olduğunu doğrula (test sunucusunda TLS tarayıcısıyla).",
+    "Her yerde HTTPS, karışık içerik yok, yalnızca TLS 1.2+ olduğunu doğrula (test sunucusunda TLS tarayıcısıyla).",
     "Servisler arası çağrıların (ödeme, SMS, BIN) sertifika doğrulamalı TLS kullandığını doğrula."
    ],
    "name_tr": "Güvenli İletişim"
@@ -259,13 +256,11 @@
    ],
    "ideas": [
     "Verify debug modes, default accounts, directory listings and sample pages are disabled.",
-    "Verify secrets are not present in front-end bundles, repositories or error pages.",
-    "Verify dependency/component versions have no known critical vulnerabilities (SCA scan)."
+    "Verify secrets are not present in front-end bundles, repositories or error pages."
    ],
    "ideas_tr": [
     "Debug modlarının, varsayılan hesapların, dizin listelemenin ve örnek sayfaların kapalı olduğunu doğrula.",
-    "Gizli bilgilerin ön yüz paketlerinde, depolarda veya hata sayfalarında bulunmadığını doğrula.",
-    "Bağımlılık/bileşen sürümlerinde bilinen kritik zafiyet olmadığını doğrula (SCA taraması)."
+    "Gizli bilgilerin ön yüz paketlerinde, depolarda veya hata sayfalarında bulunmadığını doğrula."
    ],
    "name_tr": "Yapılandırma"
   },
@@ -279,12 +274,14 @@
    "ideas": [
     "Verify personal/financial data is masked in UI, logs, exports and error messages (e.g. card number, TCKN).",
     "Verify caching headers prevent storage of sensitive pages; verify data retention/deletion rules (KVKK/GDPR).",
-    "Verify full card numbers and CVV are never stored or logged (PCI DSS scope)."
+    "Verify full card numbers and CVV are never stored or logged (PCI DSS scope).",
+    "Verify no sensitive data is stored in localStorage/sessionStorage or exposed in URLs."
    ],
    "ideas_tr": [
     "Kişisel/finansal verinin arayüzde, loglarda, dışa aktarımlarda ve hata mesajlarında maskelendiğini doğrula (kart no, TCKN).",
     "Önbellek başlıklarının hassas sayfaların saklanmasını engellediğini; saklama/silme kurallarını (KVKK/GDPR) doğrula.",
-    "Tam kart numarası ve CVV'nin asla saklanmadığını veya loglanmadığını doğrula (PCI DSS kapsamı)."
+    "Tam kart numarası ve CVV'nin asla saklanmadığını veya loglanmadığını doğrula (PCI DSS kapsamı).",
+    "Hassas verinin localStorage/sessionStorage'da tutulmadığını ve URL'de görünmediğini doğrula."
    ],
    "name_tr": "Veri Koruma"
   },
@@ -292,15 +289,20 @@
    "id": "V15",
    "name": "Secure Coding and Architecture",
    "features": [
+    "api",
     "all"
    ],
    "ideas": [
     "Verify a threat model / security design review exists for the feature (evidence, not a test).",
-    "Verify resource consumption limits (payload size, pagination limits, timeouts) protect against abuse."
+    "Verify resource consumption limits (payload size, pagination limits, timeouts) protect against abuse.",
+    "Verify dependency/component versions have no known critical vulnerabilities (SCA scan).",
+    "Verify field-level rules: a user cannot set properties they may not change (e.g. role, price) via mass assignment."
    ],
    "ideas_tr": [
     "Özellik için tehdit modeli / güvenlik tasarım incelemesi olduğunu doğrula (test değil, kanıt).",
-    "Kaynak tüketim sınırlarının (gövde boyutu, sayfalama sınırı, zaman aşımları) kötüye kullanıma karşı koruduğunu doğrula."
+    "Kaynak tüketim sınırlarının (gövde boyutu, sayfalama sınırı, zaman aşımları) kötüye kullanıma karşı koruduğunu doğrula.",
+    "Bağımlılık/bileşen sürümlerinde bilinen kritik zafiyet olmadığını doğrula (SCA taraması).",
+    "Alan düzeyi kuralları doğrula: kullanıcı değiştirmemesi gereken özellikleri (rol, fiyat) toplu atama ile ayarlayamamalı."
    ],
    "name_tr": "Güvenli Kodlama ve Mimari"
   },

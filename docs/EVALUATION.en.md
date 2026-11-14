@@ -137,7 +137,16 @@ How to set up a blind trial correctly (copy the folder outside the repo, keep th
 | Exploratory | 65 / 74 | 79 / 74 | **90 / 74** |
 | **Mean (all runs)** | **89.3 / 85.4** | **94.9 / 92.6** | **95.2 / 93.3** |
 
-- **Reading:** the skills help most on the weakest model (Haiku: +3.9 points, +14 on test design). On strong models the gap is small (+1.9 / +2.3), and several trials hit the ceiling. So the skills lift a cheaper model, and mostly add consistency on a strong one.
+- **Statistics (added in 0.10.0, `python tools/eval_stats.py evals/results/trials-0.9.0.json`):** 95% confidence interval of the difference (resampling within each trial) and a permutation test:
+
+| | Runs | With skills | Without | Difference | 95% CI | p |
+|---|---:|---:|---:|---:|---|---:|
+| Haiku | 42 | 89.3 | 85.4 | +3.8 | [−0.3, +8.4] | 0.17 |
+| Sonnet 5.5 | 42 | 94.9 | 92.6 | +2.3 | [+0.4, +4.4] | 0.07 |
+| Opus | 42 | 95.2 | 93.3 | +1.9 | [+0.1, +3.5] | 0.18 |
+| **All three models** | 126 | 93.1 | 90.5 | **+2.7** | [+1.0, +4.4] | **0.014** |
+
+- **Correct reading:** pooled over the three models, the skills add a small but detectable gain (+2.7 points). For each model alone the gap cannot be told apart from noise, and the intervals overlap. So **the statement "the skills help most on the weakest model" is not established by this data**: Haiku has the largest point estimate, but its interval includes zero. The 0.9.0 release notes and README stated this too firmly; that is corrected. Bootstrap intervals from 3 runs per cell tend to be too narrow. The two clearest single cells are exploratory testing on Opus (+14.0 [+5.4, +22.6]) and test design on Haiku (+12.0 [+0.9, +24.1]).
 - **Exploratory fix:** in 0.7.0 the with-skill arm lost. The revised skill (short-session mode, "follow the data", attack checklist) scored 90 vs 74 on Opus and 79 vs 74 on Sonnet. It still loses on Haiku (65 vs 74); a weak model may not use long instructions well. That remains open.
 - **Mobile plan review:** no difference; the skill added nothing here.
 - **Limits (important):**

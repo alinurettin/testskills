@@ -1,6 +1,6 @@
 # Defect reporting
 
-A defect report has one job: let someone who was not there **reproduce the problem and understand its impact** without asking a single question. The fields follow ISTQB CTFL v4.0 §5.5.
+A defect report has one job: let someone who was not there **reproduce the problem and understand its impact** without asking a single question. The fields follow ISTQB CTFL v4.0.1 §5.5.
 
 ## Contents
 1. Fields
@@ -26,6 +26,7 @@ A defect report has one job: let someone who was not there **reproduce the probl
 | Reproducibility | Always, or n of m attempts; any conditions |
 | Severity / priority | See section 2 |
 | Evidence | Screenshot, video, Playwright trace, HAR, log excerpt with timestamp and correlation ID |
+| Date, reporter, status | Date observed, who reported it (with role), and the status (`defects.json`: `reported_on`, `reported_by`, `status`). Without them no defect metric can be computed. |
 | Notes | Workaround, first seen in which build, suspected area. Mark suspicion as suspicion. |
 
 ## 2. Severity vs priority

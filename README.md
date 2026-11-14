@@ -1,6 +1,6 @@
 # QA Suite: Yapay zekâ için profesyonel yazılım test skill'leri
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.9.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.10.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[English README →](README.en.md)**
 
@@ -49,7 +49,7 @@ Her denemede ajana yalnızca bir test uzmanına verilecek girdiler verildi: bir 
 
 17 skill'in tamamında vekil yönlendirme ölçümü: **84/84** istek doğru skill'e gitti. Bunlara skill gerektirmeyen 5 yakın istek de dahil. Ayrıca 280'den fazla birim testi var.
 
-**Skill'li ve skill'siz karşılaştırma (126 koşu, 7 bağımsız deneme, 3 model):** skill'ler en çok zayıf modele katkı sağlıyor. Haiku'da ortalama 85,4'ten 89,3'e çıktı (test tasarımında 86'dan 100'e); Sonnet 5.5 ve Opus'ta fark küçük (+2 civarı) ve çoğu denemede iki taraf da tavana yakın. Mobil plan incelemesinde ve Haiku'daki keşif testinde skill'li kol geride ya da eşit. Her hücrede 3 koşu var; sinyaldir, istatistiksel kanıt değildir.
+**Skill'li ve skill'siz karşılaştırma (126 koşu, 7 bağımsız deneme, 3 model):** üç model birlikte alındığında skill'ler ortalamayı 90,5'ten 93,1'e çıkardı (+2,7 puan, %95 güven aralığı +1,0 ile +4,4, permütasyon testi p = 0,014). Tek tek modellerde fark istatistiksel olarak ayırt edilemiyor (Haiku +3,8, Sonnet 5.5 +2,3, Opus +1,9; aralıklar örtüşüyor), yani "zayıf modele daha çok yarıyor" demek için veri yetmiyor. Mobil plan incelemesinde ve Haiku'daki keşif testinde skill'li kol geride ya da eşit. Hesap: `python tools/eval_stats.py evals/results/trials-0.9.0.json`.
 
 Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVALUATION.md)**. Her denemenin gerçek çıktıları: [examples/](examples/).
 

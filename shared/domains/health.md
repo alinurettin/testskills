@@ -15,11 +15,12 @@ Use this pack for patient-facing apps, hospital and clinic systems, appointments
 ## 1. Regulations and standards to check
 | Area | What it usually drives |
 |---|---|
-| Personal health data (KVKK: health data is a special category; GDPR Art. 9) | Explicit consent or a legal basis, strict access control, access logging, retention, secure transfer, data minimisation |
+| Personal health data (KVKK: health data is a special category; GDPR Art. 9; in Türkiye also the Kişisel Sağlık Verileri Hakkında Yönetmelik, amended in Official Gazette 04.07.2026/33300 with Art. 13/A on re-evaluating an earlier diagnosis) | Explicit consent or a legal basis, strict access control, access logging, retention, secure transfer, data minimisation; after a re-evaluation report, later processes must use the report and not the old diagnosis |
+| Electronic informed consent (in Türkiye: Bilgilendirilmiş Rızanın Elektronik Ortamda Alınması Hakkında Yönetmelik, Official Gazette 27.10.2026/33413) | Identity of patient and professional verified first; a verified mobile number (valid 12 months); consent by an intervention-specific SMS one-time password; an audit record with integrity hash and time stamp; no e-consent when the legal representative is missing or cannot be verified electronically |
 | National health systems (in Türkiye: Ministry of Health systems such as e-Nabız / USS; SGK MEDULA for reimbursement and e-prescription) | Integration contracts, message validation, error and resend handling, identity matching. Confirm the current integration specifications. |
 | Interoperability standards (HL7 v2, HL7 FHIR, DICOM, ICD-10, LOINC, SNOMED CT where used) | Message and resource validation, code-system correctness, units |
 | Medical device software (IEC 62304, ISO 14971; EU MDR or the local equivalent when the software is a medical device) | Risk management traceability, software safety classes, verification evidence; the RTM becomes regulatory evidence |
-| Accessibility | Patient portals are often subject to accessibility obligations; test against WCAG 2.2 AA |
+| Accessibility (in Türkiye: Presidential Circular 2025/10, Official Gazette 21.06.2025/32933, requires WCAG 2.2 measured with the Ministry of Family and Social Services' A-level checklist, with public bodies and private hospitals due by 21.06.2026) | Patient portals are subject to accessibility obligations; test against WCAG 2.2 AA, with the A-level checklist as the legal minimum in Türkiye |
 
 ## 2. Implicit requirements checklist
 - **Identity:**

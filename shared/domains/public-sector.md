@@ -16,9 +16,9 @@ Use this pack for citizen-facing services, internal government systems, e-signat
 | Area | What it usually drives |
 |---|---|
 | E-government integration (in Türkiye: e-Devlet Kapısı login and services) | Authentication via the national gateway, identity attributes received, session handover, error pages when the gateway is unavailable |
-| Information and communication security (in Türkiye: the Presidency Digital Transformation Office's Information and Communication Security Guide, and related circulars) | Security controls by asset criticality level, logging, data localisation, supplier requirements. Treat it as a checklist source for security testing. |
+| Information and communication security (in Türkiye: the Information and Communication Security Guide and its audit guide, now published by the Cybersecurity Directorate, Siber Güvenlik Başkanlığı, under Law No. 7545 of 19.03.2025; the Digital Transformation Office that first issued it was closed in March 2025) | Security controls by asset criticality level, logging, data localisation, supplier requirements. Treat it as a checklist source for security testing. |
 | Electronic signature and registered e-mail (in Türkiye: e-signature law No. 5070, KEP) | Signature creation and verification, certificate validity and revocation, timestamps, legal delivery evidence |
-| Accessibility obligations for public websites and apps (national rules; the EU Web Accessibility Directive) | WCAG 2.x AA conformance, an accessibility statement, a feedback mechanism |
+| Accessibility obligations for public websites and apps (in Türkiye: Presidential Circular 2025/10, Official Gazette 21.06.2025/32933, requires WCAG 2.2 measured with the Ministry of Family and Social Services' A-level checklist, with public bodies due by 21.06.2026; the EU Web Accessibility Directive) | The A-level checklist as the legal minimum in Türkiye, WCAG 2.2 AA as the usual project target, an accessibility statement, a feedback mechanism |
 | Personal data (KVKK / GDPR), right to information | Lawful basis, transparency texts, retention, responses to information requests |
 | Archiving and records management | Retention schedules, document formats, disposal rules |
 

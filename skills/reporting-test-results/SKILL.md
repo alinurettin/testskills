@@ -4,7 +4,7 @@ description: Writes defect reports (severity vs priority, evidence) and computes
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Reporting test results
@@ -32,23 +32,29 @@ Write in the user's language (TR/EN). Defect titles and steps follow the same la
 ## B. Status and completion reports
 ```bash
 python scripts/completion_report.py --qa qa --kind completion --out qa/completion-report.md   # end of cycle or release
-python scripts/completion_report.py --qa qa --kind status --out qa/status-report.md           # interim
+python scripts/completion_report.py --qa qa --kind status --out qa/status-report.md \
+    --period "Sprint 14, week 2" --json-out qa/report-facts.json [--baseline qa/report-facts.prev.json]   # interim
 python scripts/completion_report.py --qa qa --json                                            # facts only
 ```
 
 Inputs are read from `qa/`:
 - **Required:** `requirements.json`, `test-cases.json`, `results.json`
-- **Optional:** `defects.json` (without it, open-defect criteria are *unknown*), `exit-criteria.json` (from `planning-tests`), `clarifications.md` (blocking questions: a `| Q-### |` table row counts as blocking when it contains "blocking" or "bloke" and is not marked closed/answered/kapalı/cevaplandı)
+- **Optional:** `defects.json` (without it, open-defect criteria are *unknown*; so are they when an open defect has no valid severity or a defect key in `results.json` is not in the register), `exit-criteria.json` (from `planning-tests`), `clarifications.md` (blocking questions: a `| Q-### |` table row counts as blocking when it contains "blocking" or "bloke" and is not marked closed/answered/kapalı/cevaplandı)
 
 The script computes:
-- coverage, execution %, and pass rate (passed ÷ (passed + failed));
-- the share of executed tests run by automation;
+- coverage, execution % (passed + failed; **a blocked test is not executed**), pass rate (passed ÷ executed), passed of planned, and blocked %;
+- automation: automated tests ÷ automation targets (candidates plus tests a tool already runs);
 - per-requirement verdicts: failed if any linked test failed, passed only if all passed;
-- open defects by severity;
-- each exit criterion, marked met / not met / unknown;
+- risk coverage: per risk level, the requirements passed / failed / not completely tested;
+- open defects by severity, deferred defects as **known defects shipped**, and defect metrics (clusters per requirement, reopen and rejection rate; detection percentage only when production defects are recorded);
+- each exit criterion, marked met / not met / unknown / waived. A misspelt criterion is unknown, never skipped;
 - the residual risks (in-scope requirements not passed, highest risk first), with the failing or unexecuted TCs and defect keys.
 
-Exit code 1 means at least one criterion is not met or unknown, which is useful as a CI gate.
+A status report adds the impediments (blocked tests with their notes), a suspension check (more than 30% blocked) and, with `--baseline`, what changed since the last report. Both kinds end with fill-in headings (`{{…}}`): fill them or delete them.
+
+Exit code 1 means at least one criterion is not met, unknown or waived, which is useful as a CI gate.
+
+**Waivers.** When stakeholders accept a risk, they record it in `qa/exit-criteria.json` under `waivers` with `criterion`, `approved_by`, `date`, `reason` and `expires`. The report then shows the criterion as *waived* with the approver; it never becomes *met*, and `--allow-waived` is needed for exit code 0. An expired or incomplete waiver does not count. **Never write a waiver yourself**: ask who accepts the risk and until when.
 
 Then add what the numbers cannot say:
 - **Summary (3–5 sentences):** what was tested against the plan, deviations from the plan (scope cut, environment problems), and the most important findings.

@@ -6,7 +6,9 @@ Two subcommands:
 charters  Rank requirements by risk (likelihood x impact) and write one exploratory
           charter per high-risk requirement: the charter sentence ("Explore <target>
           with <resources> to discover <information>"), heuristics chosen from the
-          requirement text and type, oracles, a time box and what is out of scope.
+          requirement text and type, oracles, a time box, "done when" and "must never"
+          lines, and what is out of scope. --defects qa/defects.json lists the open defects
+          of each requirement (past defects are where the next ones hide).
           Requirements without a risk are scored 1x1 and listed last. Deprecated and
           deferred requirements are skipped.
 
@@ -41,6 +43,9 @@ Session sheet format (keys are case-insensitive; Turkish keys work too):
   "[REQ-###]" after a tag links that note to specific requirements. Indented lines below a
   note add detail; for BUG notes the keys steps/expected/actual/severity/data/evidence
   (adımlar/beklenen/gerçekleşen/önem/veri/kanıt) fill the defect draft.
+  "confidence: confirmed | seen once" (güven: doğrulandı | bir kez görüldü) says whether the
+  bug was reproduced. A bug seen once is still a BUG: it keeps its defect draft and its
+  regression test, and the report counts it separately. Never downgrade it to a QUESTION.
   Only charter and duration are required, so a short session (10-45 min) can keep a two-line
   header; durations under 10 or over 180 min produce a warning.
 
@@ -60,17 +65,22 @@ import argparse
 import json
 import re
 import sys
+from collections import Counter
 from pathlib import Path
 
 PRI_RANK = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 PRI_SHORT = {"critical": "c", "high": "h", "medium": "m", "low": "l"}
+OPEN_DEFECT_STATUS = ("open", "in-progress", "resolved")  # data-model.md: open until verified closed
 TAGS = ("BUG", "ISSUE", "QUESTION", "IDEA", "NOTE", "COVERED")
 TAG_ALIASES = {"BUG": "BUG", "HATA": "BUG", "DEFECT": "BUG", "ISSUE": "ISSUE", "SORUN": "ISSUE",
                "QUESTION": "QUESTION", "SORU": "QUESTION", "IDEA": "IDEA", "FIKIR": "IDEA", "FİKİR": "IDEA",
                "NOTE": "NOTE", "NOT": "NOTE", "COVERED": "COVERED", "KAPSAM": "COVERED", "COVERAGE": "COVERED"}
 HEADER_KEYS = {
     "charter": "charter", "görev": "charter", "gorev": "charter", "misyon": "charter", "mission": "charter",
+    "test başlatma belgesi": "charter", "test baslatma belgesi": "charter", "başlatma belgesi": "charter",
+    "baslatma belgesi": "charter",
     "tester": "tester", "testçi": "tester", "testci": "tester", "test eden": "tester",
+    "test uzmanı": "tester", "test uzmani": "tester",
     "start": "start", "başlangıç": "start", "baslangic": "start", "date": "start", "tarih": "start",
     "duration": "duration", "süre": "duration", "sure": "duration",
     "req": "req", "reqs": "req", "requirements": "req", "gereksinim": "req", "gereksinimler": "req",
@@ -84,7 +94,14 @@ DETAIL_KEYS = {"steps": "steps", "step": "steps", "adımlar": "steps", "adimlar"
                "gerceklesen": "actual", "gerçek": "actual", "severity": "severity", "önem": "severity",
                "onem": "severity", "ciddiyet": "severity", "data": "data", "veri": "data",
                "evidence": "evidence", "kanıt": "evidence", "kanit": "evidence",
-               "repro": "repro", "tekrar": "repro"}
+               "repro": "repro", "tekrar": "repro",
+               "confidence": "confidence", "güven": "confidence", "guven": "confidence",
+               "kesinlik": "confidence"}
+# confidence values (folded) -> canonical; anything else is reported as a warning and shown as written
+CONFIDENCE = {"confirmed": "confirmed", "reproduced": "confirmed", "dogrulandi": "confirmed", "teyit edildi": "confirmed",
+              "yeniden uretildi": "confirmed", "seen once": "seen once", "seen-once": "seen once", "once": "seen once",
+              "unconfirmed": "seen once", "not reproduced": "seen once", "bir kez goruldu": "seen once",
+              "bir kez": "seen once", "dogrulanmadi": "seen once"}
 SEVERITIES = {"critical": "critical", "kritik": "critical", "high": "high", "yüksek": "high", "yuksek": "high",
               "medium": "medium", "orta": "medium", "low": "low", "düşük": "low", "dusuk": "low"}
 REQ_RE = re.compile(r"\bREQ-\d{3,}\b")
@@ -102,7 +119,14 @@ T = {
         "no_risk": "no risk", "charter": "Charter", "explore": "Explore {target} with {resources} to discover {info}.",
         "reqs": "Requirements", "risk": "Risk", "timebox": "Time box", "min": "min", "heur": "Heuristics and prompts",
         "oracles": "Oracles (how you will recognise a problem)", "oos": "Out of scope",
-        "setup": "Setup and resources", "open_q": "Open questions {q}: explore to inform the answer; do not decide the "
+        "setup": "Setup and resources",
+        "done_when": "Done when", "done_text": "each heuristic below has at least one COVERED note and every acceptance "
+        "criterion was exercised, or the time box (or action budget) ends. List what was not reached as NOT covered.",
+        "must_never": "Must never", "never_generic": "leave the test environment; use real personal data or real "
+        "payment instruments; delete or change data the session did not create; take an irreversible action "
+        "without asking",
+        "known_defects": "Open defects on this requirement (retest around them)",
+        "open_q": "Open questions {q}: explore to inform the answer; do not decide the "
         "expected result yourself.", "derived": "Derived (implicit) requirement: confirm it with the product owner.",
         "ac": "Acceptance criteria: {ac}", "claims": "Claims: the requirement text and its acceptance criteria",
         "also": "Also consider (weaker match)",
@@ -131,7 +155,11 @@ T = {
         "tag_counts": "Notes per tag", "bugs": "Bugs", "issues": "Issues and obstacles", "questions": "Open questions",
         "ideas": "Test ideas", "coverage": "Coverage by requirement", "covered_notes": "Covered (as noted)",
         "cov_cols": "| REQ | Sessions | Session minutes (shared) | BUG | QUESTION |", "none": "None.",
-        "bug_cols": "| Session | Time | Bug | REQ | Defect draft | Candidate TC |",
+        "bug_cols": "| Session | Time | Bug | REQ | Defect draft | Candidate TC | Confidence |",
+        "conf_line": "Bugs by confidence: confirmed {c} · seen once {o} · not stated {n}. A bug seen once is still "
+        "reported; reproduce it before filing.",
+        "conf": {"confirmed": "confirmed", "seen once": "seen once", "": "not stated"},
+        "f_conf": "Confidence", "conf_once": " - reproduce before filing; do not drop it",
         "debrief": "Debrief (PROOF) prompts", "proof": [
             ("Past", "What happened in the session? Where did the time go ({tbs})?"),
             ("Results", "What was achieved? {bugs} bug(s), coverage of {reqs}."),
@@ -160,22 +188,28 @@ T = {
         "exploratory finding", "auto_idea": "decide after the first manual run",
     },
     "tr": {
-        "ch_title": "Keşif testi görev kartları (charter)", "ch_intro": "{src} dosyasından sbtm.py ile üretildi. "
-        "Görevler gereksinim riskine (olasılık x etki) göre sıralanır; riski olmayan gereksinimler 1x1 sayılır ve "
-        "sona konur. Her kartı gözden geçirin: hedefi netleştirin, uymayan sezgisel yöntemleri çıkarın, zaman "
-        "kutusunda anlaşın.",
-        "ranking": "Risk sıralaması", "rank_cols": "| # | REQ | Başlık | O x E | Skor | Seviye | Zaman kutusu | Görev |",
-        "budget": "Planlanan bütçe: {n} oturum, {m} dk (~{h} saat) görev süresi.",
-        "no_risk": "risk yok", "charter": "Görev", "explore": "{resources} kullanarak {target} alanını keşfet; "
+        "ch_title": "Keşif testi başlatma belgeleri (charter)", "ch_intro": "{src} dosyasından sbtm.py ile üretildi. "
+        "Test başlatma belgeleri gereksinim riskine (olasılık x etki) göre sıralanır; riski olmayan gereksinimler "
+        "1x1 sayılır ve sona konur. Her belgeyi gözden geçirin: hedefi netleştirin, uymayan sezgisel yöntemleri "
+        "çıkarın, zaman kutusunda anlaşın.",
+        "ranking": "Risk sıralaması", "rank_cols": "| # | REQ | Başlık | O x E | Skor | Seviye | Zaman kutusu | Başlatma belgesi |",
+        "budget": "Planlanan bütçe: {n} oturum, {m} dk (~{h} saat) belge kapsamındaki süre.",
+        "no_risk": "risk yok", "charter": "Test başlatma belgesi (charter)", "explore": "{resources} kullanarak {target} alanını keşfet; "
         "amaç: {info} bulmak.",
         "reqs": "Gereksinimler", "risk": "Risk", "timebox": "Zaman kutusu", "min": "dk", "heur": "Sezgisel yöntemler ve sorular",
-        "oracles": "Kahinler (sorunu nasıl tanıyacaksınız)", "oos": "Kapsam dışı",
-        "setup": "Hazırlık ve kaynaklar", "open_q": "Açık sorular {q}: cevabı beslemek için keşfedin; beklenen sonucu "
+        "oracles": "Test sonucunu bilenler (oracle: sorunu nasıl tanıyacaksınız)", "oos": "Kapsam dışı",
+        "setup": "Hazırlık ve kaynaklar",
+        "done_when": "Ne zaman biter", "done_text": "aşağıdaki her sezgisel yöntem için en az bir KAPSAM notu var ve her "
+        "kabul kriteri denendi, ya da zaman kutusu (veya işlem bütçesi) doldu. Ulaşılamayanları KAPSANMADI olarak yazın.",
+        "must_never": "Asla yapılmaz", "never_generic": "test ortamının dışına çıkmak; gerçek kişisel veri veya gerçek "
+        "ödeme aracı kullanmak; oturumun oluşturmadığı veriyi silmek veya değiştirmek; sormadan geri alınamaz işlem yapmak",
+        "known_defects": "Bu gereksinimdeki açık hatalar (çevresini yeniden test edin)",
+        "open_q": "Açık sorular {q}: cevabı beslemek için keşfedin; beklenen sonucu "
         "kendiniz belirlemeyin.", "derived": "Türetilmiş (örtük) gereksinim: ürün sahibiyle teyit edin.",
         "ac": "Kabul kriterleri: {ac}", "claims": "İddialar (Claims): gereksinim metni ve kabul kriterleri",
         "also": "Ayrıca düşünün (zayıf eşleşme)",
         "ask_risk": "sıralama geçici; olasılık ve etkiyi sorun",
-        "other_oracles": "Diğer FEW HICCUPPS kahinleri: Geçmiş (önceki sürüm), İmaj, Benzer ürünler, "
+        "other_oracles": "Diğer FEW HICCUPPS tutarlılık ölçütleri: Geçmiş (önceki sürüm), İmaj, Benzer ürünler, "
         "Kullanıcı beklentileri, Ürün (kendi içinde tutarlılık), Amaç, Yasalar ve standartlar; Bilinen hata "
         "kalıpları, Açıklanabilirlik, Dünya (gerçek hayatta anlamlı mı?)",
         "sheet": "Oturum formu: şablonu kopyalayın, `charter:` alanına yukarıdaki cümleyi ve `req: {req}` yazın.",
@@ -191,26 +225,30 @@ T = {
         "default_res": "kabul kriterlerini ve çeşitli gerçekçi verileri",
         "default_info": "{req} gereksiniminden sapmaları ve kimsenin tanımlamadığı davranışları",
         "sum_title": "Keşif testi oturum özeti", "sessions": "Oturumlar", "totals": "Toplamlar",
-        "sess_cols": "| Oturum | Görev | Test eden | Başlangıç | Süre | T / B / S % | Fırsat % | BUG | ISSUE | QUESTION | IDEA | COVERED |",
+        "sess_cols": "| Oturum | Başlatma belgesi | Test uzmanı | Başlangıç | Süre | T / B / S % | Fırsat % | BUG | ISSUE | QUESTION | IDEA | COVERED |",
         "tot_duration": "Toplam oturum süresi: {n} oturumda {m} dk ({h} saat).",
         "tbs_line": "TBS (süreye göre ağırlıklı, {n} oturumun {k} tanesinde kayıtlı): test %{t}, hata inceleme %{b}, "
         "hazırlık %{s}.", "tbs_none": "TBS: kaydedilmemiş (oturum formlarına `tbs: test/bug/setup` ekleyin).",
-        "opp_line": "Fırsat (görev dışı) süresi: kaydeden oturumlarda sürenin %{o}'i.",
+        "opp_line": "Fırsat (belge kapsamı dışı) süresi: kaydeden oturumlarda sürenin %{o}'i.",
         "tag_counts": "Etiket başına not", "bugs": "Hatalar", "issues": "Sorunlar ve engeller", "questions": "Açık sorular",
         "ideas": "Test fikirleri", "coverage": "Gereksinim bazında kapsam", "covered_notes": "Kapsanan (notlara göre)",
         "cov_cols": "| REQ | Oturum | Oturum dakikası (paylaşımlı) | BUG | QUESTION |", "none": "Yok.",
-        "bug_cols": "| Oturum | Saat | Hata | REQ | Hata taslağı | Aday TC |",
-        "debrief": "Değerlendirme (PROOF) soruları", "proof": [
+        "bug_cols": "| Oturum | Saat | Hata | REQ | Hata taslağı | Aday TC | Güven |",
+        "conf_line": "Güvene göre hatalar: doğrulandı {c} · bir kez görüldü {o} · belirtilmemiş {n}. Bir kez görülen "
+        "hata da raporlanır; kayda girmeden önce yeniden üretin.",
+        "conf": {"confirmed": "doğrulandı", "seen once": "bir kez görüldü", "": "belirtilmemiş"},
+        "f_conf": "Güven", "conf_once": " - kayda girmeden önce yeniden üretin; bulguyu atmayın",
+        "debrief": "Bilgilendirme toplantısı (PROOF) soruları", "proof": [
             ("Past (Geçmiş)", "Oturumda ne oldu? Zaman nereye gitti ({tbs})?"),
             ("Results (Sonuçlar)", "Ne elde edildi? {bugs} hata, {reqs} kapsamı."),
             ("Obstacles (Engeller)", "Ne engel oldu? {issues} sorun kaydedildi."),
-            ("Outlook (Görünüm)", "Geriye ne kaldı? {ideas} fikir, {qs} açık soru; yeni görevler?"),
-            ("Feelings (Hisler)", "Test eden ürün ve oturum hakkında ne hissediyor? (sorun; notlarda yok)")],
+            ("Outlook (Görünüm)", "Geriye ne kaldı? {ideas} fikir, {qs} açık soru; yeni test başlatma belgeleri?"),
+            ("Feelings (Hisler)", "Test uzmanı ürün ve oturum hakkında ne hissediyor? (sorun; notlarda yok)")],
         "warn_title": "Uyarılar", "not_rec": "kaydedilmemiş",
         "def_title": "Hata raporu taslakları", "def_intro": "Oturum formlarındaki her BUG notu için bir taslak. "
         "Tüm <...> alanlarını doldurun, bir kez daha yeniden üretin, mükerrer kayıt arayın, sonra hatayı takip "
         "aracına girin ve anahtarını qa/defects.json ile qa/results.json dosyalarına yazın.",
-        "f_session": "Oturum", "f_linked": "Bağlantılar", "f_env": "Ortam", "f_sev": "Önem (severity)",
+        "f_session": "Oturum", "f_linked": "Bağlantılar", "f_env": "Ortam", "f_sev": "Önem derecesi",
         "f_pri": "Öncelik", "f_pre": "Ön koşullar", "f_steps": "Yeniden üretme adımları", "f_exp": "Beklenen",
         "f_act": "Gerçekleşen", "f_repro": "Tekrarlanabilirlik", "f_evid": "Kanıt", "f_notes": "Notlar (oturumdan)",
         "p_env": "<sürüm, ortam, tarayıcı/işletim sistemi, yerel ayar, test hesabı rolü>",
@@ -420,6 +458,16 @@ def cmd_charters(a) -> int:
     if not reqs:
         print("error: no active requirements in the file", file=sys.stderr)
         return 1
+    open_defects = []
+    if getattr(a, "defects", None):
+        try:
+            ddoc = json.loads(Path(a.defects).read_text(encoding="utf-8-sig"))
+            open_defects = [d for d in ddoc.get("defects", []) if isinstance(d, dict)
+                            and d.get("status", "open") in OPEN_DEFECT_STATUS]
+        except (OSError, ValueError, AttributeError) as e:
+            print(f"error: cannot read defects: {e}", file=sys.stderr)
+            return 2
+        open_defects.sort(key=lambda d: (PRI_RANK.get(d.get("severity"), 4), str(d.get("id", ""))))
     rows = []
     for r in reqs:
         li, im, has = risk_of(r)
@@ -457,7 +505,16 @@ def cmd_charters(a) -> int:
                 f"- **{t['risk']}:** " + (f"{x['li']} x {x['im']} = {x['score']} ({t['levels'][x['level']]})"
                                            if x["has"] else f"{t['no_risk']} ({t['levels']['low']}) - {t['ask_risk']}")
                 + (f" - {r['risk'].get('rationale')}" if x["has"] and r["risk"].get("rationale") else ""),
-                f"- **{t['timebox']}:** {x['box']} {t['min']}"]
+                f"- **{t['timebox']}:** {x['box']} {t['min']}",
+                f"- **{t['done_when']}:** {t['done_text']}",
+                f"- **{t['must_never']}:** " + "; ".join(
+                    [t["never_generic"]] + [OOS_EXTRA[rule["id"]][a.lang].split(" (")[0].lower()
+                                            for rule in rules if rule["id"] in OOS_EXTRA])]
+        known = [d for d in open_defects if r["id"] in (d.get("requirement_ids") or [])]
+        if known:
+            out.append(f"- **{t['known_defects']}:** " + "; ".join(
+                f"{cell(d.get('id', '?'))} ({d.get('severity', '-')}, {d.get('status', 'open')}) {cell(d.get('title', ''))}".strip()
+                for d in known))
         if r.get("questions") or r.get("status") == "clarification-needed":
             out.append(f"- {t['open_q'].format(q=', '.join(r.get('questions') or []))}".replace(" :", ":").replace("  ", " "))
         if r.get("derived"):
@@ -481,7 +538,7 @@ def cmd_charters(a) -> int:
                 out.append(f"- {OOS_EXTRA[rule['id']][a.lang]}")
         others = [y["r"]["id"] for y in top if y is not x]
         if others:
-            out.append("- " + ("Kendi görev kartı olan gereksinimler: " if a.lang == "tr" else
+            out.append("- " + ("Kendi test başlatma belgesi olan gereksinimler: " if a.lang == "tr" else
                                "Requirements with their own charter: ") + ", ".join(others))
         out += ["", f"_{t['sheet'].format(req=r['id'])}_", ""]
     write(Path(a.out), "\n".join(out))
@@ -594,11 +651,26 @@ def parse_session(path: Path) -> tuple[dict, list[str], list[str]]:
     if not any(n["tag"] == "COVERED" for n in s["notes"]):
         warns.append(f"{path.name}: no COVERED notes - coverage cannot be reported for this session")
     for n in s["notes"]:
+        raw = n["detail"].get("confidence")
+        if raw is None:
+            continue
+        n["confidence"] = CONFIDENCE.get(fold(raw).strip(" .:"), "")
+        if not n["confidence"]:
+            warns.append(f"{path.name}:{n['line']}: confidence '{raw}' not understood - write 'confirmed' or 'seen once'")
+    for n in s["notes"]:
         if not n["reqs"]:
             detail = " ".join([n["text"]] + [v if isinstance(v, str) else " ".join(v) for v in n["detail"].values()]
                               + n["extra"])
             n["reqs"] = list(dict.fromkeys(REQ_RE.findall(detail))) or list(s["reqs"])
     return s, errors, warns
+
+
+def conf_label(n: dict, t: dict) -> str:
+    """Display text for a note's confidence: the canonical label, the raw text when not understood, else 'not stated'."""
+    c = n.get("confidence")
+    if c:
+        return t["conf"][c]
+    return n["detail"].get("confidence") or t["conf"][""]
 
 
 def cap(v: str) -> str:
@@ -778,6 +850,8 @@ def cmd_report(a) -> int:
             defects += [f"- **{t['f_exp']}:** {exp}",
                         f"- **{t['f_act']}:** {det.get('actual') or t['p_act']}",
                         f"- **{t['f_repro']}:** {det.get('repro') or t['p_repro']}",
+                        f"- **{t['f_conf']}:** " + conf_label(n, t)
+                        + (t["conf_once"] if n.get("confidence") == "seen once" else ""),
                         f"- **{t['f_evid']}:** {det.get('evidence') or t['p_evid'].format(time=when)}"]
             if n["extra"]:
                 defects.append(f"- **{t['f_notes']}:** " + " / ".join(n["extra"]))
@@ -824,10 +898,12 @@ def cmd_report(a) -> int:
     sm += ["", f"## {t['bugs']}", ""]
     bugs = [(s, n) for s in sessions for n in s["notes"] if n["tag"] == "BUG"]
     if bugs:
-        sm += [t["bug_cols"], "|---|---|---|---|---|---|"]
+        sm += [t["bug_cols"], "|---|---|---|---|---|---|---|"]
         for s, n in bugs:
             sm.append(f"| {cell(s['id'])} | {n['time'] or '-'} | {cell(n['text'])} | {', '.join(n['reqs']) or '-'} | "
-                      f"{n['defect']} | {n['tc']} |")
+                      f"{n['defect']} | {n['tc']} | {cell(conf_label(n, t))} |")
+        cc = Counter(n.get("confidence", "") for _, n in bugs)
+        sm += ["", t["conf_line"].format(c=cc["confirmed"], o=cc["seen once"], n=len(bugs) - cc["confirmed"] - cc["seen once"])]
     else:
         sm.append(t["none"])
     sm += listing("ISSUE", t["issues"]) + listing("QUESTION", t["questions"]) + listing("IDEA", t["ideas"], True)
@@ -873,6 +949,7 @@ def main() -> int:
     c.add_argument("--top", type=int, default=10, help="number of charters (default 10; 0 = all)")
     c.add_argument("--timebox", type=int, default=90, help="minutes for high/medium risk (default 90)")
     c.add_argument("--lang", choices=["tr", "en"], default="en")
+    c.add_argument("--defects", help="qa/defects.json: list each requirement's open defects in its charter")
     c.add_argument("--out", required=True)
     r = sub.add_parser("report", help="session sheets -> summary, defect drafts, candidate test cases")
     r.add_argument("sessions", nargs="+", help="session sheet(s) (.md)")

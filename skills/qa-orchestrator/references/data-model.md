@@ -156,7 +156,7 @@ The field reference below describes the **generated JSON**. You only need it whe
   }
 }
 ```
-Required per entry: `status`. Optional fields are `defects`, `source`, `projects`, `flaky`, `errors`, `note`, `spec` and `duration_ms`. `pw_results.py` writes the Playwright fields. It keeps manual entries and defect keys that are already in the file.
+Required per entry: `status`. Optional fields are `defects`, `source`, `projects`, `flaky`, `errors`, `note`, `spec` and `duration_ms`. `pw_results.py` writes the Playwright fields; `junit_results.py` (`source: "junit"`), `reconcile.py` (`source: "reconcile"`) and `k6_results.py` (`source: "k6"`, with a `performance` object holding the measured values and thresholds) write theirs. It keeps manual entries and defect keys that are already in the file.
 
 ## exit-criteria.json (optional)
 
@@ -167,12 +167,26 @@ The planning skill writes this file and the completion report evaluates it. Leav
   "min_requirement_coverage_pct": 100,
   "min_execution_pct": 95,
   "min_pass_rate_pct": 95,
+  "max_blocked_pct": 5,
   "max_open_defects": { "critical": 0, "high": 0, "medium": 5 },
+  "max_deferred_defects": { "critical": 0 },
   "all_critical_requirements_passed": true,
+  "min_requirements_passed_pct": { "critical": 100, "high": 100, "medium": 90 },
   "max_blocking_questions_open": 0,
-  "min_automation_pct": 60
+  "min_automation_pct": 50,
+  "waivers": [
+    { "criterion": "max_open_defects.medium", "approved_by": "Product owner name", "date": "2026-11-14",
+      "reason": "Workaround documented in the release notes", "expires": "2026-12-15" }
+  ]
 }
 ```
+
+- Execution counts `passed` and `failed` only; a `blocked` test is not executed. `min_pass_rate_pct` is passed ÷ executed, `min_passed_of_planned_pct` is passed ÷ all active tests.
+- `min_automation_pct` is automated tests ÷ automation targets (tests with `automation.candidate` plus tests a tool already runs). A result counts as automated when `source` is set, is not `manual`, and the status is `passed`, `failed` or `blocked`.
+- `max_open_defects` and `max_deferred_defects` take a limit per severity, or one number for all severities.
+- `min_requirements_passed_pct` takes a limit per risk level of the requirements.
+- `waivers` record a risk that stakeholders accepted. All of `criterion`, `approved_by`, `reason` and `expires` are required. A waived criterion is reported as waived, not as met. Only people write waivers.
+- A key the report does not know is reported as unknown, so a typing error cannot open the gate.
 
 ## defects.json (optional)
 
@@ -189,7 +203,9 @@ Use this when defects are tracked outside Jira, or when a snapshot is exported f
 
 - `severity` records the technical impact: `critical`, `high`, `medium` or `low`.
 - `priority` records the urgency of the fix.
-- `status` is one of `open`, `in-progress`, `resolved`, `closed`, `rejected` or `deferred`. Only `open`, `in-progress` and `resolved` count as open until the defect is verified closed.
+- `status` is one of `new`, `open`, `in-progress`, `resolved`, `reopened`, `closed`, `rejected`, `duplicate` or `deferred`. `new`, `open`, `in-progress`, `resolved` and `reopened` count as open until the defect is verified closed. `deferred` defects are reported separately as known defects shipped. An unknown status counts as open.
+- A missing or invalid `severity` is unknown, and makes the open-defect criteria unknown.
+- Optional keys for defect metrics: `reported_on`, `reported_by`, `detected_in` (test level or `production`), `introduced_in`, `root_cause`, `component`, `resolution`, `reopened_count`.
 
 ## Enumerations
 

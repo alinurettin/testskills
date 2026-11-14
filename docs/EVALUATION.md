@@ -121,7 +121,16 @@ Kör denemeyi doğru kurmak (klasörü repo dışına kopyalamak, cevap anahtar�
 | Keşif testi | 65 / 74 | 79 / 74 | **90 / 74** |
 | **Ortalama (tüm koşular)** | **89,3 / 85,4** | **94,9 / 92,6** | **95,2 / 93,3** |
 
-- **Okuma:** Skill'lerin katkısı en çok en zayıf modelde (Haiku: +3,9 puan, test tasarımında +14). Güçlü modellerde fark küçük (+1,9 / +2,3), çoğu denemede tavan etkisi var. Yani skill'ler daha ucuz modelin kalitesini yükseltiyor; güçlü modelde ise çoğunlukla tutarlılık sağlıyor.
+- **İstatistik (0.10.0'da eklendi, `python tools/eval_stats.py evals/results/trials-0.9.0.json`):** Farkın %95 güven aralığı (deneme içinde yeniden örnekleme) ve permütasyon testi:
+
+| | Koşu | Skill'li | Skill'siz | Fark | %95 güven aralığı | p |
+|---|---:|---:|---:|---:|---|---:|
+| Haiku | 42 | 89,3 | 85,4 | +3,8 | [−0,3, +8,4] | 0,17 |
+| Sonnet 5.5 | 42 | 94,9 | 92,6 | +2,3 | [+0,4, +4,4] | 0,07 |
+| Opus | 42 | 95,2 | 93,3 | +1,9 | [+0,1, +3,5] | 0,18 |
+| **Üç model birlikte** | 126 | 93,1 | 90,5 | **+2,7** | [+1,0, +4,4] | **0,014** |
+
+- **Doğru okuma:** Üç model birlikte alındığında skill'lerin küçük ama ayırt edilebilir bir katkısı var (+2,7 puan). Tek tek modellerde fark istatistiksel olarak ayırt edilemiyor; aralıklar birbirinin üzerine biniyor. Bu yüzden **"skill'ler en çok zayıf modele yarıyor" ifadesi bu veriyle kanıtlanmış değil**: Haiku'daki fark nokta tahmini olarak en büyük, ama aralığı sıfırı içeriyor. 0.9.0 sürüm notlarında ve README'de bu ifade fazla kesin yazılmıştı; düzeltildi. Hücre başına 3 koşuyla hesaplanan bootstrap aralıkları olduğundan dar çıkma eğilimindedir. Tek tek hücrelerde en net iki sonuç: Opus'ta keşif testi (+14,0 [+5,4, +22,6]) ve Haiku'da test tasarımı (+12,0 [+0,9, +24,1]).
 - **Keşif testi düzeltmesi:** 0.7.0'da skill'li kol geride kalmıştı. Düzeltilmiş skill (kısa oturum modu, "veriyi takip et", saldırı listesi) Opus'ta 74'e karşı 90, Sonnet'te 74'e karşı 79 verdi. Haiku'da hâlâ geride (65'e 74): zayıf model uzun talimatı iyi kullanamıyor olabilir, bu açık kalan bir sorun.
 - **Mobil planı incelemesi:** Fark yok; skill bu denemede katkı sağlamadı.
 - **Sınırlar (önemli):**

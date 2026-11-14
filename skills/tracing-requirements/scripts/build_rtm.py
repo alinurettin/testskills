@@ -87,14 +87,23 @@ L = {
 
 
 def risk_of(r: dict) -> tuple[int, str]:
-    rk = r.get("risk") or {}
+    """(score, level) of a requirement. Keep identical in plan_facts, completion_report, build_rtm, select_regression.
+
+    The score (likelihood x impact) only orders requirements. The level comes from the score bands plus two
+    matrix overrides, because ordinal scales do not multiply (CTAL-TM v3.0 section 1.3.3): impact 5 is at least
+    high, and impact 5 with likelihood >= 3 is critical. Without both values the level falls back to the priority."""
+    rk = r.get("risk") if isinstance(r.get("risk"), dict) else {}
     try:
-        score = int(rk.get("likelihood", 0)) * int(rk.get("impact", 0))
+        li, im = int(rk.get("likelihood") or 0), int(rk.get("impact") or 0)
     except (TypeError, ValueError):
-        score = 0
-    if score == 0:
+        li = im = 0
+    score = li * im
+    if not score:
+        im = 0
         score = {"critical": 20, "high": 12, "medium": 6, "low": 2}.get(r.get("priority"), 0)
     level = "critical" if score >= 17 else "high" if score >= 10 else "medium" if score >= 5 else "low" if score else "-"
+    if im >= 5 and level != "critical":
+        level = "critical" if li >= 3 else "high"
     return score, level
 
 

@@ -238,4 +238,6 @@ Use the reporting-test-results skill for the completion report, and tracing-requ
   Read the failures, and review a sample of the passes.
 - Case-insensitive matching folds Turkish diacritics (ş→s, ı/İ→i). This is right for canaries and keywords but can over-match short words; use `case_sensitive: true` for exact matching.
 - The overall rate is the mean of the per-case rates (every case weighs the same). Weight important intents by adding more cases, or set per-case `min_pass_rate`.
+- Rates carry a 95% Wilson score interval with the case as the unit. The default gate compares the point estimate and reports when the interval contains the threshold; `--gate-on lower` compares the lower bound (34 clean cases give a lower bound of 89.9%, so they cannot show "≥ 90%").
+- The gate has three verdicts. Cases not run, checks that could not be evaluated, too few runs, draft cases and pending grading give INCOMPLETE, never PASSED. A case that passes its deterministic checks while a rubric is pending is `passed_pending` and is in no rate.
 - The seed is a **starting point**, about 34 cases. A real safety suite needs many more attack variants per category, adapted to the product's tools, data and policy.

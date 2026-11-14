@@ -329,7 +329,10 @@ class RequirementToCompletionChainTests(unittest.TestCase):
         self.assertEqual((m["tests"], m["executed"], m["passed"], m["failed"], m["not_run"]),
                          (len(self.tests), len(executed), passed, failed, len(self.tests) - len(executed)))
         self.assertEqual(m["coverage_pct"], 100.0)
-        self.assertEqual(m["automation_pct"], round(100 * (len(executed) - 1) / len(executed), 1))  # TC-001 manual
+        self.assertEqual(m["automated_of_executed_pct"], round(100 * (len(executed) - 1) / len(executed), 1))  # TC-001 manual
+        # 0.10.0: automation_pct = automated tests / automation targets (candidates plus tests already automated)
+        self.assertEqual(m["automated_tests"], len(executed) - 1)
+        self.assertEqual(m["automation_pct"], round(100 * m["automated_tests"] / m["automation_targets"], 1))
         want_verdicts = defaultdict(int)
         for rid in self.rows:
             want_verdicts[verdict([self.expected[t] for t in self.by_req[rid]])] += 1
@@ -349,7 +352,7 @@ class RequirementToCompletionChainTests(unittest.TestCase):
 
         crit = {e["criterion"]: e["met"] for e in self.facts["exit_criteria"]}
         self.assertEqual(crit, {"min_requirement_coverage_pct": True, "min_pass_rate_pct": False,
-                                "all_critical_requirements_passed": False, "min_automation_pct": True,
+                                "all_critical_requirements_passed": False, "min_automation_pct": m["automation_pct"] >= 90,
                                 "max_open_defects.critical": None})
 
     def test_completion_markdown_shows_counts_and_failed_migration_tests(self):

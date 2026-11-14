@@ -16,13 +16,16 @@ Tags (English | Türkçe):
 Optional "[REQ-###]" after the tag links a note to specific requirements: "10:41 BUG [REQ-002]: ...".
 Indented lines under a note add detail. For BUG notes these keys fill the defect draft:
   steps / adımlar (";" separated, or numbered lines "1. ..."), expected / beklenen, actual / gerçekleşen,
-  severity / önem (critical|high|medium|low), data / veri, evidence / kanıt, repro / tekrar.
+  severity / önem (critical|high|medium|low), data / veri, evidence / kanıt, repro / tekrar,
+  confidence / güven (confirmed | seen once; doğrulandı | bir kez görüldü). A bug seen once stays a BUG.
+The time before a tag is optional: leave it out when you cannot read a clock; never invent it.
 tbs = percent of session time spent on Test design and execution / Bug investigation and reporting /
 Setup (environment, data, access). The three numbers must add up to 100. Estimate them at the end.
 opportunity = percent of time spent off-charter (worth doing, but not what the charter asked).
 Short session (under ~45 min): only "charter:" (one line) and "duration:" are required; the other
-header lines are optional. Write the notes as you test and do not reformat them; add a rough tbs at
-the end (aim for test >= 75). Spend the time probing, not on this sheet.
+header lines are optional. Write the notes as you test and do not reformat them. An agent leaves
+tbs and opportunity out instead of inventing numbers. Spend the budget probing, not on this sheet.
+Turkish keys: the official term for charter is "test başlatma belgesi"; "görev" and "charter" also work.
 Use test environments and synthetic data only (example.com addresses, fictional names).
 -->
 
@@ -48,6 +51,7 @@ build: <version or commit>
   expected: <requirement or oracle, e.g. REQ-001 says ...>
   actual: <what happened, verbatim>
   severity: <critical|high|medium|low>
+  confidence: <confirmed|seen once>
 10:30 QUESTION: <what a stakeholder must decide>
 10:40 ISSUE: <what slowed or blocked testing>
 10:50 IDEA: <test idea for later>
@@ -62,8 +66,8 @@ Outlook: what still needs doing (new charters)? Feelings: how do you feel about 
 ## Türkçe şablon
 
 oturum: S-002
-görev: <kaynaklar> kullanarak <hedef> alanını keşfet; amaç: <bilgi> bulmak
-test eden: <isim veya rol>
+test başlatma belgesi: <kaynaklar> kullanarak <hedef> alanını keşfet; amaç: <bilgi> bulmak
+test uzmanı: <isim veya rol>
 başlangıç: 2026-09-30 14:00
 süre: 90
 gereksinim: REQ-001
@@ -78,14 +82,15 @@ sürüm: <sürüm veya commit>
 14:05 KAPSAM: <neyi denediniz>
 14:15 HATA: <ne yanlış, nerede, hangi koşulda>
   adımlar: <adım 1>; <adım 2>
-  beklenen: <gereksinim veya kahin, ör. REQ-001 der ki ...>
+  beklenen: <gereksinim veya test sonucunu bilen (oracle), ör. REQ-001 der ki ...>
   gerçekleşen: <olan şey, aynen>
   önem: <critical|high|medium|low>
+  güven: <doğrulandı|bir kez görüldü>
 14:30 SORU: <paydaşın karar vermesi gereken konu>
 14:40 SORUN: <testi yavaşlatan veya engelleyen şey>
 14:50 FİKİR: <sonrası için test fikri>
 
-## Değerlendirme (PROOF) - test lideriyle doldurun
+## Bilgilendirme toplantısı (PROOF) - test lideriyle doldurun
 
 <!-- Past (Geçmiş): ne oldu? Results (Sonuçlar): ne bulundu ve kapsandı? Obstacles (Engeller): ne engel oldu?
-Outlook (Görünüm): geriye ne kaldı (yeni görevler)? Feelings (Hisler): ürün hakkında ne hissediyorsunuz? -->
+Outlook (Görünüm): geriye ne kaldı (yeni test başlatma belgeleri)? Feelings (Hisler): ürün hakkında ne hissediyorsunuz? -->

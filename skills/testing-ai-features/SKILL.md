@@ -4,12 +4,12 @@ description: Tests LLM and generative-AI features (chatbots, RAG, agents) with a
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Testing AI features
 
-**Status: experimental (no blind trial yet).** The scripts are covered by unit tests and demos; a blind trial is planned for 0.7.
+**Status: experimental.** One blind trial (0.7.0, Opus, 3 runs per arm) gave 65% with the skill and 59% without, and both arms missed the hard findings; it has not been re-trialled since (docs/EVALUATION.md §7). The scoring gate was hardened in 0.10.0.
 
 An LLM feature gives a different answer to the same question on different runs. It can be talked out of its instructions by a user or by a document it reads, and it fails in fluent, confident sentences. Classic "expected result equals actual result" testing is not enough. This skill makes AI features testable the same way as the rest of the product:
 - explicit, numeric acceptance thresholds;
@@ -114,12 +114,14 @@ python scripts/ai_eval.py score --cases qa/ai/evals.jsonl --outputs qa/ai/output
 ```
 - **Deterministic checks first.** They are cheap, repeatable and explainable: `contains`, `not_contains`, `regex`, `not_regex`, `max_chars`, `json_valid`, `json_keys`, `equals`, `one_of`, `refusal`, `no_pii`, `max_latency_ms`, `max_tokens` and `tool_not_called`. The `refusal` and `no_pii` checks are heuristics, so read their failures before you file defects.
 - **Pass rate per case** = passed runs / evaluated runs. A case is *flaky* when 0 < rate < 1. For a safety case that is a failure, not noise. For a quality case it shows how often users see the bad answer.
-- **The gate fails (exit 1)** when any of these holds:
+- **The gate is FAILED (exit 1)** when any of these holds:
   - the overall rate (the mean of the case rates) is below `--threshold`;
-  - any critical case failed in any run, or was not run;
+  - any critical case failed in any run;
   - a case with its own `min_pass_rate` is below it;
   - a latency or token budget is exceeded.
-- **Pending checks.** `rubric` and `human` checks are listed as "needs model/human grading" and excluded from the rate. A case whose only checks need judgement has no automatic verdict.
+- **The gate is INCOMPLETE (exit 1, never PASSED)** when nothing failed but evidence is missing: a case was not run or a check could not be evaluated, a case has fewer than `--min-runs` 3 (critical: `--min-runs-critical` 5) runs, a case is still `draft` (`--allow-draft`), or a case awaits grading (`--allow-pending`). Report INCOMPLETE as "not shown", not as "passed with remarks".
+- **Every rate has a 95% Wilson interval** (unit: the case). When the interval contains the threshold, the data cannot show that the true rate reaches it: say so, and add cases. `--gate-on lower` gates on the lower bound.
+- **Pending checks.** `rubric` and `human` checks are listed as "needs model/human grading". A case that passes its deterministic checks but still awaits grading is `passed_pending`: not a pass, in no rate, shown under Pending. A case whose only checks need judgement has no automatic verdict.
 - `--results` writes the verdicts to `qa/results.json` under the TC IDs, with `flaky` flags and pass-rate notes. A pass that still awaits grading is not written.
 
 ### 5. Grade the judgement checks

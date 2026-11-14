@@ -4,7 +4,7 @@ description: Turns QA Suite test cases into Playwright TypeScript automation tha
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.9.0"
+  version: "0.10.0"
 ---
 
 # Automating with Playwright
@@ -128,7 +128,7 @@ If the team wants Gherkin scenarios as the automation entry point, use the `writ
 ## Files
 - `scripts/scaffold_project.py`: project skeleton from `assets/template/`; never overwrites.
 - `scripts/generate_specs.py`: test-cases.json → traceable spec skeletons, idempotent, data-driven groups.
-- `scripts/check_automation.py`: static automation coverage (automated, skeleton, missing, orphan, duplicate); `--strict` for CI.
+- `scripts/check_automation.py`: static automation coverage (automated, skeleton, no assertion, missing, orphan, duplicate); a tagged test without `expect` is not counted as automated; `--strict` for CI.
 - `scripts/pw_results.py`: Playwright JSON report → `qa/results.json` (per TC, across projects, flaky, fixme).
 - `assets/template/`: `playwright.config.ts`, `package.json`, `tsconfig.json`, fixtures, auth setup, `BasePage`, CI workflow, `.env.example`, `.gitignore`.
 - `references/playwright-patterns.md`, `references/manual-to-automation.md`, `references/ci-and-reporting.md`.
