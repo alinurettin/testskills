@@ -223,6 +223,6 @@ Use this when defects are tracked outside Jira, or when a snapshot is exported f
 - **priority**: `critical`, `high`, `medium`, `low`
 - **test.polarity**: `positive`, `negative`
 - **test.category**: `functional`, `ui`, `api`, `integration`, `data`, `security`, `performance`, `accessibility`, `usability`, `compatibility`, `localization`, `reliability`
-- **test.technique**: `equivalence-partitioning`, `boundary-value-analysis`, `decision-table`, `state-transition`, `pairwise`, `classification-tree`, `use-case`, `scenario`, `crud`, `error-guessing`, `checklist`, `exploratory`, `requirements-based`
+- **test.technique**: `equivalence-partitioning`, `boundary-value-analysis`, `decision-table`, `state-transition`, `pairwise`, `classification-tree`, `use-case`, `scenario`, `crud`, `error-guessing`, `checklist`, `exploratory`, `requirements-based`, `metamorphic`, `domain`, `random`
 - **test.status**: `draft`, `ready`, `deprecated`
 - **result.status**: `passed`, `failed`, `blocked`, `not-run`, `skipped`

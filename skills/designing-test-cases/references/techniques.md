@@ -14,6 +14,8 @@ These techniques follow the ISTQB CTFL v4.0 and CTAL-TA v4.0 syllabi and ISO/IEC
 9. Error guessing and checklist-based testing
 10. Exploratory testing (session-based)
 11. Writing script specs from requirements
+12. Metamorphic testing and the test-oracle problem
+13. Domain and random testing
 
 ---
 
@@ -121,9 +123,12 @@ For each use case or end-to-end user goal:
 Scenarios also cover realistic journeys that cross features, such as "register → add to basket → apply coupon → pay → cancel".
 
 ## 7. CRUD testing
-Build a matrix of **entity × operation (Create, Read, Update, Delete) × role**. Mark each cell as allowed or forbidden.
-- Allowed cells: positive tests. Also verify that the data persists correctly and appears everywhere it should, such as lists, search, exports and audit logs.
-- Forbidden cells: negative tests through the UI **and** directly through the URL or API (authorisation bypass).
+CRUD testing (CTAL-TA v4.0 §3.2.1) checks the **life cycle of data entities across functions**. It is not a permission matrix: role × operation belongs to authorisation testing.
+1. Build a matrix of **function (rows) × entity (columns)** and write C, R, U or D in each cell where the function creates, reads, updates or deletes the entity.
+2. **Completeness check (static):** every entity needs at least one C, R, U and D somewhere. A missing letter is a finding or a question: data that is created but never deleted, or read but created nowhere.
+3. **Life-cycle tests:** for each entity, run C → R → U → R → D → R through the functions that own each letter, and check after every step that all reading functions (lists, search, exports, reports, audit log) show the same state.
+4. **Negatives:** read, update or delete before create and after delete; a second create of the same key; an update of a field that another function treats as read-only.
+- Authorisation (who may do which operation, through the UI **and** directly through the URL or API) is a separate matrix: see the security and API skills.
 - Also check the effects of Delete: linked data, soft versus hard delete, and whether a deleted item can still be reached by URL.
 
 ## 8. Classification tree
@@ -141,6 +146,27 @@ When the specification is thin or the risk is high, add **charters** as test cas
 - **To discover:** the information sought.
 
 Timebox each session, usually to 60–90 minutes. Charters are the only test cases allowed to have loose steps. Their expected result is "notes, defects and questions recorded".
+
+## 12. Metamorphic testing and the test-oracle problem
+Some outputs cannot be checked against an exact expected value: search ranking, recommendations, route or price optimisation, reports over large data, ML and LLM outputs. This is the **test-oracle problem** (CTAL-TA v4.0 §1.3.4). Options, in order of preference: a specified exact result; a second independent implementation or the previous version (back-to-back); a partial oracle (properties that must always hold); a **metamorphic relation**.
+
+Metamorphic testing (CTAL-TA v4.0 §3.3.2): run a source test, change the input in a known way, and check the **relation between the two outputs** instead of each output.
+
+| Relation | Follow-up input | Outputs must |
+|---|---|---|
+| Permutation | same items in another order | be the same set, total or ranking |
+| Add irrelevant data | add a record the filter excludes | not change |
+| Narrowing | add a filter or a more specific query | be a subset of the source result |
+| Scaling | multiply quantity or change currency/unit | scale by the same factor (within rounding rules) |
+| Round trip | export then import, encode then decode | equal the original |
+| Equivalent form | same request in another language, casing or spelling (İ/I, ASCII Turkish) | have the same meaning or verdict |
+| Monotonicity | increase one input (amount, risk) | not move the other way (fee, limit) |
+
+Write each as one test case with technique `metamorphic` (`tech: mt`): steps = source input, follow-up input; expected = the relation. Coverage = relations exercised ÷ relations identified. A violated relation is a defect even though no exact expected value exists.
+
+## 13. Domain and random testing
+- **Domain testing** (CTAL-TA v4.0 §3.1.1) generalises EP and BVA to several interacting variables: a rule such as `amount <= limit - used` is a border in two dimensions. Test an ON point (on the border) and an OFF point (the closest value on the other side) for each border, and keep the other variables at typical IN values so one border is tested at a time. `ep_bva.py` labels ON/OFF/IN/OUT points; use technique `domain` (`tech: dom`).
+- **Random testing** (CTAL-TA v4.0 §3.1.3): draw inputs from the operational profile with a fixed seed, and use a partial oracle or metamorphic relation to judge them. It complements, never replaces, the systematic techniques; record the seed so a failure can be repeated. Technique `random` (`tech: rnd`).
 
 ## 11. Writing script specs from requirements
 - Save each spec as `qa/design/DS-###-<short-name>.json`. Set `requirement_ids` and `language`.

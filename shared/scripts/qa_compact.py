@@ -62,7 +62,7 @@ POL = {"+": "positive", "-": "negative", "−": "negative", "positive": "positiv
 TECH = {"ep": "equivalence-partitioning", "bva": "boundary-value-analysis", "dt": "decision-table",
         "st": "state-transition", "pw": "pairwise", "ct": "classification-tree", "uc": "use-case",
         "sc": "scenario", "crud": "crud", "eg": "error-guessing", "cl": "checklist", "ex": "exploratory",
-        "rb": "requirements-based"}
+        "rb": "requirements-based", "mt": "metamorphic", "dom": "domain", "rnd": "random"}
 TECH_FULL = set(TECH.values())
 REQ_STATUS = {"cn": "clarification-needed", "draft": "draft", "ready": "ready", "deferred": "deferred",
               "deprecated": "deprecated", "clarification-needed": "clarification-needed"}
