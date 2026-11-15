@@ -829,6 +829,30 @@ def reconcile(a) -> dict:
 
     missing = [k for k, v in src.items() if v is not MATCHED]
     del src
+    # ---- rejects: source rows = loaded rows + rejected rows. A missing key that the load rejected with a
+    # reason is explained (still listed, by reason); a reject that was loaded anyway or is not in the source is a finding.
+    rejects = None
+    if getattr(a, "rejects", None):
+        with open(a.rejects, encoding="utf-8-sig", newline="") as fh:
+            sample = fh.readline()
+            fh.seek(0)
+            rd = csv.DictReader(fh, delimiter=max([",", ";", "\t", "|"], key=sample.count))
+            rrows = list(rd)
+            rcols = rd.fieldnames or []
+        kcols = [k for k in keys if k in rcols] or rcols[:len(keys)]
+        reason_col = next((c for c in rcols if c.lower() in ("reason", "reject_reason", "neden", "red_nedeni", "hata")), None)
+        rej = {tuple((r.get(c) or "").strip() for c in kcols): (r.get(reason_col) or "").strip() if reason_col else ""
+               for r in rrows}
+        as_tuple = lambda k: k if isinstance(k, tuple) else (str(k),)
+        miss_set = {as_tuple(k) for k in missing}
+        explained = sorted(k for k in rej if k in miss_set)
+        by_reason: dict = {}
+        for k in explained:
+            by_reason[rej[k] or "(no reason given)"] = by_reason.get(rej[k] or "(no reason given)", 0) + 1
+        rejects = {"file": Path(a.rejects).name, "rows": len(rej), "explained_missing": len(explained),
+                   "by_reason": by_reason, "no_reason": sum(1 for k in explained if not rej[k]),
+                   "not_missing": [" | ".join(k) for k in sorted(rej) if k not in miss_set][:20]}
+        missing = [k for k in missing if as_tuple(k) not in set(explained)]
 
     # ---- raw source values for the examples (second, cheap pass over the source)
     need = {ex["key"] for st in colstat.values() for ex in st["examples"]}
@@ -919,6 +943,7 @@ def reconcile(a) -> dict:
         "duplicates": {"source": {"count": len(f_dup_s), "keys": lim(f_dup_s), "occurrences": {keystr(k): dup_s[k] for k in f_dup_s[: a.max_examples]}},
                        "target": {"count": len(f_dup_t), "keys": lim(f_dup_t), "occurrences": {keystr(k): dup_t[k] for k in f_dup_t[: a.max_examples]}}},
         "missing_in_target": {"count": len(f_missing), "keys": lim(f_missing)},
+        "rejects": rejects,
         "unexpected_in_target": {"count": len(f_unexp), "keys": lim(f_unexp), "near_matches": near},
         "columns": {c: {"rule": plan[c]["rule"], "source": " + ".join(plan[c]["needs"]), "numeric": plan[c]["numeric"],
                         **{k: v for k, v in colstat[c].items()}, "mismatch_keys": mism_keys[c][: a.max_examples]} for c in cols},
@@ -1366,6 +1391,16 @@ def render(res: dict) -> str:
     L += keylist(t["dup_s"], res["duplicates"]["source"], res["duplicates"]["source"]["occurrences"])
     L += keylist(t["dup_t"], res["duplicates"]["target"], res["duplicates"]["target"]["occurrences"])
     L += keylist(t["missing"], res["missing_in_target"])
+    rj = res.get("rejects")
+    if rj:
+        L += ["", f"### Rejects ({rj['file']})",
+              f"- {rj['rows']} rejected key(s); {rj['explained_missing']} explain keys missing in the target: " +
+              (", ".join(f"{k}: {v}" for k, v in sorted(rj["by_reason"].items())) or "none"),
+              "- Balance: source rows = matched + rejected + missing above. Keys still listed as missing were neither loaded nor rejected."]
+        if rj["no_reason"]:
+            L.append(f"- ⚠ {rj['no_reason']} reject(s) have no reason: a reject without a reason cannot be signed off.")
+        if rj["not_missing"]:
+            L.append(f"- ⚠ rejected but present in the target, or not in the source: {', '.join(rj['not_missing'])}")
     L += keylist(t["unexp"], res["unexpected_in_target"])
     if res["unexpected_in_target"]["near_matches"]:
         L += ["", t["key_hint"].format(n=res["unexpected_in_target"]["near_matches"], m=res["unexpected_in_target"]["near_matches"])]
@@ -1424,6 +1459,8 @@ def main() -> int:
     ap.add_argument("--delimiter", default=",", help="CSV delimiter for both files (default ,)")
     ap.add_argument("--delimiter-source", help="override the delimiter for the source file (e.g. ';')")
     ap.add_argument("--delimiter-target", help="override the delimiter for the target file")
+    ap.add_argument("--rejects", help="CSV of rejected rows (key column(s) + optional reason): missing keys found "
+                                        "there are reported as rejected by reason instead of missing")
     ap.add_argument("--max-examples", type=int, default=20, help="examples/keys listed per finding (default 20)")
     ap.add_argument("--lang", choices=("tr", "en"), default="en")
     ap.add_argument("--out", help="Markdown report path (required to run the reconciliation)")

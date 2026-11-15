@@ -228,6 +228,25 @@ class TruncationHintTests(unittest.TestCase):
             self.assertIn("truncated at 16 characters", (t / "r.md").read_text(encoding="utf-8"))
 
 
+class RejectsBalanceTests(unittest.TestCase):
+    def test_rejects_explain_missing_keys(self):
+        nl = chr(10)
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            (t / "s.csv").write_text(nl.join(["id,ad", "1,A", "2,B", "3,C", "4,D", ""]), encoding="utf-8")
+            (t / "t.csv").write_text(nl.join(["id,ad", "1,A", ""]), encoding="utf-8")
+            (t / "r.csv").write_text(nl.join(["id,reason", "2,invalid IBAN", "3,", "9,dup", ""]), encoding="utf-8")
+            js = t / "o.json"
+            r = run(SK / "testing-data-migrations/scripts/reconcile.py", "--source", t / "s.csv", "--target", t / "t.csv",
+                    "--key", "id", "--rejects", t / "r.csv", "--out", t / "o.md", "--json", js)
+            res = json.loads(js.read_text(encoding="utf-8"))
+            self.assertEqual(r.returncode, 1)                       # key 4 was neither loaded nor rejected
+            self.assertEqual(res["missing_in_target"]["count"], 1)
+            self.assertEqual(res["rejects"]["explained_missing"], 2)
+            self.assertEqual(res["rejects"]["no_reason"], 1)
+            self.assertEqual(res["rejects"]["not_missing"], ["9"])
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))
