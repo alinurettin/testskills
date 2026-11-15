@@ -48,6 +48,7 @@ If the user only has a spreadsheet or a list, convert it into these files first.
    | UNCONFIRMED | a derived requirement is still unconfirmed | Get stakeholder confirmation, or drop it |
    | OPEN_QUESTIONS | tested on assumptions | Chase the answers. Revisit the tests once they arrive. |
    | FAILED | a linked test failed | Check the defect link. The requirement is not satisfied. |
+   | DRAFT_ONLY | covered only by `draft` tests | Have a person review the tests; coverage by unreviewed tests is a plan, not evidence |
    | READY_ON_ASSUMPTION | a requirement or its tests are `ready` while questions are open or a derived requirement is unconfirmed | Set them back to `draft`, or get the answer and record who confirmed |
    | ORPHAN | a test has no requirement | Link it, tag it `exploratory`, or deprecate it |
    | DUPLICATE | identical preconditions, steps and data | Keep one, deprecate the rest, and union their links |

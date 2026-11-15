@@ -220,7 +220,7 @@ class RtmGapTests(unittest.TestCase):
             mapped = self.rtm(Path(d), "--req-map", m)
             self.assertIn(("REQ-110", "THIN"), mapped)          # high risk, one happy-path test
             self.assertIn(("REQ-110", "NO_NEGATIVE"), mapped)   # functional, no negative test
-            self.assertFalse({g for g in mapped if g[0] == "REQ-111"})
+            self.assertFalse({g for g in mapped if g[0] == "REQ-111" and g[1] != "DRAFT_ONLY"})  # generated tests are drafts until reviewed
 
 
 class MobileReqMapTests(unittest.TestCase):

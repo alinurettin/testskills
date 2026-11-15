@@ -264,6 +264,18 @@ class AgentToolCheckTests(unittest.TestCase):
         self.assertEqual(m.run_check({"type": "tool_order", "value": ["x"]}, {"output": "ok"})[0], "na")  # not recorded: never a pass
 
 
+class VerifiedCoverageTests(unittest.TestCase):
+    def test_verified_coverage_and_draft_only(self):
+        fix = ROOT / "tests" / "fixtures" / "coupon"
+        with tempfile.TemporaryDirectory() as t:
+            run(SK / "tracing-requirements/scripts/build_rtm.py", "--requirements", fix / "requirements.json", "--tests",
+                fix / "test-cases.json", "--results", fix / "results.json", "--out-dir", t)
+            md = (Path(t) / "rtm.md").read_text(encoding="utf-8")
+            self.assertRegex(md, r"(Verified|Doğrulanan)[^
+]*: 1 / 5")
+            self.assertIn("DRAFT_ONLY", md)
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

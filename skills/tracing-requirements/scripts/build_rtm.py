@@ -48,12 +48,13 @@ L = {
         "req": "Requirement", "src": "Source", "title_c": "Title", "risk": "Risk", "prio": "Priority", "status": "Status",
         "tests": "Tests", "pos": "Pos", "neg": "Neg", "tech": "Techniques", "exec": "Execution", "defects": "Defects",
         "cov": "Coverage", "none": "none", "ok": "No problems found.",
-        "m_reqs": "Requirements in scope", "m_cov": "Covered by ≥1 active test", "m_neg": "Functional reqs with a negative test",
+        "m_reqs": "Requirements in scope", "m_cov": "Covered by ≥1 active test", "m_ver": "Verified (every linked test passed)", "m_neg": "Functional reqs with a negative test",
         "m_tests": "Active tests", "m_orph": "Orphan tests", "m_exec": "Execution", "m_def": "Linked defects",
         "m_tech": "Tests by technique", "m_prio": "Tests by priority", "excluded": "excluded: deferred/deprecated",
         "g": {"UNCOVERED": "no active test", "NO_NEGATIVE": "no negative test for a functional rule",
               "THIN": "high/critical risk covered by a single test", "UNCONFIRMED": "derived requirement not yet confirmed",
               "OPEN_QUESTIONS": "tested on assumptions (open questions)",
+              "DRAFT_ONLY": "covered only by draft tests: nobody has reviewed them yet",
               "READY_ON_ASSUMPTION": "marked ready although it rests on open questions or an unconfirmed derived requirement: a person must confirm first", "FAILED": "linked test failed",
               "NOT_RUN": "tests not executed"},
         "affected": "Tests to review/re-run for changed requirements",
@@ -70,12 +71,13 @@ L = {
         "req": "Gereksinim", "src": "Kaynak", "title_c": "Başlık", "risk": "Risk", "prio": "Öncelik", "status": "Durum",
         "tests": "Testler", "pos": "Poz", "neg": "Neg", "tech": "Teknikler", "exec": "Koşum", "defects": "Hatalar",
         "cov": "Kapsam", "none": "yok", "ok": "Sorun bulunmadı.",
-        "m_reqs": "Kapsamdaki gereksinimler", "m_cov": "En az 1 aktif testle kapsanan", "m_neg": "Negatif testi olan fonksiyonel gereksinim",
+        "m_reqs": "Kapsamdaki gereksinimler", "m_cov": "En az 1 aktif testle kapsanan", "m_ver": "Doğrulanan (bağlı testlerin hepsi geçti)", "m_neg": "Negatif testi olan fonksiyonel gereksinim",
         "m_tests": "Aktif testler", "m_orph": "Sahipsiz testler", "m_exec": "Koşum", "m_def": "Bağlı hatalar",
         "m_tech": "Tekniğe göre testler", "m_prio": "Önceliğe göre testler", "excluded": "hariç: ertelenen/kullanımdan kalkan",
         "g": {"UNCOVERED": "aktif test yok", "NO_NEGATIVE": "fonksiyonel kural için negatif test yok",
               "THIN": "yüksek/kritik risk tek bir testle kapsanıyor", "UNCONFIRMED": "türetilmiş gereksinim henüz onaylanmadı",
               "OPEN_QUESTIONS": "varsayımlarla test ediliyor (açık sorular)",
+              "DRAFT_ONLY": "yalnızca taslak testlerle kapsanıyor: henüz kimse incelemedi",
               "READY_ON_ASSUMPTION": "açık soruya ya da onaylanmamış türetilmiş gereksinime dayandığı halde hazır işaretli: önce bir kişi onaylamalı", "FAILED": "bağlı test başarısız",
               "NOT_RUN": "testler koşulmadı"},
         "affected": "Değişen gereksinimler için gözden geçirilecek/yeniden koşulacak testler",
@@ -264,6 +266,8 @@ def build(reqs: list, tests: list, results: dict, changed: list[str]):
             g.append("UNCONFIRMED")
         if r.get("questions") and r.get("status") == "clarification-needed":
             g.append("OPEN_QUESTIONS")
+        if ts and all(t.get("status", "draft") == "draft" for t in ts):
+            g.append("DRAFT_ONLY")
         shaky = bool(r.get("questions")) or (r.get("derived") and r.get("status") != "ready")
         if shaky and ((r.get("questions") and r.get("status") == "ready") or any(t.get("status") == "ready" for t in ts)):
             g.append("READY_ON_ASSUMPTION")
@@ -286,6 +290,9 @@ def build(reqs: list, tests: list, results: dict, changed: list[str]):
         "requirements_total": len(reqs), "requirements_in_scope": len(in_scope),
         "requirements_covered": len(covered),
         "coverage_pct": round(100 * len(covered) / len(in_scope), 1) if in_scope else 0.0,
+        # designed coverage says a test exists; verified coverage says every linked test has passed
+        "requirements_verified": sum(1 for r in rows if r["execution"] == "passed" and r["status"] not in ("deferred", "deprecated")),
+        "verified_pct": round(100 * sum(1 for r in rows if r["execution"] == "passed" and r["status"] not in ("deferred", "deprecated")) / len(in_scope), 1) if in_scope else 0.0,
         "functional_with_negative": sum(1 for r in functional if r["negative"] > 0),
         "functional_total": len(functional),
         "tests_active": len(active), "tests_deprecated": len(tests) - len(active),
@@ -315,6 +322,7 @@ def to_md(rep: dict, errors: list, warnings: list, lang: str, project: str) -> s
     o = [f"# {t['title']}" + (f": {project}" if project else ""), "", f"## {t['summary']}", ""]
     o.append(f"- {t['m_reqs']}: {m['requirements_in_scope']} / {m['requirements_total']} ({t['excluded']})")
     o.append(f"- {t['m_cov']}: {m['requirements_covered']} / {m['requirements_in_scope']} (**{m['coverage_pct']}%**)")
+    o.append(f"- {t['m_ver']}: {m['requirements_verified']} / {m['requirements_in_scope']} (**{m['verified_pct']}%**)")
     o.append(f"- {t['m_neg']}: {m['functional_with_negative']} / {m['functional_total']}")
     o.append(f"- {t['m_tests']}: {m['tests_active']} (+{m['tests_deprecated']} {t['depr']}) · "
              f"{', '.join(f'{k}: {v}' for k, v in m['by_polarity'].items())}")
