@@ -173,6 +173,30 @@ class AsvsLevelTests(unittest.TestCase):
                 self.assertIn(topic, out["L2"])
 
 
+class ReadyOnAssumptionTests(unittest.TestCase):
+    def test_gap_is_reported(self):
+        req = {"requirements": [
+            {"id": "REQ-001", "title": "a", "text": "a", "type": "functional", "source": "s", "priority": "high",
+             "status": "ready", "derived": False, "questions": ["Q-001"]},
+            {"id": "REQ-002", "title": "b", "text": "b", "type": "functional", "source": "s", "priority": "high",
+             "status": "ready", "derived": False}]}
+        step = [{"action": "a", "expected": "b"}]
+        tc = {"test_cases": [
+            {"id": "TC-001", "title": "t1", "requirement_ids": ["REQ-001"], "priority": "high", "polarity": "positive",
+             "technique": "checklist", "steps": step, "status": "ready"},
+            {"id": "TC-002", "title": "t2", "requirement_ids": ["REQ-002"], "priority": "high", "polarity": "positive",
+             "technique": "checklist", "steps": step, "status": "ready"}]}
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            (t / "r.json").write_text(json.dumps(req), encoding="utf-8")
+            (t / "t.json").write_text(json.dumps(tc), encoding="utf-8")
+            run(SK / "tracing-requirements/scripts/build_rtm.py", "--requirements", t / "r.json", "--tests", t / "t.json", "--out-dir", t)
+            md = (t / "rtm.md").read_text(encoding="utf-8")
+            lines = [x for x in md.splitlines() if "READY_ON_ASSUMPTION" in x]
+            self.assertTrue(any("REQ-001" in x for x in lines))
+            self.assertFalse(any("REQ-002" in x for x in lines))
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

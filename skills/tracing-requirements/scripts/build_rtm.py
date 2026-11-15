@@ -53,7 +53,8 @@ L = {
         "m_tech": "Tests by technique", "m_prio": "Tests by priority", "excluded": "excluded: deferred/deprecated",
         "g": {"UNCOVERED": "no active test", "NO_NEGATIVE": "no negative test for a functional rule",
               "THIN": "high/critical risk covered by a single test", "UNCONFIRMED": "derived requirement not yet confirmed",
-              "OPEN_QUESTIONS": "tested on assumptions (open questions)", "FAILED": "linked test failed",
+              "OPEN_QUESTIONS": "tested on assumptions (open questions)",
+              "READY_ON_ASSUMPTION": "marked ready although it rests on open questions or an unconfirmed derived requirement: a person must confirm first", "FAILED": "linked test failed",
               "NOT_RUN": "tests not executed"},
         "affected": "Tests to review/re-run for changed requirements",
         "orphan": "test without requirement", "dup": "identical preconditions/steps/data",
@@ -74,7 +75,8 @@ L = {
         "m_tech": "Tekniğe göre testler", "m_prio": "Önceliğe göre testler", "excluded": "hariç: ertelenen/kullanımdan kalkan",
         "g": {"UNCOVERED": "aktif test yok", "NO_NEGATIVE": "fonksiyonel kural için negatif test yok",
               "THIN": "yüksek/kritik risk tek bir testle kapsanıyor", "UNCONFIRMED": "türetilmiş gereksinim henüz onaylanmadı",
-              "OPEN_QUESTIONS": "varsayımlarla test ediliyor (açık sorular)", "FAILED": "bağlı test başarısız",
+              "OPEN_QUESTIONS": "varsayımlarla test ediliyor (açık sorular)",
+              "READY_ON_ASSUMPTION": "açık soruya ya da onaylanmamış türetilmiş gereksinime dayandığı halde hazır işaretli: önce bir kişi onaylamalı", "FAILED": "bağlı test başarısız",
               "NOT_RUN": "testler koşulmadı"},
         "affected": "Değişen gereksinimler için gözden geçirilecek/yeniden koşulacak testler",
         "orphan": "gereksinime bağlı olmayan test", "dup": "ön koşul/adım/veri birebir aynı",
@@ -262,6 +264,9 @@ def build(reqs: list, tests: list, results: dict, changed: list[str]):
             g.append("UNCONFIRMED")
         if r.get("questions") and r.get("status") == "clarification-needed":
             g.append("OPEN_QUESTIONS")
+        shaky = bool(r.get("questions")) or (r.get("derived") and r.get("status") != "ready")
+        if shaky and ((r.get("questions") and r.get("status") == "ready") or any(t.get("status") == "ready" for t in ts)):
+            g.append("READY_ON_ASSUMPTION")
         for code in g:
             gaps.append({"id": rid, "code": code, "risk_score": score, "risk_level": level})
     gaps.sort(key=lambda g: (-g["risk_score"], g["id"], g["code"]))
