@@ -170,6 +170,7 @@ If test cases come next, continue with the `designing-test-cases` skill.
 ## Files
 
 - `scripts/qa_compact.py`: compact text ⇄ JSON (`req` / `tc`), with validation and merging.
+- `scripts/check_sources.py`: checks that each requirement's wording and numbers occur in the source documents (SUPPORTED / WEAK / NOT_FOUND / DERIVED), so an invented requirement is caught or marked `derived`. Run it after writing `requirements.json`: `python scripts/check_sources.py qa/requirements.json <source files>`.
 - `scripts/lint_requirements.py`: heuristic TR/EN linter, output as Markdown or JSON.
 - `references/quality-criteria.md`: 29148 characteristics, writing rules, severity guide, contradiction scan.
 - `references/implicit-requirements.md`: discovery questions by area, and domain packs.

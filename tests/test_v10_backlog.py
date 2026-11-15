@@ -197,6 +197,37 @@ class ReadyOnAssumptionTests(unittest.TestCase):
             self.assertFalse(any("REQ-002" in x for x in lines))
 
 
+class SourceCheckTests(unittest.TestCase):
+    def test_verdicts(self):
+        reqs = {"requirements": [
+            {"id": "REQ-001", "text": "Kupon sepet tutarı 100 TL ve üzerindeyse uygulanır."},
+            {"id": "REQ-002", "text": "Kupon sepet tutarı 250 TL ve üzerindeyse uygulanır."},
+            {"id": "REQ-003", "text": "Sistem haftalık rapor e-postası gönderir.", "derived": True},
+            {"id": "REQ-004", "text": "Yönetici panelinde grafik gösterilir ve dışa aktarılır."}]}
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            (t / "r.json").write_text(json.dumps(reqs, ensure_ascii=False), encoding="utf-8")
+            (t / "s.md").write_text("Kayıtlı kullanıcı sepet tutarı 100 TL ve üzerindeyse kupon uygulanır.", encoding="utf-8")
+            r = run(SK / "analyzing-requirements/scripts/check_sources.py", t / "r.json", t / "s.md", "--out", t / "o.md")
+            md = (t / "o.md").read_text(encoding="utf-8")
+            self.assertEqual(r.returncode, 1)
+            self.assertIn("| REQ-001 | SUPPORTED", md)
+            self.assertIn("| REQ-002 | NOT_FOUND", md)   # the number 250 is nowhere in the source
+            self.assertIn("| REQ-003 | DERIVED", md)
+            self.assertIn("| REQ-004 | NOT_FOUND", md)   # wording has no support
+
+
+class TruncationHintTests(unittest.TestCase):
+    def test_truncated_text_is_named(self):
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            (t / "s.csv").write_text("id,ad" + chr(10) + "1,Abdurrahman Gazi Yilmazoglu" + chr(10), encoding="utf-8")
+            (t / "t.csv").write_text("id,ad" + chr(10) + "1,Abdurrahman Gazi" + chr(10), encoding="utf-8")
+            run(SK / "testing-data-migrations/scripts/reconcile.py", "--source", t / "s.csv", "--target", t / "t.csv",
+                "--key", "id", "--out", t / "r.md")
+            self.assertIn("truncated at 16 characters", (t / "r.md").read_text(encoding="utf-8"))
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

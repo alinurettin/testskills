@@ -15,6 +15,7 @@
 12. Sign-off criteria (template)
 13. reconcile.py: how it works and its limits
 14. Reconciliation checks as test cases (REQ → TC → results → RTM)
+15. ETL and warehouse loads: history, deltas, late data, parallel run
 
 ---
 
@@ -232,3 +233,15 @@ A reconciliation report on its own never reaches the RTM or the completion repor
 - **Privacy.** `results.json` goes into repositories and reports. Its entries therefore carry keys, counts, totals and hints only, never field values. The values stay in the Markdown report inside the secure zone (§10).
 - **Stable IDs.** A check keeps its TC ID across regenerations: through the `# reconcile-tc-map:` header line of the generated file, and through the `design_ref` `reconcile:<object>:<check>` in `qa/test-cases.json`. Use the same `--object` for design and run, one per migration object. A check that disappears (a column removed from the mapping, a dropped `--sum`) stays as a `deprecated` test case, so that its ID is never reused.
 - **What is not covered.** These test cases cover reconciliation levels 1–4 of one entity. Referential integrity, business rules, reject handling (negative cases), rehearsal timing and application-level regression still need their own test cases.
+
+## 15. ETL and warehouse loads: history, deltas, late data, parallel run
+One-off migrations compare a snapshot. Recurring loads need checks over time.
+
+| Topic | Checks (each is a test case with a query as evidence) |
+|---|---|
+| **History (slowly changing dimension type 2)** | Per business key exactly one current row (`is_current` or open end date). Validity intervals do not overlap and have no gaps. A change in a tracked attribute closes the old row and opens a new one with the load date; a change in an untracked attribute updates in place. Re-running the same load creates no new version. Facts join to the version valid on the fact date, not to the current one. |
+| **Delta / change data capture** | Inserts, updates and deletes in the source each arrive once in the target. The high-water mark advances only after a successful load. A row changed twice between loads ends with its last state. A deleted source row is closed or flagged, not left active. A re-run of the same window is idempotent: counts and totals do not change. |
+| **Late and out-of-order data** | A record that arrives after its period was loaded lands in the right period (and the aggregate is corrected). A fact that arrives before its dimension row gets a placeholder key and is repaired when the dimension arrives. Events with equal timestamps keep a defined order. |
+| **Rejects** | Source rows = loaded rows + rejected rows, per load and per reason. Every reject has a reason code and can be reprocessed. A reject rate above the agreed limit stops the load. |
+| **Parallel run** | Old and new pipelines run on the same inputs for an agreed number of cycles, including a month end. Compare outputs per cycle with `reconcile.py`; every difference is explained (defect in new, defect in old, or accepted change) before the old pipeline is switched off. |
+| **Time** | Timestamps are compared in one time zone; a load around midnight and around a daylight-saving change puts rows into the right business day. |

@@ -121,7 +121,7 @@ T = {
             "Missing/unexpected/duplicate keys: **load defect** (rejects, filters, non-idempotent rerun) or a **scope gap** in the spec (test/closed records).",
             "Control-total differences without row-level findings: suspect the comparison scope or a totals query; with row findings they are the consequence, file the row-level cause."],
         "legend": "∅ = empty. Values are shown exactly; the comparison is exact for text and within tolerance {tol} for numbers.",
-        "h_srcbad": "source not transformable: {msg}", "h_lost": "value lost (empty in target)",
+        "h_srcbad": "source not transformable: {msg}", "h_lost": "value lost (empty in target)", "h_trunc": "truncated at {n} characters (target column too short?)",
         "h_extra": "value present where empty expected", "h_x100": "×100: decimal separator lost",
         "h_d100": "÷100: decimal separator misplaced", "h_sign": "sign flipped", "h_round": "small difference ({d}): rounding if the source has more decimals, otherwise precision loss/truncation (float?)",
         "h_moj": "encoding: {good} text decoded as {bad} (mojibake)", "h_moj_src": "source read with the wrong encoding? ({good} as {bad}) - check --encoding-source",
@@ -162,7 +162,7 @@ T = {
             "Eksik/beklenmeyen/mükerrer anahtar: **yükleme hatası** (reddedilen kayıt, filtre, idempotent olmayan tekrar çalıştırma) ya da spesifikasyonda **kapsam boşluğu** (test/kapalı kayıtlar).",
             "Satır bulgusu olmadan kontrol toplamı farkı: karşılaştırma kapsamından veya toplam sorgusundan şüphelenin; satır bulgusu varsa fark onun sonucudur, satır düzeyindeki nedeni raporlayın."],
         "legend": "∅ = boş. Değerler olduğu gibi gösterilir; metin tam eşitlikle, sayılar {tol} toleransla karşılaştırılır.",
-        "h_srcbad": "kaynak dönüştürülemedi: {msg}", "h_lost": "değer kaybolmuş (hedefte boş)",
+        "h_srcbad": "kaynak dönüştürülemedi: {msg}", "h_lost": "değer kaybolmuş (hedefte boş)", "h_trunc": "{n}. karakterde kesilmiş (hedef kolon kısa mı?)",
         "h_extra": "boş beklenirken değer var", "h_x100": "×100: ondalık ayracı kaybolmuş",
         "h_d100": "÷100: ondalık ayracı kaymış", "h_sign": "işaret ters", "h_round": "küçük fark ({d}): kaynakta fazla ondalık varsa yuvarlama, yoksa hassasiyet kaybı/kesme (float?)",
         "h_moj": "kodlama: {good} metin {bad} olarak okunmuş (bozuk karakter)", "h_moj_src": "kaynak yanlış kodlamayla mı okundu? ({good} → {bad}) - --encoding-source kontrol edin",
@@ -475,6 +475,9 @@ def diagnose(expected: str, target: str, numeric: bool, t: dict, codes: frozense
         return t["h_lost"]
     if expected == "" and target.strip() != "":
         return t["h_extra"]
+    if not numeric and isinstance(expected, str) and len(target) >= 3 and len(target) < len(expected) \
+            and expected.startswith(target):
+        return t["h_trunc"].format(n=len(target))
     if numeric:
         try:
             e, v = parse_decimal(expected), parse_decimal(target)
