@@ -275,6 +275,17 @@ class VerifiedCoverageTests(unittest.TestCase):
             self.assertIn("DRAFT_ONLY", md)
 
 
+class MassAssignmentProbeTests(unittest.TestCase):
+    def test_probe_is_generated_only_with_flag(self):
+        doc = ROOT / "evals" / "trial-api" / "api" / "openapi.json"
+        with tempfile.TemporaryDirectory() as d:
+            for flag, expect in ((None, False), ("--security-probes", True)):
+                args = [doc, "--req", "REQ-1", "--out", Path(d) / "o.md", "--spec-out", Path(d) / "o.ts"] + ([flag] if flag else [])
+                self.assertEqual(run(SK / "testing-apis/scripts/openapi_tests.py", *args).returncode, 0)
+                ts = (Path(d) / "o.ts").read_text(encoding="utf-8")
+                self.assertEqual("mass assignment" in ts and "qa-injected" in ts, expect)
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

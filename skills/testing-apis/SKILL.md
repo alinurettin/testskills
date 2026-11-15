@@ -69,7 +69,7 @@ The script produces, per operation:
 - an invalid-pattern value for strings with a `pattern`;
 - a BOLA test when the operation is secured and takes an ID. When a `POST` on the collection returns an `id`, the test creates the resource with user A and reads it with user B, so it runs without manual data (it is skipped until `API_TOKEN_OTHER` is set). Otherwise it is a skeleton (`test.fixme`).
 - a body-level BOLA skeleton for ID fields in the request body (for example `fromAccountId`);
-- with `--security-probes` (test environments only): one SQL-injection and one XSS probe per operation over all free-text string fields. They pass when the API answers 2xx/4xx without a 5xx, a leaked database/stack error, or the script echoed unescaped in an HTML response. They are a smoke check, not a penetration test;
+- with `--security-probes` (test environments only): one SQL-injection and one XSS probe per operation over all free-text string fields. They pass when the API answers 2xx/4xx without a 5xx, a leaked database/stack error, or the script echoed unescaped in an HTML response. It also adds one mass-assignment probe per write operation: read-only fields and `role`/`isAdmin`/`status` are sent, and the test fails if a 2xx response echoes them. Check afterwards with a GET that nothing was stored. They are a smoke check, not a penetration test;
 - `GET` by ID creates its resource first when possible, instead of trusting example IDs;
 - negative tests also check the documented error-body schema. It requests the example resource with the second user's token (`as: 'other'` → `API_TOKEN_OTHER`). Confirm that the example ID belongs to the `API_TOKEN` user, then delete the `fixme` line.
 

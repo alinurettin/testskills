@@ -314,7 +314,7 @@ def main() -> int:
     ap.add_argument("--lang", choices=["tr", "en"], default="en")
     ap.add_argument("--only-tag", help="only operations with this OpenAPI tag")
     ap.add_argument("--security-probes", action="store_true",
-                    help="add SQL-injection and XSS probe tests for free-text body fields (test environments only)")
+                    help="add SQL-injection, XSS and mass-assignment probe tests (test environments only)")
     ap.add_argument("--out", required=True, help="compact test cases (.src.md)")
     ap.add_argument("--spec-out", dest="spec_out", help="Playwright API spec (.spec.ts) with the same TC IDs")
     sys.stdout.reconfigure(encoding="utf-8")
@@ -621,6 +621,27 @@ def main() -> int:
             # optional DAST-lite probes: one SQLi and one XSS test per operation over all free-text string fields
             free = [f for f, v in (synthesis_view(body_schema).get("properties") or {}).items()
                     if v.get("type") == "string" and not v.get("readOnly") and not any(k in v for k in ("enum", "format", "pattern"))]
+            if a.security_probes and isinstance(body, dict) and M in ("POST", "PUT", "PATCH"):
+                # mass assignment (OWASP API3:2023 BOPLA): fields the client must not set are sent anyway
+                props_ma = (body_schema or {}).get("properties") or {}
+                extra = {k: "qa-injected" for k, v in props_ma.items() if v.get("readOnly")}
+                extra.update({k: v for k, v in {"role": "admin", "isAdmin": True, "status": "qa-injected"}.items()
+                              if k not in body})
+                b2 = {**body, **extra}
+                title = (f"{M} {path} istemcinin ayarlamaması gereken alanları yok sayar veya reddeder (mass assignment)" if a.lang == "tr"
+                         else f"{M} {path} ignores or rejects fields the client must not set (mass assignment)")
+                exp = ("HTTP 4xx, ya da 2xx ve enjekte edilen değerler yanıtta yok" if a.lang == "tr"
+                       else "HTTP 4xx, or 2xx and the injected values are absent from the response")
+                tid = add(title, "h", "-", "eg", [(t["step_send"].format(m=M, p=path), b2, exp)], ["api", "security", "mass-assignment", tag])
+                spec += [f"  test({ts(tid + ' ' + title)}, {{ tag: ['@{tid}', '@api', '@security'] }}, async ({{ request }}) => {{",
+                         f"    const res = await api(request, {call_args}, {{ body: {ts(b2)} }});",
+                         "    expect(res.status()).toBeLessThan(500);",
+                         "    if (res.ok()) {",
+                         "      const text = await res.text();",
+                         "      expect(text).not.toContain('qa-injected');",
+                         "      expect(text).not.toMatch(/\"role\"\\s*:\\s*\"admin\"|\"isAdmin\"\\s*:\\s*true/);",
+                         "    }", "  });"]
+                counts["exec"] += 1
             if a.security_probes and isinstance(body, dict) and free:
                 for kind, payload in (("sqli", "' OR '1'='1' --"), ("xss", "<script>alert(1)</script>")):
                     b2 = {**body, **{f: payload for f in free}}
