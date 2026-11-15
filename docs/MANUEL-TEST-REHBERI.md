@@ -1,6 +1,6 @@
 # Manuel test uzmanları için rehber
 
-Bu rehber, testleri elle koşan ve test case'lerini Excel'de, Xray'de ya da TestRail'de tutan test uzmanları içindir. Kod yazmanız gerekmez. QA Suite'e bir story ya da mevcut test setinizi verirsiniz; soru listesi, test case'ler, izlenebilirlik matrisi, içe aktarılabilir dosyalar ve raporlar alırsınız.
+Bu rehber, testleri elle koşan ve test senaryolarını (test case) Excel'de, Xray'de ya da TestRail'de tutan test uzmanları içindir. Kod yazmanız gerekmez. QA Suite'e bir story ya da mevcut test setinizi verirsiniz; soru listesi, test case'ler, izlenebilirlik matrisi, içe aktarılabilir dosyalar ve raporlar alırsınız.
 
 Asistan testlerinizi sizin yerinize koşmaz. Ürettiği her şey bir **taslaktır**; gözden geçirmek ve onaylamak sizin işiniz.
 

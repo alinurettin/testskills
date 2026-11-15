@@ -4,7 +4,7 @@ description: Tests LLM and generative-AI features (chatbots, RAG, agents) with a
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.10.0"
+  version: "0.11.0"
 ---
 
 # Testing AI features

@@ -100,7 +100,7 @@ T = {
         "f_empty": "empty value",
     },
     "tr": {
-        "title": "DS/SDA tasarımı", "partitions": "Denklik sınıfları", "param": "Parametre",
+        "title": "DS/SDA tasarımı", "partitions": "Denklik payları", "param": "Parametre",
         "part": "Sınıf", "range": "Aralık", "valid": "Geçerli", "rep": "Temsilci değer",
         "bounds": "Sınır değerleri", "value": "Değer", "note": "Not", "warn": "Uyarılar (netleştirilmeli)",
         "conds": "Kapsam öğeleri → test girdileri (geçerli değerler birleştirilebilir; her geçersiz değer tek başına test edilir)",

@@ -1,5 +1,18 @@
 # Değişiklik günlüğü
 
+**0.11.0**: Denetimden ertelenen maddeler
+- **Kapsam hesabı:** yeni `design_coverage.py` her tasarım spesifikasyonu için kapsanan/toplam kapsam öğesini, kapsanmayanları ve eskimiş referansları verir (`--min-coverage` ile kapı).
+- **Teknikler (CTAL-TA v4.0):** metamorfik test ve test sonucunu bilen (oracle) problemi, alan testi, rastgele test eklendi; CRUD testi fonksiyon × varlık matrisi olarak düzeltildi. Yeni teknik kodları: `mt`, `dom`, `rnd`.
+- **Durum geçişi:** `--switch 0|1|2|3` (N-switch) ve ulaşılan kapsam sayıları (durum, geçiş, zincir).
+- **Yapay zekâ:** eşleştirilmiş vakalarda tutarlılık kontrolü (`pair`); başlangıç setinde aynı zararlı istek Türkçe, ASCII Türkçe ve İngilizce.
+- **Güvenlik:** `nfr_checklist.py asvs --level` artık filtreliyor; SSRF, XXE, CORS, `__Host-` çerez öneki, WebSocket ve kiracı izolasyonu kontrolleri eklendi (alt madde numaraları doğrulanmadı).
+- **Otomasyon:** `check_automation.py` statik lint (sabit bekleme, `test.only`, `force: true`, ham CSS/XPath, parola sabiti, `networkidle`); kararsız (flaky) test politikası.
+- **Test verisi:** `mask_data.py` k-anonimlik ve l-çeşitlilik raporu (`quasi_identifiers`, `min_k`), geri çevrilebilir hash uyarısı.
+- **İzlenebilirlik:** yeni boşluk `READY_ON_ASSUMPTION` (açık soruya ya da onaylanmamış türetilmiş gereksinime dayanan "hazır" öğeler).
+- **Orkestratör:** yapay zekâ çıktısı bir kişi inceleyene kadar taslak kalır; girdide kişisel/gizli veri kontrolü; teslim özetinde neyin script'le hesaplandığı ve kimin incelediği.
+- **Diğer:** çıkış kriteri şablonuna yeni kriterler; erişilebilirlikte axe `incomplete` sonuçları ve EN 301 549 notu; resmi Türkçe terimler (denklik payı, hata tahminleme, test başlatma belgesi) script çıktılarında ve README'de. `examples/` altındaki geçmiş deneme çıktıları değiştirilmedi.
+- Bu sürüm için yeni kör deneme yapılmadı. 463 test.
+
 **0.10.0**: Uzman denetimi (ISTQB müfredatları ve standartlarla karşılaştırma) ve yanlış sonuç veren script'lerin düzeltilmesi
 Beş alan güncel kaynaklarla denetlendi (CTFL v4.0.1, CTAL-TA v4.0, CTAL-TM v3.0, CT-AI v2.0, CT-TAE, CT-PT, ASVS 5.0, TTB Sözlüğü v2.0). Raporlar ve yapılan/ertelenen listesi: `docs/audit-2026-11/`.
 

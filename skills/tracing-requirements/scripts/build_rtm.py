@@ -83,7 +83,7 @@ L = {
         "dups": "kopya grupları", "depr": "kullanımdan kalkmış", "derived": "türetilmiş",
         "calib": "Kalibrasyon (gözden geçirin)",
         "skew": "Öncelik şişmesi: %{c} kritik, %{ch} kritik+yüksek (hedef ≈ %5–15 kritik, ≤ %50 kritik+yüksek). Yeniden derecelendirin: yalnızca yayın durdurucu (go/no-go) testler kritiktir; varyantlar ve sınır komşuları bir seviye aşağıdadır.",
-        "redundant": "{n} test ({ids}) aynı gereksinim, polarite, teknik ({tech}) ve sonuç kalıbını paylaşıyor: büyük olasılıkla aynı denklik sınıfı. Bir temsilci ve sınır değerlerini bırakın.",
+        "redundant": "{n} test ({ids}) aynı gereksinim, polarite, teknik ({tech}) ve sonuç kalıbını paylaşıyor: büyük olasılıkla aynı denklik payı. Bir temsilci ve sınır değerlerini bırakın.",
     },
 }
 

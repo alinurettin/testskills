@@ -1,6 +1,6 @@
 # QA Suite: Yapay zekâ için profesyonel yazılım test skill'leri
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.10.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.11.0-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[English README →](README.en.md)**
 
@@ -19,7 +19,7 @@ Yapay zekâ asistanınıza (Claude Code, claude.ai, Claude API ve Agent Skills s
 9. performans, erişilebilirlik ve güvenlik testleri
 10. risk bazlı regresyon seçimi, hata ve tamamlama raporları
 
-Türkçe ve İngilizce çıktı üretir.
+Türkçe ve İngilizce çıktı üretir. Türkçe terimlerde Türk Test Kurulu'nun resmi karşılıkları esas alınır; ekiplerde yaygın kullanım farklıysa ikisi birlikte verilir (örneğin test senaryosu = test case, test başlatma belgesi = charter). Tablo: [shared/glossary-tr.md](shared/glossary-tr.md).
 
 ## Neden farklı?
 - **Kombinasyonları tahmin ettirmez, hesaplatır.** Sınır değerler, karar tabloları, durum geçişleri ve pairwise setleri deterministik Python script'leriyle hesaplanır. Script'lerin bulduğu boşluk ve çelişkiler netleştirme sorusu olarak geri döner.
@@ -70,7 +70,7 @@ Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVAL
 | `reporting-test-results` | Hata raporları; çıkış kriterlerini otomatik değerlendiren tamamlama raporu |
 | `reviewing-test-cases` | Excel/TestRail CSV içe aktarımı ve test kalitesi denetimi |
 | `testing-apis` | OpenAPI 3'ten sözleşme testleri ve aynı TC ID'leriyle koşturulabilir Playwright API paketi: şema kontrolü, sınırlar, BOLA, sözleşme boşluğu soruları, istek/yanıt kanıtı |
-| `running-exploratory-tests` **(deneysel)** | Keşif testi: kısa hata avı (veriyi ekranlar arasında takip etme, web/API saldırı listesi) ya da tam SBTM: riske göre sıralı görev kartları (charter), sezgisel yöntemler (SFDIPOT, FEW HICCUPPS, turlar), oturum notlarından özet, hata ve regresyon testi |
+| `running-exploratory-tests` **(deneysel)** | Keşif testi: kısa hata avı (veriyi ekranlar arasında takip etme, web/API saldırı listesi) ya da tam SBTM: riske göre sıralı test başlatma belgeleri (charter), sezgisel yöntemler (SFDIPOT, FEW HICCUPPS, turlar), oturum notlarından özet, hata ve regresyon testi |
 | `testing-ai-features` **(deneysel)** | LLM, chatbot ve RAG testi: saldırgan eval seti (OWASP LLM Top 10 2026, TR/EN), tekrarlı koşularda deterministik puanlama, kararsızlık ve yayın kapısı |
 | `preparing-test-data` **(deneysel)** | Geçerli TCKN/VKN/IBAN'lı, ilişkisel bütünlüklü sentetik veri; üretim extract'larının deterministik maskelenmesi (KVKK/GDPR) |
 | `testing-mobile-apps` **(deneysel)** | iOS/Android kontrol listeleri (yaşam döngüsü, kesintiler, izinler, çevrimdışı, MASVS, erişilebilirlik), kullanım payından cihaz matrisi, JUnit → sonuçlar |

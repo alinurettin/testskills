@@ -86,7 +86,8 @@ TECH = {"ep": "ep", "bva": "bva", "dt": "dt", "st": "st", "pw": "pw", "ct": "ct"
         "equivalence-partitioning": "ep", "boundary-value-analysis": "bva", "decision-table": "dt",
         "state-transition": "st", "pairwise": "pw", "classification-tree": "ct", "use-case": "uc",
         "scenario": "sc", "error-guessing": "eg", "checklist": "cl", "exploratory": "ex",
-        "requirements-based": "rb", "denklik sınıfı": "ep", "eşdeğer sınıf": "ep", "eşdeğerlik sınıfı": "ep",
+        "requirements-based": "rb", "denklik sınıfı": "ep", "denklik payı": "ep", "denklik paylarına ayırma": "ep", "hata tahminleme": "eg",
+        "karar tablosu testi": "dt", "durum geçişi testi": "st", "eşdeğer sınıf": "ep", "eşdeğerlik sınıfı": "ep",
         "sınır değer analizi": "bva", "sınır değer": "bva", "karar tablosu": "dt", "durum geçişi": "st",
         "ikili test": "pw", "sınıflandırma ağacı": "ct", "kullanım senaryosu": "uc", "senaryo": "sc",
         "hata tahmini": "eg", "kontrol listesi": "cl", "keşif testi": "ex", "gereksinim tabanlı": "rb"}
