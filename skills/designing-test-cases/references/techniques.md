@@ -98,6 +98,7 @@ These techniques follow the ISTQB CTFL v4.0 and CTAL-TA v4.0 syllabi and ISO/IEC
 **Pitfalls:**
 - Forgetting timers or background events, such as "unpaid orders are cancelled after 30 minutes".
 - Forgetting the side effects of transitions (the `action`). The expected result must check them, for example "the e-mail was sent" or "the stock was released".
+- **Coverage levels** (CTFL v4.0.1 §4.2.4, CTAL-TA v4.0 §3.2.2): all states < valid transitions (0-switch) < all transitions (valid + invalid, the N-## rows) < N-switch (`--switch 1|2|3`: every chain of N+1 transitions). The script prints the achieved figures (states, transitions, chains covered/total); quote them instead of saying "full coverage". Use 1-switch or more for high-risk life cycles (payments, orders, contracts).
 
 ## 5. Pairwise / combinatorial testing
 **Idea:** Most interaction faults are triggered by one or two parameters together. Covering every *pair* of values finds most of them with a fraction of the tests.

@@ -136,6 +136,27 @@ class PairConsistencyTests(unittest.TestCase):
             self.assertTrue(all(c["pair"] in ids and c["pair"] != c["id"] for c in paired))
 
 
+class StateCoverageTests(unittest.TestCase):
+    def test_n_switch_and_figures(self):
+        d = SK / "designing-test-cases"
+        spec = {"id": "DS-9", "title": "x", "states": ["A", "B", "C"], "events": ["go", "back"], "initial": "A", "final": [],
+                "transitions": [{"id": "T1", "from": "A", "event": "go", "to": "B"}, {"id": "T2", "from": "B", "event": "go", "to": "C"},
+                                {"id": "T3", "from": "C", "event": "back", "to": "A"}]}
+        with tempfile.TemporaryDirectory() as t:
+            f = Path(t) / "s.json"
+            f.write_text(json.dumps(spec), encoding="utf-8")
+            for n, chains in ((0, 3), (1, 3), (2, 3)):
+                r = run(d / "scripts/state_transition.py", f, "--switch", n, "--format", "json")
+                res = json.loads(r.stdout)
+                fig = res["coverage_figures"]
+                self.assertEqual(fig["states"], [3, 3])
+                self.assertEqual(fig["transitions"], [3, 3])
+                self.assertEqual(fig[f"{n}-switch chains"], [chains, chains])
+            ids = [s["transitions"] for s in res["sequences"]]
+            flat = [x for s in ids for x in s]
+            self.assertTrue(any(flat[i:i + 3] == ["T3", "T1", "T2"] for i in range(len(flat))))  # a 2-switch chain is walked
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

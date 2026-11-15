@@ -26,7 +26,7 @@ Spec (JSON):
 }
 
 Usage:
-  python state_transition.py spec.json [--switch 0|1] [--max-length 12] [--format md|json] [--lang tr] [--out f]
+  python state_transition.py spec.json [--switch 0|1|2|3] [--max-length 12] [--format md|json] [--lang tr] [--out f]
 """
 from __future__ import annotations
 
@@ -173,17 +173,26 @@ def run(spec: dict, switch: int, max_len: int) -> dict:
     invalid = [(s, e) for s in states for e in events
                if not table[s][e] and not ignored(s, e) and s in reach]
 
-    if switch == 0:
-        targets = [(t,) for t in trans]
-    else:
-        targets = [(a, b) for a in trans for b in trans if a["to"] == b["from"]]
-        targets += [(t,) for t in trans if not any(t["to"] == b["from"] for b in trans)]
+    # N-switch coverage: every chain of N+1 consecutive transitions (0-switch = every transition,
+    # 1-switch = every pair, ...). Transitions that end in a state without exits stay as shorter chains.
+    chains = [(t,) for t in trans]
+    for _ in range(switch):
+        longer = [c + (b,) for c in chains for b in trans if c[-1]["to"] == b["from"]]
+        ended = [c for c in chains if not any(c[-1]["to"] == b["from"] for b in trans)]
+        chains = longer + ended
+    targets = chains
     sequences, unreachable = cover(trans, initial, finals, targets, max_len)
+    walked = [t for seq in sequences for t in seq]
+    visited = {initial} | {t["to"] for t in walked} if walked else {initial}
+    figures = {"states": [len(visited & set(states)), len(states)],
+               "transitions": [len({t["id"] for t in walked}), len(trans)],
+               f"{switch}-switch chains": [len(targets) - len(unreachable), len(targets)]}
 
     return {
         "id": spec.get("id"), "title": spec.get("title"), "requirement_ids": spec.get("requirement_ids", []),
         "states": states, "events": events, "initial": initial, "final": sorted(finals),
         "coverage": f"{switch}-switch",
+        "coverage_figures": figures,
         "table": {s: {e: [f"{t['id']}→{t['to']}" + (f" [{t['guard']}]" if t.get("guard") else "")
                           for t in table[s][e]] for e in events} for s in states},
         "findings": [{"type": k, **v} for k, v in findings],
@@ -233,13 +242,19 @@ def to_md(res: dict, lang: str) -> str:
               "|---|---|---|---|---|"]
         for n in res["invalid_transitions"]:
             o.append(f"| {n['id']} | {n['state']} | {n['event']} | {' → '.join(n['path_to_state']) or '(start)'} | {t['reject']} |")
+    fig = res.get("coverage_figures")
+    if fig:
+        o += ["", "Coverage achieved by the sequences below: " +
+              " · ".join(f"{k} {v[0]}/{v[1]}" for k, v in fig.items()) +
+              ". Invalid transitions (N-##) are separate negative tests."]
     return "\n".join(o) + "\n"
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("spec")
-    ap.add_argument("--switch", type=int, choices=[0, 1], default=0)
+    ap.add_argument("--switch", type=int, choices=[0, 1, 2, 3], default=0,
+                    help="N-switch coverage: chains of N+1 consecutive transitions (default 0 = every transition)")
     ap.add_argument("--max-length", type=int, default=15, help="max transitions per sequence")
     ap.add_argument("--lang", choices=["en", "tr"])
     ap.add_argument("--format", choices=["md", "json"], default="md")
