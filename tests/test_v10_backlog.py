@@ -306,6 +306,27 @@ class ReviewSmellTests(unittest.TestCase):
         self.assertFalse({"BRANCHING_EXPECTED", "ACTION_IN_EXPECTED"} & clean)
 
 
+class RequirementLintTests(unittest.TestCase):
+    def rules(self, req: dict, lang: str) -> set:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("lint_requirements", SK / "analyzing-requirements/scripts/lint_requirements.py")
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        return {f["rule"] for f in m.lint_one(req, lang)}
+
+    def test_weak_modal(self):
+        self.assertIn("WEAK_MODAL", self.rules({"text": "The system should lock the account after 5 failed attempts."}, "en"))
+        self.assertIn("WEAK_MODAL", self.rules({"text": "Sistem 5 hatalı denemeden sonra hesabı kilitleyebilir."}, "tr"))
+        self.assertNotIn("WEAK_MODAL", self.rules({"text": "The system shall lock the account after 5 failed attempts."}, "en"))
+
+    def test_acceptance_criteria_are_linted(self):
+        req = {"text": "The system shall lock the account after 5 failed attempts.",
+               "acceptance_criteria": ["The page loads fast and the message is appropriate."]}
+        self.assertIn("AC_VAGUE", self.rules(req, "en"))
+        req["acceptance_criteria"] = ["Given 5 failed attempts, then the message 'Account locked' is shown."]
+        self.assertNotIn("AC_VAGUE", self.rules(req, "en"))
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

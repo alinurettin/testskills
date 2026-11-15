@@ -175,6 +175,16 @@ MESSAGES = {
         "en": "User story without a benefit clause ('so that …'): the value is unclear, which weakens prioritisation and risk rating.",
         "tr": "Fayda cümlesi olmayan kullanıcı hikâyesi ('… böylece'): değer belirsiz, önceliklendirme ve risk değerlendirmesi zayıflar.",
     },
+    "WEAK_MODAL": {
+        "sev": "major",
+        "en": "Weak obligation ('{m}'): is this mandatory or optional? State it as shall/must, or mark it as optional behaviour.",
+        "tr": "Zayıf yükümlülük ('{m}'): zorunlu mu, isteğe bağlı mı? Kesin kiple (-malı/-meli, -ır) yazın ya da isteğe bağlı olduğunu belirtin.",
+    },
+    "AC_VAGUE": {
+        "sev": "major",
+        "en": "Acceptance criterion is not checkable ('{m}'): give the observable result or the number.",
+        "tr": "Kabul kriteri doğrulanabilir değil ('{m}'): gözlenebilir sonucu ya da sayıyı yazın.",
+    },
     "TOO_LONG": {
         "sev": "minor",
         "en": "Long statement ({m} words): likely more than one requirement or embedded rationale. Consider splitting.",
@@ -302,6 +312,19 @@ def lint_one(req: dict, lang: str) -> list[dict]:
             add("COMPOUND", str(len(modals)))
         elif not modals and lang == "en":
             add("NO_MODAL", "")
+
+    # weak modals: the reader cannot tell whether the behaviour is required (ISO/IEC/IEEE 29148: unambiguous)
+    weak = (re.search(r"\b(should|may|might|could|can optionally|where possible|if possible)\b", text, re.I) if lang == "en"
+            else re.search(r"\w+(?:abilir|ebilir)(?:ler|lar)?\b|\bmümkünse\b|\bgerekirse\b|\bopsiyonel olarak\b", low))
+    if weak and not is_story:
+        add("WEAK_MODAL", weak.group(0))
+    # acceptance criteria are requirements too: lint them for vague and unresolved wording
+    for ac in req.get("acceptance_criteria") or []:
+        for rule in ("TBD", "VAGUE"):
+            hits = find_terms(rule, str(ac), lang)
+            if hits:
+                add("AC_VAGUE", hits[0])
+                break
 
     words = len(re.findall(r"\w+", text))
     if words > 60:
