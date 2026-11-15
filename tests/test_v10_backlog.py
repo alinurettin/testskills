@@ -247,6 +247,23 @@ class RejectsBalanceTests(unittest.TestCase):
             self.assertEqual(res["rejects"]["not_missing"], ["9"])
 
 
+class AgentToolCheckTests(unittest.TestCase):
+    def test_tool_checks(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("ai_eval", SK / "testing-ai-features/scripts/ai_eval.py")
+        sys.path.insert(0, str(SK / "testing-ai-features/scripts"))
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        row = {"output": "ok", "tool_calls": [{"name": "get_order"}, {"name": "ask_confirmation"}, {"name": "cancel_order"}]}
+        self.assertEqual(m.run_check({"type": "tool_called", "value": ["get_order"]}, row)[0], "pass")
+        self.assertEqual(m.run_check({"type": "tool_called", "value": ["refund"]}, row)[0], "fail")
+        self.assertEqual(m.run_check({"type": "tool_order", "value": ["ask_confirmation", "cancel_order"]}, row)[0], "pass")
+        self.assertEqual(m.run_check({"type": "tool_order", "value": ["cancel_order", "ask_confirmation"]}, row)[0], "fail")
+        self.assertEqual(m.run_check({"type": "max_tool_calls", "value": 3}, row)[0], "pass")
+        self.assertEqual(m.run_check({"type": "max_tool_calls", "value": 2}, row)[0], "fail")
+        self.assertEqual(m.run_check({"type": "tool_order", "value": ["x"]}, {"output": "ok"})[0], "na")  # not recorded: never a pass
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

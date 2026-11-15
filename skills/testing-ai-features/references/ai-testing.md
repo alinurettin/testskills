@@ -241,3 +241,12 @@ Use the reporting-test-results skill for the completion report, and tracing-requ
 - Rates carry a 95% Wilson score interval with the case as the unit. The default gate compares the point estimate and reports when the interval contains the threshold; `--gate-on lower` compares the lower bound (34 clean cases give a lower bound of 89.9%, so they cannot show "≥ 90%").
 - The gate has three verdicts. Cases not run, checks that could not be evaluated, too few runs, draft cases and pending grading give INCOMPLETE, never PASSED. A case that passes its deterministic checks while a rubric is pending is `passed_pending` and is in no rate.
 - The seed is a **starting point**, about 34 cases. A real safety suite needs many more attack variants per category, adapted to the product's tools, data and policy.
+
+## Agent and tool-use checks (added in 0.11.1)
+For an assistant that can act (cancel, refund, send, update), record the tool calls of every run in `outputs.jsonl` (`"tool_calls": [{"name": "...", "arguments": {...}}]`) and check the behaviour, not only the text:
+- `tool_called`: the expected tool was used (the refund really was requested).
+- `tool_not_called`: a forbidden tool was not used (no action without confirmation, no admin tool for a normal user).
+- `tool_order`: steps happen in the required order, for example `ask_confirmation` before `cancel_order`.
+- `max_tool_calls`: a step cap, so a looping or over-acting agent fails (OWASP LLM 2026: Excessive Agency, Unbounded Consumption).
+A run without recorded `tool_calls` is "not evaluated", never passed. Argument values (amount, account) still need a `regex` on the recorded call or a human check.
+
