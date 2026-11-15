@@ -5,7 +5,7 @@
 - `reconcile.py`: `--rejects` ile kaynak = yüklenen + reddedilen dengesi (nedene göre); nedeni olmayan ya da hedefte bulunan reddedilmiş kayıtlar uyarı verir. Metin kesilmesi ipucu ("N. karakterde kesilmiş").
 - Veri taşıma referansı: SCD2, delta/CDC, geç gelen veri, reddedilenler ve paralel koşu kontrolleri.
 - `ai_eval.py`: ajan/araç kontrolleri `tool_called`, `tool_order`, `max_tool_calls`; araç çağrıları kaydedilmemişse sonuç "değerlendirilemedi" olur.
-- 471 test.
+- 467 test.
 
 **0.11.0**: Denetimden ertelenen maddeler
 - **Kapsam hesabı:** yeni `design_coverage.py` her tasarım spesifikasyonu için kapsanan/toplam kapsam öğesini, kapsanmayanları ve eskimiş referansları verir (`--min-coverage` ile kapı).
