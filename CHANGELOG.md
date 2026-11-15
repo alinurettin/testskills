@@ -1,5 +1,12 @@
 # Değişiklik günlüğü
 
+**0.11.1**: Denetimden kalan küçük maddeler
+- `check_sources.py` (analyzing-requirements): her gereksinimin kelimeleri ve sayıları kaynak belgede geçiyor mu (SUPPORTED / WEAK / NOT_FOUND / DERIVED). Kelime düzeyinde bir kontroldür; anlam değişikliğini yakalamaz.
+- `reconcile.py`: `--rejects` ile kaynak = yüklenen + reddedilen dengesi (nedene göre); nedeni olmayan ya da hedefte bulunan reddedilmiş kayıtlar uyarı verir. Metin kesilmesi ipucu ("N. karakterde kesilmiş").
+- Veri taşıma referansı: SCD2, delta/CDC, geç gelen veri, reddedilenler ve paralel koşu kontrolleri.
+- `ai_eval.py`: ajan/araç kontrolleri `tool_called`, `tool_order`, `max_tool_calls`; araç çağrıları kaydedilmemişse sonuç "değerlendirilemedi" olur.
+- 471 test.
+
 **0.11.0**: Denetimden ertelenen maddeler
 - **Kapsam hesabı:** yeni `design_coverage.py` her tasarım spesifikasyonu için kapsanan/toplam kapsam öğesini, kapsanmayanları ve eskimiş referansları verir (`--min-coverage` ile kapı).
 - **Teknikler (CTAL-TA v4.0):** metamorfik test ve test sonucunu bilen (oracle) problemi, alan testi, rastgele test eklendi; CRUD testi fonksiyon × varlık matrisi olarak düzeltildi. Yeni teknik kodları: `mt`, `dom`, `rnd`.

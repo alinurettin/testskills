@@ -4,7 +4,7 @@ description: Reviews an existing test suite written by people or AI. Imports Exc
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.0"
+  version: "0.11.1"
 ---
 
 # Reviewing test cases
