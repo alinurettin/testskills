@@ -167,7 +167,7 @@ def main() -> int:
     ap.add_argument("kind", choices=["wcag", "asvs"])
     ap.add_argument("--features", default="all", help="comma-separated feature keys (see --list-features)")
     ap.add_argument("--list-features", action="store_true")
-    ap.add_argument("--level", help="wcag: A or AA (default AA = A+AA); asvs: L1/L2/L3 (label only)")
+    ap.add_argument("--level", help="wcag: A or AA (default AA = A+AA); asvs: L1/L2/L3 (default L2): higher levels add the deeper checks (SSRF, XXE, cookie prefix, WebSocket, tenant isolation)")
     ap.add_argument("--page", default="", help="page/screen/API under test, used in titles and steps")
     ap.add_argument("--req", required=False, default="", help="fallback requirement ID(s), comma-separated, for tests "
                     "the --req-map does not cover (--req and/or --req-map is needed)")
@@ -264,7 +264,10 @@ def main() -> int:
     else:
         first = n
         for c in chapters:
-            ideas = c["ideas_tr"] if a.lang == "tr" else c["ideas"]
+            ideas = list(c["ideas_tr"] if a.lang == "tr" else c["ideas"])
+            rank = {"L1": 1, "L2": 2, "L3": 3}
+            want = rank.get((a.level or "L2").upper(), 2)
+            ideas += [m["tr" if a.lang == "tr" else "en"] for m in c.get("more", []) if rank.get(m["level"], 2) <= want]
             name = c["name_tr"] if a.lang == "tr" else c["name"]
             for i, idea in enumerate(ideas, 1):
                 short = re.split(r"[;:.(]", idea)[0][:70].strip()

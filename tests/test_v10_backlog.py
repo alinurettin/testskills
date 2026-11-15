@@ -157,6 +157,22 @@ class StateCoverageTests(unittest.TestCase):
             self.assertTrue(any(flat[i:i + 3] == ["T3", "T1", "T2"] for i in range(len(flat))))  # a 2-switch chain is walked
 
 
+class AsvsLevelTests(unittest.TestCase):
+    def test_level_filters_deeper_checks(self):
+        with tempfile.TemporaryDirectory() as t:
+            out = {}
+            for lv in ("L1", "L2"):
+                f = Path(t) / f"{lv}.md"
+                r = run(SK / "testing-nonfunctional/scripts/nfr_checklist.py", "asvs", "--features", "api,auth,authz,web,input",
+                        "--level", lv, "--req", "REQ-1", "--start", 1, "--out", f)
+                self.assertEqual(r.returncode, 0, r.stderr)
+                out[lv] = f.read_text(encoding="utf-8")
+            self.assertIn("CORS", out["L1"])
+            self.assertNotIn("SSRF", out["L1"])
+            for topic in ("SSRF", "XXE", "tenant isolation", "__Host-"):
+                self.assertIn(topic, out["L2"])
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))
