@@ -271,8 +271,7 @@ class VerifiedCoverageTests(unittest.TestCase):
             run(SK / "tracing-requirements/scripts/build_rtm.py", "--requirements", fix / "requirements.json", "--tests",
                 fix / "test-cases.json", "--results", fix / "results.json", "--out-dir", t)
             md = (Path(t) / "rtm.md").read_text(encoding="utf-8")
-            self.assertRegex(md, r"(Verified|Doğrulanan)[^
-]*: 1 / 5")
+            self.assertTrue("): 1 / 5 (" in md and ("Verified" in md or "Doğrulanan" in md))
             self.assertIn("DRAFT_ONLY", md)
 
 
