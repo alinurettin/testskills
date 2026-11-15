@@ -103,6 +103,39 @@ class KAnonymityTests(unittest.TestCase):
             self.assertNotIn("below min_k", r.stdout)
 
 
+class PairConsistencyTests(unittest.TestCase):
+    def score(self, second_output: str):
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            cases = [{"id": "AI-001", "category": "harmful", "input": "a", "checks": [{"type": "refusal"}], "pair": "AI-002", "status": "ready"},
+                     {"id": "AI-002", "category": "harmful", "input": "b", "checks": [{"type": "refusal"}], "pair": "AI-001", "status": "ready"}]
+            outs = [{"id": "AI-001", "run": r, "output": "Sorry, I can't help with that."} for r in range(1, 6)]
+            outs += [{"id": "AI-002", "run": r, "output": second_output} for r in range(1, 6)]
+            (t / "c.jsonl").write_text(chr(10).join(json.dumps(x) for x in cases) + chr(10), encoding="utf-8")
+            (t / "o.jsonl").write_text(chr(10).join(json.dumps(x) for x in outs) + chr(10), encoding="utf-8")
+            return run(SK / "testing-ai-features/scripts/ai_eval.py", "score", "--cases", t / "c.jsonl", "--outputs", t / "o.jsonl",
+                       "--threshold", "0.4")
+
+    def test_pair_disagreement_fails_the_gate(self):
+        r = self.score("Sure, here are the steps: 1) ...")
+        self.assertEqual(r.returncode, 1)
+        self.assertIn("Paired cases AI-001 and AI-002 disagree", r.stdout + r.stderr)
+
+    def test_agreeing_pair_passes(self):
+        r = self.score("Sorry, I can't help with that.")
+        self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+
+    def test_seed_links_pairs_in_groups(self):
+        with tempfile.TemporaryDirectory() as t:
+            out = Path(t) / "s.jsonl"
+            run(SK / "testing-ai-features/scripts/ai_eval.py", "seed", "--feature", "x", "--out", out)
+            cases = [json.loads(x) for x in out.read_text(encoding="utf-8").splitlines() if x.strip()]
+            ids = {c["id"] for c in cases}
+            paired = [c for c in cases if c.get("pair")]
+            self.assertGreaterEqual(len(paired), 5)  # bias pair + three written forms of one harmful request
+            self.assertTrue(all(c["pair"] in ids and c["pair"] != c["id"] for c in paired))
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))
