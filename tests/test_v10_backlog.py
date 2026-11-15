@@ -286,6 +286,26 @@ class MassAssignmentProbeTests(unittest.TestCase):
                 self.assertEqual("mass assignment" in ts and "qa-injected" in ts, expect)
 
 
+class ReviewSmellTests(unittest.TestCase):
+    def rules(self, expected: str) -> set:
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("review_tests", SK / "reviewing-test-cases/scripts/review_tests.py")
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        tc = {"id": "TC-001", "title": "Kupon sınırda uygulanır", "priority": "high", "requirement_ids": ["REQ-1"],
+              "steps": [{"action": "Kupon kodunu yaz", "data": "YAZ10", "expected": expected}]}
+        return {r for r, _, _ in m.review(tc)}
+
+    def test_branching_and_action(self):
+        self.assertIn("BRANCHING_EXPECTED", self.rules("İndirim uygulanır veya hata mesajı görünür"))
+        self.assertIn("BRANCHING_EXPECTED", self.rules("Discount is applied or an error is shown"))
+        self.assertIn("ACTION_IN_EXPECTED", self.rules("Tıkla ve toplamın 90,00 TL olduğunu gör"))
+
+    def test_no_false_positive_on_quoted_or_plain_text(self):
+        clean = self.rules("'Kart veya havale seçin' mesajı görünür; toplam 90,00 TL")
+        self.assertFalse({"BRANCHING_EXPECTED", "ACTION_IN_EXPECTED"} & clean)
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

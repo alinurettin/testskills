@@ -34,7 +34,13 @@ from pathlib import Path
 W = {"critical": 25, "major": 10, "minor": 3}
 SEV = {"MISSING_EXPECTED": "critical", "VAGUE_EXPECTED": "major", "NO_DATA": "major", "DEPENDENT": "major",
        "NO_REQ": "major", "MULTI_ACTION": "minor", "TOO_MANY_STEPS": "minor", "WEAK_TITLE": "minor",
-       "NO_PRIORITY": "minor", "EXPECTED_ECHO": "minor"}
+       "NO_PRIORITY": "minor", "EXPECTED_ECHO": "minor", "BRANCHING_EXPECTED": "major", "ACTION_IN_EXPECTED": "minor"}
+# an expected result that allows two outcomes is not an oracle; quoted text is ignored ("... veya ..." in a message)
+BRANCH = re.compile(r"\b(veya|ya da|yahut|duruma göre|eğer|or|either|depending on|if applicable)\b", re.I)
+QUOTED = re.compile(r"['\"“”‘’«»][^'\"“”‘’«»]*['\"“”‘’«»]")
+# an expected result that starts with something the tester does is a hidden step
+ACT_START = re.compile(r"^\s*(tıkla|tıklayın|gir|girin|yaz|yazın|seç|seçin|aç|açın|git|gidin|kontrol et|doğrula|"
+                       r"click|enter|type|select|open|go to|navigate|press|check that you|verify by)\b", re.I)
 VAGUE = re.compile(
     r"(doğru (şekilde )?çalış|düzgün (şekilde )?çalış|başarı(lı|yla)|sorunsuz|beklendiği gibi|beklenen (şekilde|sonuç)|"
     r"uygun (şekilde|mesaj|hata)|hata (olmamalı|almamalı|vermemeli)|çalışmalı|çalışır\b|işlem (tamamlan|gerçekleş)|"
@@ -68,12 +74,16 @@ MSG = {
            "NO_DATA": "step {s}: input without concrete data", "DEPENDENT": "depends on another test ('{m}')",
            "NO_REQ": "no requirement link", "MULTI_ACTION": "step {s} performs several actions",
            "TOO_MANY_STEPS": "{m} steps; consider splitting", "WEAK_TITLE": "generic title",
-           "NO_PRIORITY": "priority missing", "EXPECTED_ECHO": "step {s}: expected result repeats the action"},
+           "NO_PRIORITY": "priority missing", "EXPECTED_ECHO": "step {s}: expected result repeats the action",
+           "BRANCHING_EXPECTED": "step {s}: expected result allows more than one outcome ('{m}'): split the test or fix the precondition",
+           "ACTION_IN_EXPECTED": "step {s}: expected result starts with an action: make it a step and state what must be observed"},
     "tr": {"MISSING_EXPECTED": "{s}. adımda beklenen sonuç yok", "VAGUE_EXPECTED": "{s}. adım: belirsiz beklenen sonuç '{m}'",
            "NO_DATA": "{s}. adım: somut veri olmadan girdi", "DEPENDENT": "başka teste bağımlı ('{m}')",
            "NO_REQ": "gereksinim bağlantısı yok", "MULTI_ACTION": "{s}. adımda birden fazla aksiyon var",
            "TOO_MANY_STEPS": "{m} adım; bölmeyi düşünün", "WEAK_TITLE": "genel/anlamsız başlık",
-           "NO_PRIORITY": "öncelik yok", "EXPECTED_ECHO": "{s}. adım: beklenen sonuç aksiyonu tekrarlıyor"},
+           "NO_PRIORITY": "öncelik yok", "EXPECTED_ECHO": "{s}. adım: beklenen sonuç aksiyonu tekrarlıyor",
+           "BRANCHING_EXPECTED": "{s}. adım: beklenen sonuç birden fazla sonuca izin veriyor ('{m}'): testi bölün ya da ön koşulu netleştirin",
+           "ACTION_IN_EXPECTED": "{s}. adım: beklenen sonuç bir aksiyonla başlıyor: adıma çevirin ve neyin gözleneceğini yazın"},
 }
 
 
@@ -92,6 +102,11 @@ def review(t: dict, other_ids: frozenset = frozenset()) -> list[tuple[str, str, 
             f.append(("NO_DATA", str(i), ""))
         if MULTI.search(act) or len(re.findall(r"\w+", act)) > 30:
             f.append(("MULTI_ACTION", str(i), ""))
+        bm = BRANCH.search(QUOTED.sub("", exp))
+        if bm:
+            f.append(("BRANCHING_EXPECTED", str(i), bm.group(0)))
+        if ACT_START.search(exp):
+            f.append(("ACTION_IN_EXPECTED", str(i), ""))
         if exp and re.sub(r"\W", "", exp.lower()) == re.sub(r"\W", "", act.lower()):
             f.append(("EXPECTED_ECHO", str(i), ""))
     text = " ".join([str(t.get("preconditions", ""))] + [str(s.get("action", "")) for s in steps])
