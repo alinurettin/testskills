@@ -26,7 +26,9 @@ mapping.json (all keys optional):
                             "reason": "DEF-41 accepted by data owner"}]}
 Transform ops (string "op" / "op:arg", or object {"op": arg}), applied left to right:
   trim, collapse_spaces (also trims), upper, lower, upper_tr, lower_tr (Turkish i/İ, ı/I),
-  date:<in>><out> (e.g. date:%d.%m.%Y>%Y-%m-%d), decimal[:scale[:sep]] (auto-detects
+  date:<in>><out> (e.g. date:%d.%m.%Y>%Y-%m-%d), tz:<in>><out>><hours> (timestamp shifted by a fixed
+  offset, e.g. tz:%d.%m.%Y %H:%M>%Y-%m-%d %H:%M>-3 when the source is UTC+3 and the target UTC; a row
+  near midnight then lands on the right day), decimal[:scale[:sep]] (auto-detects
   "1.234,56" / "1,234.56"; sep "," or "." forces the decimal separator; rounds HALF_UP),
   map:{"A":"ACTIVE"} ("*" = fallback; unknown codes are transform errors), default:<value>,
   strip_leading_zeros, zfill:<n>, concat:["col1","col2","sep"] (last item = separator; empty
@@ -316,7 +318,7 @@ KEY_RULES = ("r_empty", "r_dup_s", "r_dup_t", "r_missing", "r_unexp")
 NULL_PP = 1.0  # a null-rate change of this many percentage points needs an explanation (report highlights it too)
 
 OPS_NOARG = {"trim", "collapse_spaces", "upper", "lower", "upper_tr", "lower_tr", "strip_leading_zeros"}
-OPS_ARG = {"date", "decimal", "map", "default", "zfill", "concat"}
+OPS_ARG = {"date", "decimal", "map", "default", "zfill", "concat", "tz"}
 NUM_RE = re.compile(r"[+-]?(\d+(\.\d*)?|\.\d+)")
 TR_ASCII = str.maketrans("çğıöşüÇĞİÖŞÜâîûÂÎÛ", "cgiosuCGIOSUaiuAIU")
 
@@ -402,6 +404,13 @@ def compile_ops(ops, where: str) -> list:
             if not isinstance(arg, str) or ">" not in arg:
                 raise UsageError(f"{where}: date needs '<in_fmt>><out_fmt>', e.g. date:%d.%m.%Y>%Y-%m-%d")
             arg = tuple(arg.split(">", 1))
+        elif name == "tz":
+            parts = str(arg).split(">")
+            try:
+                arg = (parts[0], parts[1], float(parts[2]))
+            except (IndexError, ValueError):
+                raise UsageError(f"{where}: tz needs '<in_fmt>><out_fmt>><hours>', e.g. "
+                                 "tz:%d.%m.%Y %H:%M>%Y-%m-%dT%H:%M:%SZ>-3 (source is UTC+3, target is UTC)") from None
         elif name == "decimal":
             parts = str(arg).split(":") if arg not in (None, "") else []
             scale = int(parts[0]) if parts and parts[0] != "" else None
@@ -449,6 +458,13 @@ def apply_ops(value: str, row: dict, ops: list) -> str:
         elif name == "date":
             if value.strip():
                 value = convert_date(value.strip(), arg[0], arg[1])
+        elif name == "tz":  # shift a local timestamp by a fixed offset before comparing (e.g. Istanbul -> UTC = -3)
+            if value.strip():
+                import datetime as _dt
+                try:
+                    value = (_dt.datetime.strptime(value.strip(), arg[0]) + _dt.timedelta(hours=arg[2])).strftime(arg[1])
+                except ValueError as e:
+                    raise TransformError(f"timestamp '{value}' does not match {arg[0]}") from e
         elif name == "decimal":
             if value.strip():
                 d = parse_decimal(value, arg[1])

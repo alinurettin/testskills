@@ -327,6 +327,23 @@ class RequirementLintTests(unittest.TestCase):
         self.assertNotIn("AC_VAGUE", self.rules(req, "en"))
 
 
+class TimezoneOpTests(unittest.TestCase):
+    def test_fixed_offset_shift_across_midnight(self):
+        nl = chr(10)
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            (t / "s.csv").write_text(nl.join(["id,ts", "1,01.03.2026 01:30", "2,15.03.2026 12:00", ""]), encoding="utf-8")
+            (t / "t.csv").write_text(nl.join(["id,ts", "1,2026-02-28 22:30", "2,2026-03-15 12:00", ""]), encoding="utf-8")
+            (t / "m.json").write_text(json.dumps({"columns": {"ts": {"source": "ts",
+                                      "transform": ["tz:%d.%m.%Y %H:%M>%Y-%m-%d %H:%M>-3"]}}}), encoding="utf-8")
+            js = t / "o.json"
+            r = run(SK / "testing-data-migrations/scripts/reconcile.py", "--source", t / "s.csv", "--target", t / "t.csv",
+                    "--key", "id", "--mapping", t / "m.json", "--out", t / "o.md", "--json", js)
+            res = json.loads(js.read_text(encoding="utf-8"))
+            self.assertEqual(r.returncode, 1)
+            self.assertEqual(res["columns"]["ts"]["mismatch_keys"], ["2"])  # row 1 matches after the shift; row 2 was not shifted by the load
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))
