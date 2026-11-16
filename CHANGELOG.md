@@ -1,5 +1,14 @@
 # Değişiklik günlüğü
 
+**0.11.2**: Denetimden kalan son küçük maddeler
+- İzlenebilirlik: "doğrulanan kapsam" metriği (bağlı testlerin hepsi geçti) ve `DRAFT_ONLY` boşluğu.
+- API: `--security-probes` ile toplu atama (mass assignment) denemesi.
+- Test inceleme: `BRANCHING_EXPECTED` (birden fazla sonuca izin veren beklenen sonuç) ve `ACTION_IN_EXPECTED` kuralları.
+- Gereksinim linter'ı: zayıf kip (`WEAK_MODAL`: "-ebilir", "should") ve kabul kriterlerinin incelenmesi (`AC_VAGUE`).
+- Mutabakat: `tz` dönüşümü (sabit saat farkıyla zaman damgası kaydırma).
+- Yapay zekâ: çok turlu konuşma vakaları (`turns`, `outputs`, kontrolde `turn`).
+- Bu sürüm için yeni kör deneme yapılmadı.
+
 **0.11.1**: Denetimden kalan küçük maddeler
 - `check_sources.py` (analyzing-requirements): her gereksinimin kelimeleri ve sayıları kaynak belgede geçiyor mu (SUPPORTED / WEAK / NOT_FOUND / DERIVED). Kelime düzeyinde bir kontroldür; anlam değişikliğini yakalamaz.
 - `reconcile.py`: `--rejects` ile kaynak = yüklenen + reddedilen dengesi (nedene göre); nedeni olmayan ya da hedefte bulunan reddedilmiş kayıtlar uyarı verir. Metin kesilmesi ipucu ("N. karakterde kesilmiş").

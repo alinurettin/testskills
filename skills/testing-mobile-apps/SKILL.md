@@ -4,7 +4,7 @@ description: Tests native and hybrid iOS/Android apps. Drafts test cases for lif
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.1"
+  version: "0.11.2"
 ---
 
 # Testing mobile apps

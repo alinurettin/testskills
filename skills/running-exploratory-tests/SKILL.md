@@ -4,7 +4,7 @@ description: Runs exploratory testing. Short bug hunts (under 45 min) go straigh
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.1"
+  version: "0.11.2"
 ---
 
 # Running exploratory tests

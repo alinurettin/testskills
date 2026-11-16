@@ -4,7 +4,7 @@ description: Writes BDD Gherkin scenarios (.feature files, TR/EN) from QA Suite 
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.1"
+  version: "0.11.2"
 ---
 
 # Writing BDD scenarios

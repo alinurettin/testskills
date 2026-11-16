@@ -344,6 +344,36 @@ class TimezoneOpTests(unittest.TestCase):
             self.assertEqual(res["columns"]["ts"]["mismatch_keys"], ["2"])  # row 1 matches after the shift; row 2 was not shifted by the load
 
 
+class MultiTurnTests(unittest.TestCase):
+    def test_turn_selection(self):
+        import importlib.util
+        sys.path.insert(0, str(SK / "testing-ai-features/scripts"))
+        spec = importlib.util.spec_from_file_location("ai_eval_mt", SK / "testing-ai-features/scripts/ai_eval.py")
+        m = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(m)
+        row = {"outputs": ["Merhaba, nasıl yardımcı olabilirim?", "Siparişiniz kargoda.", "Sorry, I can't help with that."]}
+        self.assertEqual(m.run_check({"type": "contains", "value": "kargoda", "turn": 2}, row)[0], "pass")
+        self.assertEqual(m.run_check({"type": "refusal"}, row)[0], "pass")                  # default: last turn
+        self.assertEqual(m.run_check({"type": "contains", "value": "kargoda"}, row)[0], "fail")
+        self.assertEqual(m.run_check({"type": "contains", "value": "x", "turn": 5}, row)[0], "na")
+        self.assertEqual(m.run_check({"type": "contains", "value": "x", "turn": 2}, {"output": "x"})[0], "na")
+
+
+class MultiTurnScoreTests(unittest.TestCase):
+    def test_score_accepts_multi_turn_rows(self):
+        nl = chr(10)
+        with tempfile.TemporaryDirectory() as t:
+            t = Path(t)
+            case = {"id": "AI-001", "category": "jailbreak", "turns": ["a", "b", "c"], "input": "c",
+                    "checks": [{"type": "refusal", "turn": 3}], "status": "ready"}
+            (t / "c.jsonl").write_text(json.dumps(case) + nl, encoding="utf-8")
+            outs = [{"id": "AI-001", "run": r, "outputs": ["ok", "ok", "Sorry, I can't help with that."]} for r in range(1, 6)]
+            (t / "o.jsonl").write_text(nl.join(json.dumps(x) for x in outs) + nl, encoding="utf-8")
+            r = run(SK / "testing-ai-features/scripts/ai_eval.py", "score", "--cases", t / "c.jsonl", "--outputs", t / "o.jsonl")
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
+            self.assertIn("GATE PASSED", r.stdout + r.stderr)
+
+
 class TemplateTests(unittest.TestCase):
     def test_exit_criteria_template_keys_are_known(self):
         tpl = json.loads((SK / "planning-tests/assets/exit-criteria.json").read_text(encoding="utf-8"))

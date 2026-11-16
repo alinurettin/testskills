@@ -4,7 +4,7 @@ description: Tests REST APIs from their OpenAPI 3.x contract. Generates traceabl
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.1"
+  version: "0.11.2"
 ---
 
 # Testing APIs

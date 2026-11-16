@@ -4,7 +4,7 @@ description: Designs non-functional tests traced to requirements. Generates k6 p
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.1"
+  version: "0.11.2"
 ---
 
 # Testing non-functional requirements

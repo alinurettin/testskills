@@ -4,7 +4,7 @@ description: Writes a risk-based test plan for a release or feature (ISO/IEC/IEE
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.1"
+  version: "0.11.2"
 ---
 
 # Planning tests
