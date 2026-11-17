@@ -1,0 +1,42 @@
+{
+  "run_id": "R18",
+  "trial": "exploratory",
+  "score": 28,
+  "max": 31,
+  "items": {
+    "K1": "full",
+    "K2": "none",
+    "K3": "full",
+    "K4": "full",
+    "K5": "full",
+    "K6": "full",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full"
+  },
+  "false_positives": [],
+  "quality_points": 4,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "found_full": 8,
+  "found_any": 8,
+  "points_K": 24,
+  "fp_traps": 0,
+  "fp_other": 0,
+  "precision": 1.0,
+  "structure": 4,
+  "evidence": [
+    "K1: BUG-05: istanbul zero versus İSTANBUL three.",
+    "K2: No stale event-list seat count after transaction reported.",
+    "K3: BUG-04: two fast clicks yield separate orders S547VB and SR2ZR6.",
+    "K4: BUG-07: refresh or direct checkout yields undefined and NaN.",
+    "K5: BUG-02: negative, zero and API quantities seven and ten accepted.",
+    "K6: BUG-03: phone input yields HTTP 500 with server.js path and telefonNormalEt stack visible.",
+    "K7: BUG-01: cancellations succeed approximately nine and 22 hours before event.",
+    "K8: BUG-06: ticket selection skipped by keyboard.",
+    "K9: BUG-08/09: raw floating-point and missing decimals.",
+    "structure: Timestamped charters; all nine defects have severity, steps, expected and actual; full debrief."
+  ],
+  "total": 28
+}

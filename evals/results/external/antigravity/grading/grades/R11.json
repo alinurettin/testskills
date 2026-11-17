@@ -1,0 +1,39 @@
+{
+  "run_id": "R11",
+  "trial": "api2",
+  "score": 92,
+  "max": 100,
+  "items": {
+    "K1": "full",
+    "K2": "full",
+    "K3": "full",
+    "K4": "full",
+    "K5": "full",
+    "K6": "full",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full",
+    "K10": "full"
+  },
+  "false_positives": [
+    "BUG-12: empty/whitespace holderName treated as invalid without minLength",
+    "BUG-14: 404 for invalid policyId treated as wrong without specified precedence"
+  ],
+  "quality_points": 13,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "evidence": [
+    "K1 BUG-01 C-010",
+    "K2 BUG-05 AD-006",
+    "K3 BUG-03 PA-016/017 follow-up GET",
+    "K4 BUG-06 ID-001/002",
+    "K5 BUG-09 C-005",
+    "K6 BUG-07 PC-016",
+    "K7 BUG-11 PC-019",
+    "K8 BUG-10 CD-001",
+    "K9 BUG-08 M-001",
+    "K10 BUG-04 PC-020 pol_5 limit 75000",
+    "Quality: clear request, response, severity and log references."
+  ]
+}

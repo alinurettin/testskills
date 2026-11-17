@@ -1,0 +1,42 @@
+{
+  "run_id": "R06",
+  "trial": "exploratory",
+  "score": 25,
+  "max": 31,
+  "items": {
+    "K1": "full",
+    "K2": "none",
+    "K3": "full",
+    "K4": "full",
+    "K5": "full",
+    "K6": "none",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full"
+  },
+  "false_positives": [],
+  "quality_points": 4,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "evidence": [
+    "K1 HATA-03 istanbul vs İstanbul",
+    "K2 no stale list finding",
+    "K3 HATA-05 double click two orders",
+    "K4 HATA-08 refresh NaN",
+    "K5 HATA-01 negative checkout and API",
+    "K6 no error disclosure or formatted phone failure",
+    "K7 HATA-02 confirmed cancellation under 24 hours",
+    "K8 HATA-04 selector skipped by Tab",
+    "K9 HATA-06/07 amount formatting and mismatch",
+    "S2-S5: timestamped charters, steps/expected/actual and severity for all findings, complete debrief"
+  ],
+  "found_full": 7,
+  "found_any": 7,
+  "points_K": 21,
+  "fp_traps": 0,
+  "fp_other": 0,
+  "precision": 1.0,
+  "structure": 4,
+  "total": 25
+}

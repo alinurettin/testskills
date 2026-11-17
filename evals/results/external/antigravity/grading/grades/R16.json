@@ -1,0 +1,42 @@
+{
+  "run_id": "R16",
+  "trial": "exploratory",
+  "score": 22,
+  "max": 31,
+  "items": {
+    "K1": "full",
+    "K2": "none",
+    "K3": "none",
+    "K4": "full",
+    "K5": "full",
+    "K6": "none",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full"
+  },
+  "false_positives": [],
+  "quality_points": 4,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "found_full": 6,
+  "found_any": 6,
+  "points_K": 18,
+  "fp_traps": 0,
+  "fp_other": 0,
+  "precision": 1.0,
+  "structure": 4,
+  "evidence": [
+    "K1: HATA-07: istanbul returns zero and İSTANBUL three.",
+    "K2: No stale event-list seat count reported.",
+    "K3: Double click explicitly produced one request; no duplicate defect reported.",
+    "K4: HATA-08: checkout refresh or browser back yields undefined and NaN.",
+    "K5: HATA-01/02: zero, negative, seven and fractional quantities accepted.",
+    "K6: No missing-ID 500 and stack trace or failing telephone validation reported.",
+    "K7: HATA-03: cancellations at 10.6 and 22.6 hours succeed.",
+    "K8: HATA-06: keyboard skips ticket options.",
+    "K9: HATA-05/09: raw floating-point and missing decimal formatting.",
+    "structure: Charters and timed notes, reproducible bug reports and complete debrief."
+  ],
+  "total": 22
+}

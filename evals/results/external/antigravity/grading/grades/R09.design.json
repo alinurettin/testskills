@@ -1,0 +1,135 @@
+{
+  "score": {
+    "K": {
+      "K1": {
+        "max": 2,
+        "sub": {
+          "min 149.99/150.00": 1,
+          "max 20000.00/20000.01": 1
+        },
+        "got": 2
+      },
+      "K2": {
+        "max": 2,
+        "sub": {
+          "399.99 -> KI 0.00": 1,
+          "400.00 -> KI 50.00": 1
+        },
+        "got": 2
+      },
+      "K3": {
+        "max": 2,
+        "sub": {
+          "son-olmayan durumda gecersiz gecis": 1,
+          "son durumda olay reddi": 1
+        },
+        "got": 2
+      },
+      "K4": {
+        "max": 2,
+        "sub": {
+          "HIZLI+UZAK -> ERR_TESLIMAT_BOLGE": 1,
+          "KAPIDA+HIZLI/MAGAZA -> ERR_KAPIDA_UYGUNLUK": 1
+        },
+        "got": 2
+      },
+      "K5": {
+        "max": 3,
+        "sub": {
+          "tavan: %10 > 150.00 iken KI = 150.00": 2,
+          "yarim-yukari yuvarlama (x,xx5)": 1
+        },
+        "got": 3
+      },
+      "K6": {
+        "max": 3,
+        "sub": {
+          "ALTIN tek taban puan, asagi yuvarlama": 2,
+          "puan NT uzerinden (kuponlu)": 1
+        },
+        "got": 3
+      },
+      "K7": {
+        "max": 3,
+        "sub": {
+          "HAZIRLANIYOR + IPTAL(MUSTERI) -> ERR": 2,
+          "HAZIRLANIYOR + IPTAL(OPERATOR) -> IPTAL_EDILDI": 1
+        },
+        "got": 3
+      },
+      "K8": {
+        "max": 3,
+        "sub": {
+          "IADE_TALEBI(gun=14) -> KABUL": 1,
+          "IADE_TALEBI(gun=15) -> ERR_IADE_SURESI": 2
+        },
+        "got": 3
+      },
+      "K9": {
+        "max": 4,
+        "sub": {
+          "NT=750.00 (kuponlu) dogru kargo": 2,
+          "NT=749.99 (kuponlu) dogru kargo": 2
+        },
+        "got": 4
+      },
+      "K10": {
+        "max": 4,
+        "sub": {
+          "KAPIDA OT=5000.00 -> KABUL": 2,
+          "KAPIDA OT=5000.01 -> ERR_KAPIDA_LIMIT": 2
+        },
+        "got": 4
+      },
+      "K11": {
+        "max": 4,
+        "sub": {
+          "UZAK+NT>=750 (ALTIN degil) -> KU 25.00": 2,
+          "UZAK+ALTIN -> KU 0.00": 1,
+          "Ek-A Ornek 4 celiskisi raporlandi [MANUEL ONAY]": 1
+        },
+        "got": 4
+      },
+      "K12": {
+        "max": 4,
+        "sub": {
+          "pairwise kapsam 100.0%, ihlal 0, satir 13": 4
+        },
+        "got": 4
+      }
+    },
+    "k_total": 36,
+    "k_max": 36,
+    "penalty_raw": 0,
+    "penalty": 0,
+    "final": 36,
+    "percent": 100.0
+  },
+  "penalty_items": [],
+  "pricing": {
+    "rows": 65,
+    "errors": []
+  },
+  "states": {
+    "rows": 52,
+    "errors": []
+  },
+  "pairwise": {
+    "rows": 13,
+    "coverage": 100.0,
+    "violations": [],
+    "unknown": [],
+    "missing_pairs": [],
+    "feasible_pairs": 59
+  },
+  "report_ex_flags": {
+    "1": [],
+    "2": [],
+    "3": [],
+    "4": [
+      "L221: 1. **[kritik celiski — ek-a ornek 4 vs. madde 6.2 & 6.5]:**",
+      "L222: ek-a ornek 4'te (`klasik`, `at = 900,00`, kuponsuz, `standart`, `uzak`) `ku = 0,00` ve `ot = 900,00` yazilmistir. oysa madde 6.5 *\"6.2 kapsamindaki ucretsiz standart teslimat bu ek ucreti kapsamaz (ek ucreti yalnizca 6.3"
+    ],
+    "5": []
+  }
+}

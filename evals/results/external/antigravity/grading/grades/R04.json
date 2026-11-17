@@ -1,0 +1,36 @@
+{
+  "run_id": "R04",
+  "trial": "api2",
+  "score": 91,
+  "max": 100,
+  "items": {
+    "K1": "full",
+    "K2": "full",
+    "K3": "half",
+    "K4": "full",
+    "K5": "half",
+    "K6": "full",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full",
+    "K10": "full"
+  },
+  "false_positives": [],
+  "quality_points": 13,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "evidence": [
+    "K1: test-kayitlari TC-022/023 cross-user query",
+    "K2: bulgular BLG-03 TC-009",
+    "K3: BLG-04 TC-034/036 shows changed PATCH response but no subsequent GET, half",
+    "K4: BLG-06 TC-052 same key distinct ids",
+    "K5: BLG-10 TC-024 user1 pageSize=1 and TC-025 admin pageSize=2 show symptom; required user1 page=1 pageSize=2 evidence absent, half",
+    "K6: BLG-07 TC-047",
+    "K7: BLG-08 TC-045",
+    "K8: BLG-09 required field and response",
+    "K9: BLG-11 stack",
+    "K10: BLG-05 TC-043 pol_1 limit 50000 amount 50001",
+    "Quality: clear reproductions, severity and traceable log."
+  ]
+}

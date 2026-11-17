@@ -1,0 +1,41 @@
+{
+  "run_id": "R14",
+  "trial": "design",
+  "score": 36,
+  "max": 36,
+  "items": {
+    "K1": "full",
+    "K2": "full",
+    "K3": "full",
+    "K4": "full",
+    "K5": "full",
+    "K6": "full",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full",
+    "K10": "full",
+    "K11": "full",
+    "K12": "full"
+  },
+  "false_positives": [],
+  "quality_points": null,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "evidence": [
+    "K1: grader 2/2; min 149.99/150.00, max 20000.00/20000.01",
+    "K2: grader 2/2; 399.99 -> KI 0.00, 400.00 -> KI 50.00",
+    "K3: grader 2/2; son-olmayan durumda gecersiz gecis, son durumda olay reddi",
+    "K4: grader 2/2; HIZLI+UZAK -> ERR_TESLIMAT_BOLGE, KAPIDA+HIZLI/MAGAZA -> ERR_KAPIDA_UYGUNLUK",
+    "K5: grader 3/3; tavan: %10 > 150.00 iken KI = 150.00, yarim-yukari yuvarlama (x,xx5)",
+    "K6: grader 3/3; ALTIN tek taban puan, asagi yuvarlama, puan NT uzerinden (kuponlu)",
+    "K7: grader 3/3; HAZIRLANIYOR + IPTAL(MUSTERI) -> ERR, HAZIRLANIYOR + IPTAL(OPERATOR) -> IPTAL_EDILDI",
+    "K8: grader 3/3; IADE_TALEBI(gun=14) -> KABUL, IADE_TALEBI(gun=15) -> ERR_IADE_SURESI",
+    "K9: grader 4/4; NT=750.00 (kuponlu) dogru kargo, NT=749.99 (kuponlu) dogru kargo",
+    "K10: grader 4/4; KAPIDA OT=5000.00 -> KABUL, KAPIDA OT=5000.01 -> ERR_KAPIDA_LIMIT",
+    "K11: grader 4/4; UZAK+NT>=750 (ALTIN degil) -> KU 25.00, UZAK+ALTIN -> KU 0.00, Ek-A Ornek 4 celiskisi raporlandi [MANUEL ONAY]",
+    "K12: grader 4/4; pairwise kapsam 100.0%, ihlal 0, satir 12",
+    "K11c: report section 7 confirms 25.00/925.00 discrepancy; no T4 claim.",
+    "DG-55: parser uppercases deliberately lowercase invalid actor; literal invalid-input rule gives ERR_GECERSIZ_GIRDI, so remove penalty."
+  ]
+}

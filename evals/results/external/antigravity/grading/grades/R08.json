@@ -1,0 +1,42 @@
+{
+  "run_id": "R08",
+  "trial": "exploratory",
+  "score": 28,
+  "max": 31,
+  "items": {
+    "K1": "full",
+    "K2": "none",
+    "K3": "full",
+    "K4": "full",
+    "K5": "full",
+    "K6": "full",
+    "K7": "full",
+    "K8": "full",
+    "K9": "full"
+  },
+  "false_positives": [],
+  "quality_points": 4,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "found_full": 8,
+  "found_any": 8,
+  "points_K": 24,
+  "fp_traps": 0,
+  "fp_other": 0,
+  "precision": 1.0,
+  "structure": 4,
+  "evidence": [
+    "K1: HATA-05: lowercase istanbul yields zero, uppercase İSTANBUL yields three.",
+    "K2: No stale event-list seat count after order or cancellation reported.",
+    "K3: HATA-06: double click creates two distinct orders.",
+    "K4: HATA-08: refresh at checkout gives undefined and NaN.",
+    "K5: HATA-01 and HATA-03: zero or negative quantities and API quantity above six.",
+    "K6: HATA-04: missing identifier yields HTTP 500 and TypeError with siparisOlustur stack.",
+    "K7: HATA-02: cancellation succeeds within 24 hours despite rule.",
+    "K8: HATA-07: ticket type is inaccessible by keyboard.",
+    "K9: HATA-09: amounts are not formatted to two decimal places.",
+    "structure: Charter and timestamp, reproducible findings with expected and actual results and severity, and debrief with coverage, gaps, risks and release recommendation."
+  ],
+  "total": 28
+}

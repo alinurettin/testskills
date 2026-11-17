@@ -1,0 +1,41 @@
+{
+  "run_id": "R05",
+  "trial": "design",
+  "score": 35,
+  "max": 36,
+  "items": {
+    "K1": "full",
+    "K2": "full",
+    "K3": "full",
+    "K4": "full",
+    "K5": "full",
+    "K6": "full",
+    "K7": "full",
+    "K8": "half",
+    "K9": "full",
+    "K10": "full",
+    "K11": "full",
+    "K12": "full"
+  },
+  "false_positives": [],
+  "quality_points": null,
+  "contaminated": false,
+  "contamination_reasons": [],
+  "grader_model": "GPT-6.1 Terra",
+  "evidence": [
+    "K1: objective grader 2/2; min 149.99/150.00=1, max 20000.00/20000.01=1",
+    "K2: objective grader 2/2; 399.99 -> KI 0.00=1, 400.00 -> KI 50.00=1",
+    "K3: objective grader 2/2; son-olmayan durumda gecersiz gecis=1, son durumda olay reddi=1",
+    "K4: objective grader 2/2; HIZLI+UZAK -> ERR_TESLIMAT_BOLGE=1, KAPIDA+HIZLI/MAGAZA -> ERR_KAPIDA_UYGUNLUK=1",
+    "K5: objective grader 3/3; tavan: %10 > 150.00 iken KI = 150.00=2, yarim-yukari yuvarlama (x,xx5)=1",
+    "K6: objective grader 3/3; ALTIN tek taban puan, asagi yuvarlama=2, puan NT uzerinden (kuponlu)=1",
+    "K7: objective grader 3/3; HAZIRLANIYOR + IPTAL(MUSTERI) -> ERR=2, HAZIRLANIYOR + IPTAL(OPERATOR) -> IPTAL_EDILDI=1",
+    "K8: objective grader 2/3; IADE_TALEBI(gun=14) -> KABUL=0, IADE_TALEBI(gun=15) -> ERR_IADE_SURESI=2",
+    "K9: objective grader 4/4; NT=750.00 (kuponlu) dogru kargo=2, NT=749.99 (kuponlu) dogru kargo=2",
+    "K10: objective grader 4/4; KAPIDA OT=5000.00 -> KABUL=2, KAPIDA OT=5000.01 -> ERR_KAPIDA_LIMIT=2",
+    "K11: objective grader 4/4; UZAK+NT>=750 (ALTIN degil) -> KU 25.00=2, UZAK+ALTIN -> KU 0.00=1, Ek-A Ornek 4 celiskisi raporlandi [MANUEL ONAY]=1",
+    "K12: objective grader 4/4; pairwise kapsam 100.0%, ihlal 0, satir 14=4",
+    "K8: 14-day request is a prefix to IADE_ONAY, not the final event; no qualifying final state row.",
+    "K11c: test-tasarimi.md sections 1 and 7 confirm 25.00/925.00 discrepancy; no T4 claim."
+  ]
+}
