@@ -4,7 +4,7 @@ description: Tests REST APIs from their OpenAPI 3.x contract. Generates traceabl
 license: MIT
 metadata:
   suite: qa-suite
-  version: "0.11.2"
+  version: "0.11.3"
 ---
 
 # Testing APIs
@@ -106,6 +106,7 @@ When `@playwright/test` is installed in another folder, run `npx playwright test
 - **Negative tests can pass for the wrong reason.** A 400 for "insufficient funds" also satisfies "amount above the maximum is rejected". When the error body carries a code, assert it (for example `VALIDATION`), and keep balances high enough that only the rule under test can reject the request.
 - **On Windows, prefer `127.0.0.1`** over `localhost` when the server listens on IPv4 only, because `localhost` may resolve to `::1`.
 - **Group failures by root cause.** For example, "returns 200 instead of 201" fails every create test. File one defect listing all affected TCs. Classify each failure as an implementation defect, a contract defect or a test data problem.
+- **A defect needs an expected result you can quote.** Quote it from the contract, a requirement or a rule the user gave. When the API does something the contract does not cover, report it under open questions, with the observed behaviour and the risk, and without an expected status code of your own. Examples: a claim on a cancelled policy is accepted; an empty string passes a field that has no `minLength`; a wrong-type ID gets 404 where you expected 400. A documented 401, 403, 404 or 400 is correct behaviour, not a finding. One invented expectation makes the reader doubt the real defects beside it.
 
 ### 5. Close the loop
 `automating-with-playwright/scripts/pw_results.py` maps the Playwright JSON report to `qa/results.json` by TC tag. Then run the RTM (`tracing-requirements`) and write defect reports (`reporting-test-results`), with the request, the response and the contract excerpt as evidence.

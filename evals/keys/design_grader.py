@@ -297,10 +297,16 @@ def parse_sequence(text):
                     continue
                 if "=" in part or ":" in part:
                     k, v = re.split(r"[=:]", part, maxsplit=1)
-                    params[fold(k)] = fold(v) if fold(k) != "GUN" else v.strip()
+                    key, raw = fold(k), v
+                    params[key] = fold(v) if key != "GUN" else v.strip()
                 else:
-                    key = DEFAULT_PARAM.get(name, "_")
+                    key, raw = DEFAULT_PARAM.get(name, "_"), part
                     params[key] = fold(part) if key != "GUN" else part.strip()
+                # 10.5.3 allows only MUSTERI / OPERATOR. A value that matches only after case/letter
+                # folding ("musteri") is ambiguous: a strict reading rejects it. Keep the raw text so
+                # that grade_states can accept both readings.
+                if key == "AKTOR" and raw.strip() != params[key] and params[key] in ("MUSTERI", "OPERATOR"):
+                    params["_AKTOR_RAW"] = raw.strip()
         out.append((name, params))
     return out
 
@@ -502,6 +508,12 @@ def grade_states(path):
             if seq:
                 last = seq[-1]
                 last_res = apply_event(ctx, last[0], last[1])
+                if (last[1].get("_AKTOR_RAW") and exp_res == "ERR_GECERSIZ_GIRDI"
+                        and last[0] in TABLE.get(pre_state, ())):
+                    # strict reading of a non-canonical aktor value: invalid input, state unchanged
+                    last_res = "ERR_GECERSIZ_GIRDI"
+                    ctx.clear()
+                    ctx.update(pre_ctx)
             else:
                 last = None
                 last_res = "KABUL"

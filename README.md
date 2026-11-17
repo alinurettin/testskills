@@ -1,6 +1,6 @@
 # QA Suite: Yapay zekâ için profesyonel yazılım test skill'leri
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.11.2-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) ![Version](https://img.shields.io/badge/version-0.11.3-blue) ![Agent Skills](https://img.shields.io/badge/Agent%20Skills-17%20skills-purple) ![Language](https://img.shields.io/badge/lang-TR%20%7C%20EN-orange)
 
 **[English README →](README.en.md)**
 
@@ -50,6 +50,8 @@ Her denemede ajana yalnızca bir test uzmanına verilecek girdiler verildi: bir 
 17 skill'in tamamında vekil yönlendirme ölçümü: **84/84** istek doğru skill'e gitti. Bunlara skill gerektirmeyen 5 yakın istek de dahil. Ayrıca 280'den fazla birim testi var.
 
 **Skill'li ve skill'siz karşılaştırma (126 koşu, 7 bağımsız deneme, 3 model):** üç model birlikte alındığında skill'ler ortalamayı 90,5'ten 93,1'e çıkardı (+2,7 puan, %95 güven aralığı +1,0 ile +4,4, permütasyon testi p = 0,014). Tek tek modellerde fark istatistiksel olarak ayırt edilemiyor (Haiku +3,8, Sonnet 5.5 +2,3, Opus +1,9; aralıklar örtüşüyor), yani "zayıf modele daha çok yarıyor" demek için veri yetmiyor. Mobil plan incelemesinde ve Haiku'daki keşif testinde skill'li kol geride ya da eşit. Hesap: `python tools/eval_stats.py evals/results/trials-0.9.0.json`.
+
+**Dış araçla kör deneme (0.11.2, 18 koşu):** Antigravity içinde Gemini 4 Hydrogen ile yapılan ve GPT-6.1 Terra'nın kör puanladığı denemede skill'li kol önde çıkmadı: ortalama %87,9'a karşı %93,3 (fark −5,3; p = 0,09). API denemesinde skill'li koşular ekili hataların hepsini buldu, ama sözleşmenin sustuğu davranışları kusur diye raporladığı için ceza aldı; 0.11.3 bu ayrımı skill'e ekledi, etkisi henüz ölçülmedi. Ayrıntı ve sınırlar: [docs/EVALUATION.md](docs/EVALUATION.md) §10.
 
 Yöntem, maliyetler ve neyin *ölçülmediği*: **[docs/EVALUATION.md](docs/EVALUATION.md)**. Her denemenin gerçek çıktıları: [examples/](examples/).
 

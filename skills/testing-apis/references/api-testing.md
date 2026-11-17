@@ -105,6 +105,12 @@ These tests need **two or more test users**. Put their tokens in the environment
   - an implementation defect (the contract is right, the implementation is wrong);
   - a contract defect (the documentation is wrong or incomplete);
   - a test data problem (see §4).
+- **Separate defects from open questions.** A defect cites the rule it breaks: a schema constraint, a documented status code, a sentence in a description, or a requirement. Behaviour that only looks wrong, on a point where the contract is silent, is an open question for the product owner. Write what was sent, what came back and why it may matter, and ask which behaviour is intended. Typical cases:
+  - a business rule the domain suggests but the contract does not state (a claim on a cancelled policy);
+  - an empty or whitespace string in a field without `minLength` or `pattern`;
+  - the order of two error checks (404 before 400, 403 before 404);
+  - ownership or audit fields set in a way nobody specified.
+- Keep the two lists apart in the report. A blind trial of 0.11.3 showed the cost of mixing them: the runs that used this skill found every planted defect, and still scored below the runs without it, because they reported contract-silent behaviour as defects.
 
 ## 10. Supported schema subset and evidence privacy
 

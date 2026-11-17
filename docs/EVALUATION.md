@@ -13,6 +13,7 @@ Bu belge sürümlere göre tarihsel sonuçları özetler. İlk denemeler 29–30
 | Skill'li / skill'siz karşılaştırma (0.2.0) | 3 görev, sabit kontrol listesiyle puanlama | Geçme oranı %93'e karşı %82 (+11 puan) |
 | Vekil yönlendirme ölçümü | Doğru skill'in adından ve açıklamasından seçilmesi | 17 skill, 84 istek: **84/84** (yeni skill'ler için 22/22) |
 | Birim ve regresyon testleri | 30 script'in davranışı | **150 test**, CI'da her push'ta koşar |
+| Dış kör deneme (0.11.2) | Antigravity + Gemini 4 Hydrogen, 3 deneme, 18 koşu; puanlayan GPT-6.1 Terra | Skill'li kol **önde değil**: %87,9'a karşı %93,3 (fark −5,3; p=0,09). Ayrıntı §10 |
 
 ## 1. Kör uçtan uca deneme: FAST transfer
 - **Kurulum:** Bir bankacılık user story'si (FAST para transferi) ve 5 hata yerleştirilmiş bir demo web uygulaması. Ajan uygulama kodunu ve cevap anahtarını görmedi.
@@ -148,3 +149,34 @@ Yeni kod regresyonları tarihsel model puanlarını değiştirmez. Pairwise kaps
 0.9.0 ham verisinin yeniden hesaplanmış skill/skillsiz ortalamaları: Haiku **89,25/85,42**, Sonnet **94,93/92,61**, Opus **95,20/93,34**. 126 tekrar yalnız **7 farklı görev** içerir; 50 koşu tam puandır. Migration'ın 18 koşusu da 100'dür. Medyan tablosu tüm gerilemeleri göstermez: Opus API ortalaması skill ile 96,33, skillsiz 99,67'dir. Maliyet metadata'sı bu kayıtta yoktur. Tutarlılık ve maliyet üstünlüğü ayrı ölçülmelidir; genel ortalama tek başına bunları kanıtlamaz.
 
 Yeni kayıtlar için [manifest/record/report akışı](EVALUATION-HARNESS.md) farklı model ayarı, grader ve commit gruplarını ayırır; bilinmeyen metadata'yı null tutar, kirlenmiş koşuları dışlar ve görev bazlı dağılım verir. Çalışma klasörünü kopyalamak ajan erişimini engellemez; izolasyonu runner/işletim sistemi sağlamalıdır.
+
+## 10. 0.11.2: dış araçla kör deneme (Antigravity, 18 koşu)
+
+0.10.0'dan beri hiçbir sürüm kör denemeyle ölçülmemişti. Bu tur, koşuları da puanlamayı da bizim dışımızdaki araçlara bıraktı.
+
+- **Kurulum:** v0.11.2 (commit `330cc6a`). Üç deneme (test tasarımı, API 3.1, keşif testi) × skill'li/skill'siz × 3 koşu. Koşan: Google Antigravity 44.4.3, Gemini 4 Hydrogen (XHigh), 16–17 Kasım 2026. Puanlayan: Codex içinde GPT-6.1 Terra; yalnızca teslimleri ve anahtarları gördü, kol bilgisini görmedi. Ham veri: `evals/results/trials-external-antigravity-2026-11.json`. Teslimler, koşu notları ve puan dosyaları: [`eval/antigravity-2026-11` dalı](https://github.com/alinurettin/testskills/tree/eval/antigravity-2026-11/evals/results/external/antigravity).
+- **Puanlar (koşu koşu):**
+
+| Deneme (en yüksek puan) | Skill'li | Skill'siz | Ortalama %, skill'li / skill'siz |
+|---|---|---|---|
+| Test tasarımı (36) | 36, 35, 36 | 36, 36, 36 | 99,1 / 100,0 |
+| API (100) | 84, 92, 76 | 87, 91, 100 | 84,0 / 92,7 |
+| Keşif testi (31) | 25, 22, 28 | 25, 28, 28 | 80,6 / 87,1 |
+| **Üç deneme birlikte** | | | **87,9 / 93,3** |
+
+- **İstatistik (`python tools/eval_stats.py evals/results/trials-external-antigravity-2026-11.json`):** fark −5,3 puan, %95 güven aralığı [−10,1, −0,6], permütasyon p=0,09. Hücre başına 3 koşu var; bu bir kanıt değil, ama yön skill'lerin aleyhine.
+- **Doğru okuma:**
+  - **Skill'ler bu modelde ölçülebilir bir fayda sağlamadı.** Hiçbir denemede skill'li kol önde değil.
+  - **API'de fark, bulma gücünden değil yanlış alarm cezasından geliyor.** Skill'li üç koşu ekili 10 hatanın hepsini tam buldu; skill'siz iki koşuda yarım puanlı maddeler var. Ceza sayılmadan puanlar skill'li 100, 100, 100 ve skill'siz 95, 91, 100 olurdu. Skill'li koşular sözleşmenin sustuğu davranışları (iptal edilmiş poliçeye hasar açılması, boş `holderName`, hata kontrollerinin sırası) kusur diye raporladı: 12 cezaya karşı 2. Anahtar "desteklenmeyen kusur" için −4 yazıyor ve puanlayıcı bunu katı ama tutarlı uyguladı. 0.9.0'da Opus'un API ortalaması da aynı yöndeydi (96,3'e karşı 99,7).
+  - **Test tasarımı tavanda.** 12 koşunun 11'i tam puan; bu deneme bu sınıf modelleri ayırt etmiyor.
+  - **Keşif testinde 12 koşunun hiçbiri K2'yi bulamadı.** Skill'li kol ayrıca K3 ve K6'yı daha çok kaçırdı (K6: 2'ye karşı 1, K3: 1'e karşı 0).
+- **Bundan çıkan düzeltmeler (0.11.3):** `testing-apis` artık kusur ile açık soruyu ayırıyor. `design_grader.py`, küçük harfle yazılmış `aktor` değeri için katı okumayı da kabul ediyor: betik v0.11.2 hâliyle skill'siz iki koşuya (R03, R14) haksız 1 puan ceza kesmişti; puanlayıcı bunu elle düzeltti, yukarıdaki puanlar düzeltilmiş hâlidir. Bu düzeltmelerin etkisi henüz ölçülmedi.
+- **Sınırlar (önemli):**
+  - Tek model, hücre başına 3 koşu, tek puanlayıcı. Keşif puanlarını ikinci bir puanlayıcı doğrulamadı. Biz yalnızca tasarım puanlarını betikle, API'de bulgu eşleşmelerini ve üç ceza kararını elle denetledik.
+  - Kollar karışık sırada koşmadı: skill'li koşular 16 Kasım 18:11–23:25, tutulan skill'siz koşular 17 Kasım 00:21–00:48.
+  - Skill'siz kol bir kez yeniden koştu. İlk denemede üç koşunun sunucusu yarıda kapanmıştı ve istem değişti ("Use your own expertise and general tools." cümlesi eklendi). İlk denemenin çıktıları silindi; iki deneme karşılaştırılamıyor. Yeniden koşma skill'siz kolun lehine bir düzeltmedir.
+  - Yalıtım yalnızca talimatla sağlandı: alt-ajanlar teknik olarak anahtar klasörüne erişebiliyordu ve internet açıktı. "Dışarı çıkan olmadı" denetimini aracın kendisi yaptı. Puanlayıcı hiçbir koşuda anahtar izi bildirmedi.
+  - Körlük tam değil: skill'li teslimlerden en az biri `skills/...` yolunu anıyor.
+  - API sunucusu bazı girdilerde çöküyor ve koşu sırasında yeniden başlatıldı (iki kolda da, 3–7 kez); bellekteki durum her seferinde sıfırlandı.
+  - Harness kullanılmadı (giriş özetleri yok) ve modelin tam API kimliği bilinmiyor. Teslimlerdeki yerel klasör yolu yayından önce `C:\eval` ile değiştirildi; başka hiçbir şeye dokunulmadı.
+  - İkinci araçla (Codex) koşu yapılmadı: iki deneme tavanda olduğu için aynı denemeleri tekrarlamak yerine önce denemelerin zorlaştırılması gerekiyor.

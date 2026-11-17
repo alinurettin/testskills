@@ -13,6 +13,7 @@ This document preserves historical results by version. The first trials ran on 2
 | With vs without skills (0.2.0) | 3 tasks graded against a fixed checklist | 93% vs 82% pass rate (+11 points) |
 | Proxy routing | Is the right skill chosen from its name and description? | 17 skills, 84 requests: **84/84** (22/22 for the new skills) |
 | Unit and regression tests | Behaviour of the 30 scripts | **150 tests**, run in CI on every push |
+| External blind trial (0.11.2) | Antigravity + Gemini 4 Hydrogen, 3 trials, 18 runs; graded by GPT-6.1 Terra | The with-skill arm is **not ahead**: 87.9% vs 93.3% (difference −5.3; p=0.09). See §10 |
 
 ## 1. Blind end-to-end trial: FAST transfer
 - **Setup:** a banking user story (FAST money transfer) and a demo web app with 5 planted defects. The agent never saw the app's code or the answer key.
@@ -164,3 +165,34 @@ New code regressions do not change historical model scores. Local fixtures test 
 Recomputed 0.9.0 skill/no-skill means: Haiku **89.25/85.42**, Sonnet **94.93/92.61**, Opus **95.20/93.34**. The 126 repeated runs represent **7 tasks**; 50 runs hit 100, including all 18 migration runs. Medians hide some regressions: Opus API means are 96.33 with skills versus 99.67 without. Current cost metadata is absent. Consistency and cost advantages need separate measurement; the overall mean alone does not demonstrate either.
 
 The new [manifest/record/report workflow](EVALUATION-HARNESS.md) separates model-setting, grader and commit cohorts, preserves unavailable metadata as null, excludes contaminated records and reports task-level distributions. Copying a directory does not restrict agent access; the runner/OS must enforce isolation.
+
+## 10. 0.11.2: blind trial run by an external tool (Antigravity, 18 runs)
+
+No release since 0.10.0 had been measured in a blind trial. In this round both the runs and the grading were done by tools other than ours.
+
+- **Setup:** v0.11.2 (commit `330cc6a`). Three trials (test design, API 3.1, exploratory) × with/without skills × 3 runs. Runner: Google Antigravity 44.4.3, Gemini 4 Hydrogen (XHigh), 16–17 November 2026. Grader: GPT-6.1 Terra in Codex; it saw only the deliverables and the answer keys, not the arms. Raw data: `evals/results/trials-external-antigravity-2026-11.json`. Deliverables, run notes and grade files: [branch `eval/antigravity-2026-11`](https://github.com/alinurettin/testskills/tree/eval/antigravity-2026-11/evals/results/external/antigravity).
+- **Scores (run by run):**
+
+| Trial (maximum) | With skills | Without | Mean %, with / without |
+|---|---|---|---|
+| Test design (36) | 36, 35, 36 | 36, 36, 36 | 99.1 / 100.0 |
+| API (100) | 84, 92, 76 | 87, 91, 100 | 84.0 / 92.7 |
+| Exploratory (31) | 25, 22, 28 | 25, 28, 28 | 80.6 / 87.1 |
+| **All three trials** | | | **87.9 / 93.3** |
+
+- **Statistics (`python tools/eval_stats.py evals/results/trials-external-antigravity-2026-11.json`):** difference −5.3 points, 95% confidence interval [−10.1, −0.6], permutation p=0.09. With 3 runs per cell this is not proof, but the direction is against the skills.
+- **Correct reading:**
+  - **The skills gave no measurable benefit on this model.** The with-skill arm is ahead in no trial.
+  - **In the API trial the gap comes from false-positive penalties, not from detection.** All three with-skill runs found all 10 planted defects in full; two runs without skills have half-credit items. Before penalties the scores would be 100, 100, 100 with skills and 95, 91, 100 without. The with-skill runs reported behaviour on which the contract is silent (a claim on a cancelled policy, an empty `holderName`, the order of error checks) as defects: 12 penalties against 2. The key sets −4 for an "unsupported defect", and the grader applied it strictly but consistently. The Opus API means in 0.9.0 pointed the same way (96.3 vs 99.7).
+  - **Test design is at the ceiling.** 11 of 12 runs scored full marks; this trial does not separate models of this class.
+  - **None of the 12 exploratory runs found K2.** The with-skill arm also missed K3 and K6 more often (K6: 2 vs 1, K3: 1 vs 0).
+- **Fixes that follow (0.11.3):** `testing-apis` now separates defects from open questions. `design_grader.py` accepts the strict reading of an `aktor` value written in lower case: at v0.11.2 the script wrongly took 1 point from two runs without skills (R03, R14); the grader corrected this by hand, and the scores above are the corrected ones. The effect of these fixes has not been measured yet.
+- **Limits (important):**
+  - One model, 3 runs per cell, one grader. No second grader checked the exploratory scores. We checked only the design scores with the script, and in the API trial the mapping of findings and three of the penalty decisions by hand.
+  - The arms did not run interleaved: with-skill runs on 16 November 18:11–23:25, the kept runs without skills on 17 November 00:21–00:48.
+  - The arm without skills was rerun once. In the first attempt the server of three runs stopped part-way, and the prompt changed (the sentence "Use your own expertise and general tools." was added). The outputs of the first attempt were deleted, so the two attempts cannot be compared. The rerun is a correction in favour of the arm without skills.
+  - Isolation was by instruction only: the sub-agents could technically read the key folder, and the internet was on. The tool itself audited that nothing left its folder. The grader reported no trace of the keys in any run.
+  - Blinding is not complete: at least one with-skill deliverable names a `skills/...` path.
+  - The API server crashes on some inputs and was restarted during runs (in both arms, 3–7 times); its in-memory state was reset each time.
+  - The harness was not used (no input hashes) and the exact API id of the model is unknown. The local folder path in the deliverables was replaced with `C:\eval` before publication; nothing else was changed.
+  - No runs were made with a second tool (Codex): two of the trials are at the ceiling, so the trials need to be made harder before they are repeated.

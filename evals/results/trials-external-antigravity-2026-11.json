@@ -1,0 +1,268 @@
+{
+ "date": "2026-11-17",
+ "note": "18 runs of v0.11.2 (commit 330cc6a) in Google Antigravity 44.4.3 with Gemini 4 Hydrogen (XHigh): 3 trials x skill/noskill x 3. Blind grader: GPT-6.1 Terra in Codex (deliverables and keys only, no arm information). Deliverables, run notes and grade files: branch eval/antigravity-2026-11, evals/results/external/antigravity/. script_score = design_grader.py total at v0.11.2; score_without_fp_penalty = api2 score before the -4 penalties. See docs/EVALUATION.md section 10 for limits.",
+ "runs": [
+  {
+   "id": "R01",
+   "trial": "api2",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 1,
+   "score": 87,
+   "max": 100,
+   "found": 9.5,
+   "total": 10,
+   "false_positives": 2,
+   "missed": [],
+   "score_without_fp_penalty": 95
+  },
+  {
+   "id": "R02",
+   "trial": "design",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [],
+   "script_score": 36
+  },
+  {
+   "id": "R03",
+   "trial": "design",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 1,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [],
+   "script_score": 35
+  },
+  {
+   "id": "R04",
+   "trial": "api2",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 2,
+   "score": 91,
+   "max": 100,
+   "found": 9.0,
+   "total": 10,
+   "false_positives": 0,
+   "missed": [],
+   "score_without_fp_penalty": 91
+  },
+  {
+   "id": "R05",
+   "trial": "design",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 2,
+   "score": 35,
+   "max": 36,
+   "found": 11.5,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [],
+   "script_score": 35
+  },
+  {
+   "id": "R06",
+   "trial": "exploratory",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 1,
+   "score": 25,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K6"
+   ]
+  },
+  {
+   "id": "R07",
+   "trial": "design",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 3,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [],
+   "script_score": 36
+  },
+  {
+   "id": "R08",
+   "trial": "exploratory",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 2,
+   "score": 28,
+   "max": 31,
+   "found": 8,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R09",
+   "trial": "design",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 2,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [],
+   "script_score": 36
+  },
+  {
+   "id": "R10",
+   "trial": "api2",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 1,
+   "score": 84,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 4,
+   "missed": [],
+   "score_without_fp_penalty": 100
+  },
+  {
+   "id": "R11",
+   "trial": "api2",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 2,
+   "score": 92,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 2,
+   "missed": [],
+   "score_without_fp_penalty": 100
+  },
+  {
+   "id": "R12",
+   "trial": "exploratory",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 1,
+   "score": 25,
+   "max": 31,
+   "found": 7,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K6"
+   ]
+  },
+  {
+   "id": "R13",
+   "trial": "api2",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 3,
+   "score": 76,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 6,
+   "missed": [],
+   "score_without_fp_penalty": 100
+  },
+  {
+   "id": "R14",
+   "trial": "design",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 3,
+   "score": 36,
+   "max": 36,
+   "found": 12,
+   "total": 12,
+   "false_positives": 0,
+   "missed": [],
+   "script_score": 35
+  },
+  {
+   "id": "R15",
+   "trial": "api2",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 3,
+   "score": 100,
+   "max": 100,
+   "found": 10,
+   "total": 10,
+   "false_positives": 0,
+   "missed": [],
+   "score_without_fp_penalty": 100
+  },
+  {
+   "id": "R16",
+   "trial": "exploratory",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 2,
+   "score": 22,
+   "max": 31,
+   "found": 6,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2",
+    "K3",
+    "K6"
+   ]
+  },
+  {
+   "id": "R17",
+   "trial": "exploratory",
+   "model": "gemini-4-hydrogen",
+   "arm": "skill",
+   "n": 3,
+   "score": 28,
+   "max": 31,
+   "found": 8,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  },
+  {
+   "id": "R18",
+   "trial": "exploratory",
+   "model": "gemini-4-hydrogen",
+   "arm": "noskill",
+   "n": 3,
+   "score": 28,
+   "max": 31,
+   "found": 8,
+   "total": 9,
+   "false_positives": 0,
+   "missed": [
+    "K2"
+   ]
+  }
+ ]
+}

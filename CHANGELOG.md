@@ -1,5 +1,11 @@
 # Değişiklik günlüğü
 
+**0.11.3**: Dış kör denemenin sonuçları ve ilk düzeltmeler
+- Değerlendirme: 0.11.2, Antigravity içinde Gemini 4 Hydrogen ile 18 koşuda ölçüldü; puanlamayı GPT-6.1 Terra kör yaptı. Skill'li kol önde çıkmadı: ortalama %87,9'a karşı %93,3. Ayrıntı ve sınırlar: `docs/EVALUATION.md` §10.
+- API: kusur ile açık soru ayrımı. Sözleşmenin sustuğu davranış kusur olarak değil, açık soru olarak raporlanır. Denemede skill'li koşular ekili hataların hepsini buldu, puanı bu ayrımı yapmadığı için kaybetti.
+- Deneme anahtarı: `design_grader.py`, küçük harfle yazılmış `aktor` değerini geçerli sayıp doğru satıra ceza kesiyordu; artık katı okumayı da kabul ediyor.
+- Bu düzeltmelerin etkisi henüz yeni bir denemeyle ölçülmedi.
+
 **0.11.2**: Denetimden kalan son küçük maddeler
 - İzlenebilirlik: "doğrulanan kapsam" metriği (bağlı testlerin hepsi geçti) ve `DRAFT_ONLY` boşluğu.
 - API: `--security-probes` ile toplu atama (mass assignment) denemesi.
