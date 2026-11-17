@@ -1,0 +1,350 @@
+#!/usr/bin/env python3
+"""Start, check, or stop isolated evaluation servers listed in manifest.csv."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import json
+import os
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import time
+import urllib.error
+import urllib.request
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+MANIFEST_PATH = ROOT / "manifest.csv"
+SERVERS_DIR = ROOT / "servers"
+LOGS_DIR = ROOT / "logs"
+PIDS_PATH = LOGS_DIR / "pids.json"
+
+HEALTH_PATHS = {
+    "trial-api2": "/health",
+    "trial-exploratory": "/api/saglik",
+}
+
+
+def load_server_runs(selected: list[str] | None = None) -> list[dict[str, str]]:
+    if not MANIFEST_PATH.is_file():
+        raise SystemExit(f"manifest.csv not found at {MANIFEST_PATH}")
+    with MANIFEST_PATH.open("r", encoding="utf-8", newline="") as f:
+        rows = [row for row in csv.DictReader(f) if row.get("port", "").strip()]
+
+    if selected:
+        wanted = set(selected)
+        known = {r["run_id"] for r in rows}
+        unknown = sorted(wanted - known)
+        if unknown:
+            raise SystemExit(
+                f"Unknown or non-server run_id(s): {', '.join(unknown)}. "
+                f"Server runs are: {', '.join(sorted(known))}"
+            )
+        rows = [r for r in rows if r["run_id"] in wanted]
+    return rows
+
+
+def load_pids() -> dict[str, dict[str, object]]:
+    if not PIDS_PATH.is_file():
+        return {}
+    try:
+        return json.loads(PIDS_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def save_pids(data: dict[str, dict[str, object]]) -> None:
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    PIDS_PATH.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def is_pid_alive(pid: int) -> bool:
+    if pid <= 0:
+        return False
+    if os.name == "nt":
+        res = subprocess.run(
+            ["tasklist", "/FI", f"PID eq {pid}", "/NH"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        return str(pid) in res.stdout
+    try:
+        os.kill(pid, 0)
+        return True
+    except OSError:
+        return False
+
+
+def stop_pid(pid: int) -> None:
+    if not is_pid_alive(pid):
+        return
+    if os.name == "nt":
+        subprocess.run(
+            ["taskkill", "/PID", str(pid), "/T", "/F"],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    else:
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except OSError:
+            return
+        for _ in range(20):
+            if not is_pid_alive(pid):
+                return
+            time.sleep(0.1)
+        try:
+            os.kill(pid, signal.SIGKILL)
+        except OSError:
+            pass
+
+
+def is_port_open(port: int, host: str = "127.0.0.1") -> bool:
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(0.3)
+        return sock.connect_ex((host, port)) == 0
+
+
+def check_health(port: int, path: str) -> tuple[bool, int | None]:
+    url = f"http://127.0.0.1:{port}{path}"
+    try:
+        with urllib.request.urlopen(url, timeout=1.0) as resp:
+            return (resp.status == 200, resp.status)
+    except urllib.error.HTTPError as err:
+        return (False, err.code)
+    except Exception:
+        return (False, None)
+
+
+def stop_runs(run_ids: list[str] | None = None) -> None:
+    pids = load_pids()
+    if not pids:
+        print("No tracked server processes found.")
+        return
+
+    targets = set(run_ids) if run_ids else set(pids.keys())
+    for run_id in sorted(targets):
+        entry = pids.get(run_id)
+        if not entry:
+            continue
+        pid = int(entry["pid"])
+        port = int(entry["port"])
+        stop_pid(pid)
+        for _ in range(20):
+            if not is_port_open(port):
+                break
+            time.sleep(0.1)
+        pids.pop(run_id, None)
+        print(f"Stopped {run_id} (port {port}, pid {pid})")
+
+    if pids:
+        save_pids(pids)
+    elif PIDS_PATH.exists():
+        PIDS_PATH.unlink()
+
+
+def status_runs(runs: list[dict[str, str]]) -> int:
+    pids = load_pids()
+    all_ok = True
+    for row in runs:
+        run_id = row["run_id"]
+        trial = row["trial"]
+        port = int(row["port"])
+        health_path = HEALTH_PATHS[trial]
+        ok, code = check_health(port, health_path)
+        pid = pids.get(run_id, {}).get("pid", "-")
+        state = "OK" if ok else f"DOWN (http={code})"
+        if not ok:
+            all_ok = False
+        print(f"{run_id}  port={port}  pid={pid}  http://127.0.0.1:{port}  [{state}]")
+    return 0 if all_ok else 1
+
+
+def start_runs(runs: list[dict[str, str]], foreground: bool = False) -> int:
+    node_bin = shutil.which("node")
+    if not node_bin:
+        raise SystemExit("Node.js ('node') was not found on PATH.")
+
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    pids = load_pids()
+
+    # Stop any previously tracked servers for the target runs so every start is fresh.
+    for row in runs:
+        run_id = row["run_id"]
+        if run_id in pids:
+            old_pid = int(pids[run_id]["pid"])
+            old_port = int(pids[run_id]["port"])
+            stop_pid(old_pid)
+            for _ in range(20):
+                if not is_port_open(old_port):
+                    break
+                time.sleep(0.1)
+            pids.pop(run_id, None)
+
+    started: list[tuple[dict[str, str], subprocess.Popen[bytes]]] = []
+
+    def spawn_one(row: dict[str, str]) -> subprocess.Popen[bytes]:
+        run_id = row["run_id"]
+        port = int(row["port"])
+        server_dir = SERVERS_DIR / run_id
+        server_js = server_dir / "server.js"
+        if not server_js.is_file():
+            raise SystemExit(f"Missing server entrypoint for {run_id}: {server_js}")
+
+        if is_port_open(port):
+            raise SystemExit(
+                f"Port {port} (assigned to {run_id}) is already in use by another process."
+            )
+
+        env = os.environ.copy()
+        env["PORT"] = str(port)
+
+        out_log = (LOGS_DIR / f"{run_id}.out.log").open("ab")
+        err_log = (LOGS_DIR / f"{run_id}.err.log").open("ab")
+
+        popen_kwargs: dict[str, object] = {
+            "cwd": str(server_dir),
+            "env": env,
+            "stdin": subprocess.DEVNULL,
+            "stdout": out_log,
+            "stderr": err_log,
+        }
+        if not foreground:
+            if os.name == "nt":
+                popen_kwargs["creationflags"] = (
+                    subprocess.CREATE_NEW_PROCESS_GROUP | subprocess.DETACHED_PROCESS
+                )
+            else:
+                popen_kwargs["start_new_session"] = True
+
+        proc = subprocess.Popen([node_bin, str(server_js)], **popen_kwargs)
+        out_log.close()
+        err_log.close()
+        pids[run_id] = {"pid": proc.pid, "port": port}
+        return proc
+
+    for row in runs:
+        started.append((row, spawn_one(row)))
+
+    save_pids(pids)
+
+    # Wait for all started servers to pass their health check.
+    deadline = time.monotonic() + 10.0
+    pending = {row["run_id"]: (row, proc) for row, proc in started}
+    healthy: dict[str, tuple[dict[str, str], int]] = {}
+
+    while pending and time.monotonic() < deadline:
+        for run_id in list(pending.keys()):
+            row, proc = pending[run_id]
+            port = int(row["port"])
+            if proc.poll() is not None:
+                print(
+                    f"ERROR: {run_id} exited early with code {proc.returncode}. "
+                    f"See {LOGS_DIR / f'{run_id}.err.log'}",
+                    file=sys.stderr,
+                )
+                pending.pop(run_id)
+                continue
+            ok, _ = check_health(port, HEALTH_PATHS[row["trial"]])
+            if ok:
+                healthy[run_id] = (row, proc.pid)
+                pending.pop(run_id)
+        if pending:
+            time.sleep(0.15)
+
+    for row, proc in started:
+        run_id = row["run_id"]
+        port = int(row["port"])
+        if run_id in healthy:
+            host = "localhost" if row["trial"] == "trial-api2" else "127.0.0.1"
+            print(f"{run_id}  http://{host}:{port}  pid={proc.pid}  [READY]")
+        else:
+            print(f"{run_id}  port={port}  pid={proc.pid}  [FAILED]", file=sys.stderr)
+
+    if len(healthy) != len(started):
+        return 1
+
+    print(f"\nAll {len(healthy)} servers started fresh and passed health checks.", flush=True)
+    print(f"Logs & PIDs: {LOGS_DIR}", flush=True)
+    if not foreground:
+        print("To stop all servers: python ./start-servers --stop")
+        return 0
+
+    print("Running in foreground (auto-restarting any crashed server); kill task or Ctrl+C to stop.", flush=True)
+    restart_counts: dict[str, int] = {}
+    try:
+        while True:
+            for idx, (row, proc) in enumerate(started):
+                if proc.poll() is not None:
+                    rid = row["run_id"]
+                    port = int(row["port"])
+                    count = restart_counts.get(rid, 0) + 1
+                    restart_counts[rid] = count
+                    print(
+                        f"WARN: {rid} exited with code {proc.returncode}; restarting (#{count})...",
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                    time.sleep(0.3)
+                    new_proc = spawn_one(row)
+                    started[idx] = (row, new_proc)
+                    save_pids(pids)
+                    deadline = time.monotonic() + 5.0
+                    while time.monotonic() < deadline:
+                        ok, _ = check_health(port, HEALTH_PATHS[row["trial"]])
+                        if ok:
+                            break
+                        time.sleep(0.1)
+                    print(f"INFO: {rid} restarted pid={new_proc.pid} on port {port}", flush=True)
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        return 0
+    finally:
+        for row, proc in started:
+            if proc.poll() is None:
+                stop_pid(proc.pid)
+        pids = load_pids()
+        for row, _ in started:
+            pids.pop(row["run_id"], None)
+        if pids:
+            save_pids(pids)
+        elif PIDS_PATH.exists():
+            PIDS_PATH.unlink()
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser(
+        description="Start/stop fresh isolated servers for blind evaluation workspaces."
+    )
+    parser.add_argument(
+        "run_ids",
+        nargs="*",
+        help="Optional run IDs (e.g. R03 R07). Defaults to all server-based runs.",
+    )
+    parser.add_argument("--stop", action="store_true", help="Stop tracked servers.")
+    parser.add_argument("--status", action="store_true", help="Show server health status.")
+    parser.add_argument(
+        "--foreground",
+        action="store_true",
+        help="Keep servers running in the foreground until interrupted.",
+    )
+    args = parser.parse_args()
+
+    if args.stop:
+        stop_runs(args.run_ids or None)
+        return 0
+
+    runs = load_server_runs(args.run_ids or None)
+    if args.status:
+        return status_runs(runs)
+    return start_runs(runs, foreground=args.foreground)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
