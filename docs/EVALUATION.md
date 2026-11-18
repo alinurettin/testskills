@@ -168,8 +168,8 @@ Yeni kayıtlar için [manifest/record/report akışı](EVALUATION-HARNESS.md) fa
 - **Doğru okuma:**
   - **Skill'ler bu modelde ölçülebilir bir fayda sağlamadı.** Hiçbir denemede skill'li kol önde değil.
   - **API'de fark, bulma gücünden değil yanlış alarm cezasından geliyor.** Skill'li üç koşu ekili 10 hatanın hepsini tam buldu; skill'siz iki koşuda yarım puanlı maddeler var. Ceza sayılmadan puanlar skill'li 100, 100, 100 ve skill'siz 95, 91, 100 olurdu. Skill'li koşular sözleşmenin sustuğu davranışları (iptal edilmiş poliçeye hasar açılması, boş `holderName`, hata kontrollerinin sırası) kusur diye raporladı: 12 cezaya karşı 2. Anahtar "desteklenmeyen kusur" için −4 yazıyor ve puanlayıcı bunu katı ama tutarlı uyguladı. 0.9.0'da Opus'un API ortalaması da aynı yöndeydi (96,3'e karşı 99,7).
-  - **Test tasarımı tavanda.** 12 koşunun 11'i tam puan; bu deneme bu sınıf modelleri ayırt etmiyor.
-  - **Keşif testinde 12 koşunun hiçbiri K2'yi bulamadı.** Skill'li kol ayrıca K3 ve K6'yı daha çok kaçırdı (K6: 2'ye karşı 1, K3: 1'e karşı 0).
+  - **Test tasarımı tavanda.** 6 koşunun 5'i tam puan; bu deneme bu sınıf modelleri ayırt etmiyor.
+  - **Keşif testinde 6 koşunun hiçbiri K2'yi bulamadı.** Skill'li kol ayrıca K3 ve K6'yı daha çok kaçırdı (K6: 2'ye karşı 1, K3: 1'e karşı 0).
 - **Bundan çıkan düzeltmeler (0.11.3):** `testing-apis` artık kusur ile açık soruyu ayırıyor. `design_grader.py`, küçük harfle yazılmış `aktor` değeri için katı okumayı da kabul ediyor: betik v0.11.2 hâliyle skill'siz iki koşuya (R03, R14) haksız 1 puan ceza kesmişti; puanlayıcı bunu elle düzeltti, yukarıdaki puanlar düzeltilmiş hâlidir. Bu düzeltmelerin etkisi henüz ölçülmedi.
 - **Sınırlar (önemli):**
   - Tek model, hücre başına 3 koşu, tek puanlayıcı. Keşif puanlarını ikinci bir puanlayıcı doğrulamadı. Biz yalnızca tasarım puanlarını betikle, API'de bulgu eşleşmelerini ve üç ceza kararını elle denetledik.

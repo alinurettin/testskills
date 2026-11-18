@@ -184,8 +184,8 @@ No release since 0.10.0 had been measured in a blind trial. In this round both t
 - **Correct reading:**
   - **The skills gave no measurable benefit on this model.** The with-skill arm is ahead in no trial.
   - **In the API trial the gap comes from false-positive penalties, not from detection.** All three with-skill runs found all 10 planted defects in full; two runs without skills have half-credit items. Before penalties the scores would be 100, 100, 100 with skills and 95, 91, 100 without. The with-skill runs reported behaviour on which the contract is silent (a claim on a cancelled policy, an empty `holderName`, the order of error checks) as defects: 12 penalties against 2. The key sets −4 for an "unsupported defect", and the grader applied it strictly but consistently. The Opus API means in 0.9.0 pointed the same way (96.3 vs 99.7).
-  - **Test design is at the ceiling.** 11 of 12 runs scored full marks; this trial does not separate models of this class.
-  - **None of the 12 exploratory runs found K2.** The with-skill arm also missed K3 and K6 more often (K6: 2 vs 1, K3: 1 vs 0).
+  - **Test design is at the ceiling.** 5 of 6 runs scored full marks; this trial does not separate models of this class.
+  - **None of the 6 exploratory runs found K2.** The with-skill arm also missed K3 and K6 more often (K6: 2 vs 1, K3: 1 vs 0).
 - **Fixes that follow (0.11.3):** `testing-apis` now separates defects from open questions. `design_grader.py` accepts the strict reading of an `aktor` value written in lower case: at v0.11.2 the script wrongly took 1 point from two runs without skills (R03, R14); the grader corrected this by hand, and the scores above are the corrected ones. The effect of these fixes has not been measured yet.
 - **Limits (important):**
   - One model, 3 runs per cell, one grader. No second grader checked the exploratory scores. We checked only the design scores with the script, and in the API trial the mapping of findings and three of the penalty decisions by hand.
