@@ -6,7 +6,7 @@ shipment life cycle and an end-to-end configuration space. All data are syntheti
 Answer key: `C:\projeler\TestSkills\evals\keys\design2.md` (+ `design2_grader.py`, `design2_ref\`).
 Never copy anything from the key folder into the agent workspace.
 
-Why it exists: `trial-design` no longer separates strong agents (11 of 12 runs at 35–36 / 36). This
+Why it exists: `trial-design` no longer separates strong agents (all 6 runs of the last trial at 35–36 / 36). This
 trial has interacting pricing rules, a date calendar, a guarded state model, a mixed-strength
 configuration matrix, row budgets, and planted specification defects next to traps. It is graded
 by script only; there is nothing to confirm by hand.
