@@ -180,3 +180,19 @@ Yeni kayıtlar için [manifest/record/report akışı](EVALUATION-HARNESS.md) fa
   - API sunucusu bazı girdilerde çöküyor ve koşu sırasında yeniden başlatıldı (iki kolda da, 3–7 kez); bellekteki durum her seferinde sıfırlandı.
   - Harness kullanılmadı (giriş özetleri yok) ve modelin tam API kimliği bilinmiyor. Teslimlerdeki yerel klasör yolu yayından önce `C:\eval` ile değiştirildi; başka hiçbir şeye dokunulmadı.
   - İkinci araçla (Codex) koşu yapılmadı: iki deneme tavanda olduğu için aynı denemeleri tekrarlamak yerine önce denemelerin zorlaştırılması gerekiyor.
+
+## 11. Yeni denemeler ve pilot (18 Kasım 2026, yayımlanmamış)
+
+§10'daki denemelerin ikisi tavandaydı. Yerlerine iki yeni deneme hazırlandı; ikisini de skill'leri hiç okumayan tasarımcılar yazdı.
+
+- **`evals/trial-api3`:** kurgusal araç kiralama API'si, 13 işlem. 16 ekili hatanın yalnızca 3'ü tek istekle bulunur; gerisi istek dizisi, önceki durum, hesap ya da iki ucun karşılaştırılmasını ister. 7 tuzak ve sözleşmenin sustuğu 14 davranış anahtarda tek tek yazılıdır. Sunucu çökmez, gerçek yığın izi ya da dosya yolu sızdırmaz. Ceza sınıfları ayrıdır: yanlış iddia −4, uydurma kural −2, açık soru 0, anahtarda olmayan gerçek kusur 0. Doğrulayıcı: `evals/keys/grade_api3.py` (91/91).
+- **`evals/trial-design2`:** kurgusal kargo şirketi için ücretlendirme, teslim tarihi, 9 durumlu yaşam döngüsü ve kısıtlı konfigürasyon uzayı; her teslim dosyasında satır sınırı; şartnameye ekili 5 kusur ve 4 tuzak. Tamamen betikle puanlanır (`evals/keys/design2_grader.py`), elle onay maddesi yoktur. Referans çözüm 100, baştan savma çözüm 9 alır.
+- **Pilot (deneme başına bir koşu, yardımsız, skill'siz, Claude Fable 5.2, süre sınırı yok):**
+
+| Deneme | Süre | Sonuç |
+|---|---|---|
+| `trial-design2` | 45 dk | **95 / 100**. Beş kusurun beşini buldu, tuzağa düşmedi. Kaybettiği 5 puan, iki hata koşulunu tek satırda birleştirdiği dört sınır satırından geliyor. |
+| `trial-api3` | 37 dk, 4.152 istek | **16 ekili hatanın 16'sını** raporladı; "Kusurlar" altında başka madde yok, 24 açık soru ayrı bölümde. Eşleşme başlıklardan ve örnek kanıtlardan denetlendi, satır satır puanlanmadı. |
+
+- **Doğru okuma:** tasarımcıların hedefi yardımsız güçlü bir ajan için %55–75'ti; pilot bunu doğrulamadı. Bu sınıf bir model kendi hesap betiğini, durum makinesi benzetimini ve fark testini yazıyor; kesin tanımlı bir görevde ekili hataları bulmak onun için tavanda. Böyle bir modelde skill paketinin "daha çok hata bulma" yönünde ölçülebilir bir katkı göstermesini beklemiyoruz.
+- **Ölçülmeyenler:** yeni denemelerde skill'li/skill'siz karşılaştırma yapılmadı. Daha zayıf ya da ucuz modellerde, sabit süre ya da istek bütçesiyle ve maliyet (token, süre) açısından fark olup olmadığı bilinmiyor. Pilotlarda yalıtım talimatla sağlandı; iki koşunun araç çağrıları sonradan denetlendi ve klasör dışına erişim görülmedi.

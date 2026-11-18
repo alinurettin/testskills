@@ -196,3 +196,19 @@ No release since 0.10.0 had been measured in a blind trial. In this round both t
   - The API server crashes on some inputs and was restarted during runs (in both arms, 3–7 times); its in-memory state was reset each time.
   - The harness was not used (no input hashes) and the exact API id of the model is unknown. The local folder path in the deliverables was replaced with `C:\eval` before publication; nothing else was changed.
   - No runs were made with a second tool (Codex): two of the trials are at the ceiling, so the trials need to be made harder before they are repeated.
+
+## 11. New trials and a pilot (18 November 2026, unreleased)
+
+Two of the trials in §10 were at the ceiling. Two new trials replace them; both were written by designers who never read the skills.
+
+- **`evals/trial-api3`:** a fictional car-rental API with 13 operations. Only 3 of the 16 planted defects can be found with a single request; the others need a sequence of requests, a prior state, arithmetic, or a comparison between two endpoints. The key lists 7 traps and 14 behaviours on which the contract is silent. The server does not crash and leaks no real stack trace or file path. Penalties are split by class: wrong claim −4, invented rule −2, open question 0, real defect outside the key 0. Verifier: `evals/keys/grade_api3.py` (91/91).
+- **`evals/trial-design2`:** pricing, promised delivery date, a 9-state life cycle and a constrained configuration space for a fictional parcel company; a row budget for every deliverable; 5 planted specification defects and 4 traps. Graded entirely by a script (`evals/keys/design2_grader.py`), with no manual items. The reference solution scores 100, a careless one 9.
+- **Pilot (one run per trial, unaided, without skills, Claude Fable 5.2, no time limit):**
+
+| Trial | Time | Result |
+|---|---|---|
+| `trial-design2` | 45 min | **95 / 100**. It found all five defects and no trap. The 5 points it lost come from four boundary rows that combine two error conditions in one row. |
+| `trial-api3` | 37 min, 4,152 requests | It reported **all 16 planted defects**; nothing else under "Kusurlar", and 24 open questions in their own section. The mapping was checked by title and by sampled evidence, not graded line by line. |
+
+- **Correct reading:** the designers aimed at 55–75% for a strong unaided agent; the pilot did not confirm that. A model of this class writes its own calculation script, state-machine simulator and differential test; finding planted defects in a precisely specified task is at the ceiling for it. We do not expect the skill package to show a measurable gain in "finding more defects" on such a model.
+- **Not measured:** no with/without-skills comparison was made on the new trials. Whether there is a difference on weaker or cheaper models, under a fixed time or request budget, or in cost (tokens, time) is unknown. Isolation in the pilots was by instruction; the tool calls of both runs were audited afterwards and show no access outside their folders.

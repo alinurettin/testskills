@@ -1,0 +1,2 @@
+test_id;olay_dizisi;beklenen_sonuc;beklenen_son_durum;beklenen_deneme_sayisi;aciklama
+ORNEK-1;TRANSFERE_VER > DAGITIMA_CIKAR > TESLIM_BASARISIZ(neden=ADRESTE_YOK);KABUL;TESLIM_EDILEMEDI;1;Biçim örneği - silinebilir

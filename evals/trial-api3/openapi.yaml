@@ -1,0 +1,1082 @@
+openapi: 3.1.0
+info:
+  title: Turna Oto Kiralama - Rezervasyon ve Kiralama API
+  version: 1.0.0
+  description: |
+    Turna Oto Kiralama A.Ş. (kurgusal) için araç arama, fiyat teklifi, rezervasyon,
+    araç teslimi, iade ve faturalama API'si. Tüm veriler sentetiktir.
+
+    Bu belge beklenen davranışın tek kaynağıdır. Aşağıdaki genel kurallar bütün
+    uçlar için geçerlidir; uçların açıklamaları bu kurallara atıf yapar.
+
+    ## 1. Kimlik doğrulama ve roller
+
+    `GET /health` dışındaki tüm uçlar `Authorization: Bearer <token>` başlığı ister.
+    Başlık yoksa veya token geçersizse 401 `UNAUTHENTICATED` döner.
+
+    Üç rol vardır:
+
+    * **Müşteri (`customer`)**: yalnızca kendi rezervasyonlarını ve kendi
+      faturalarını görebilir; yalnızca kendi rezervasyonları üzerinde işlem
+      yapabilir.
+    * **Şube personeli (`staff`)**: bir şubeye bağlıdır. Alış şubesi veya dönüş
+      şubesi kendi şubesi olan rezervasyonları ve kendi şubesi adına kesilmiş
+      faturaları görebilir. Araç teslimi ve iade işlemlerini yapar (hangi şubenin
+      personelinin yapabileceği ilgili uçta yazılıdır).
+    * **Yönetici (`admin`)**: tüm kayıtları görebilir; değiştirme, iptal, teslim
+      ve iade işlemlerini her rezervasyon için yapabilir; gelir raporunu alabilir.
+
+    Her ucun açıklamasında hangi rollerin çağırabileceği yazılıdır. Yetki kuralı:
+
+    * Rolün hiç izinli olmadığı bir işlem, kaynak var olsun ya da olmasın 403
+      `FORBIDDEN` döner.
+    * Rol izinliyse: kaynak yoksa 404 `NOT_FOUND`; kaynak var ama çağıranın
+      erişim kapsamı dışındaysa 403 `FORBIDDEN` döner.
+
+    ## 2. Sunucu saati
+
+    Test ortamında sunucu saati SABİTTİR: her zaman `2026-03-10T09:00:00+03:00`
+    (Salı). "Şu an"a göre tanımlanan bütün kurallar bu ana göre işler.
+    `GET /health` yanıtındaki `now` alanı aynı değeri verir. Yeni oluşturulan
+    kayıtların `createdAt` ve `cancelledAt` değerleri de bu andır.
+
+    ## 3. Tarih ve saat
+
+    * Tarih-saat alanları RFC 3339 biçimindedir ve ofset zorunludur (`Z` veya
+      `±ss:dd`), ör. `2026-03-15T10:00:00+03:00`. Ofsetsiz ya da geçersiz değer
+      400 döner.
+    * Farklı ofsetle yazılmış ama aynı anı gösteren değerler aynı kabul edilir
+      (`2026-03-15T07:00:00Z` ile `2026-03-15T10:00:00+03:00` aynı andır).
+    * Yanıtlardaki tarih-saat değerleri her zaman `+03:00` ofsetiyle yazılır.
+    * Yalnızca tarih taşıyan alanlar ve sorgu parametreleri `YYYY-AA-GG`
+      biçimindedir.
+    * "Takvim günü" gerektiren her hesap (yaş, ehliyet süresi, tarih süzgeçleri,
+      rapor aralığı) Türkiye saatine (UTC+03:00) göre yapılır. Tarih türündeki
+      süzgeçlerde aralığın her iki ucu da dahildir.
+
+    ## 4. Para
+
+    Tutarlar Türk lirasıdır (`TRY`), en fazla 2 ondalık basamaklı sayılardır ve
+    aksi belirtilmedikçe KDV hariçtir. Yüzde ile hesaplanan her tutar kuruşa
+    (0,01 TL) **yarım yukarı** yuvarlanır (ör. 12,345 → 12,35; 12,344 → 12,34).
+
+    ## 5. Hatalar
+
+    Hata yanıtlarının gövdesi `Error` şemasındadır (`code`, `message`, isteğe
+    bağlı `details`). Hata yanıtları iç ayrıntı (yığın izi, dosya yolu vb.)
+    içermez.
+
+    * 400 `VALIDATION_ERROR`: gövde geçerli JSON değil ya da JSON nesnesi değil,
+      zorunlu alan eksik, tip / biçim / enum / sınır hatası, şemada tanımlı
+      olmayan alan, geçersiz sorgu parametresi.
+    * 401 `UNAUTHENTICATED`, 403 `FORBIDDEN`, 404 `NOT_FOUND`.
+    * 409: durum çakışmaları (`INVALID_STATE`, `VEHICLE_OUT_OF_SERVICE`,
+      `VEHICLE_ALREADY_BOOKED`, `IDEMPOTENCY_KEY_REUSED`).
+    * 413 `PAYLOAD_TOO_LARGE`: 100 000 bayttan büyük gövde.
+    * 422: iş kuralı ihlalleri; kodlar ilgili kuralın yanında yazılıdır.
+
+    ## 6. Listeleme, sıralama, sayfalama
+
+    Liste uçları `{ data, meta }` döner. `page` (varsayılan 1, en az 1) ve
+    `pageSize` (varsayılan 20, 1–50) parametreleri geçerlidir; aralık dışı ya da
+    tam sayı olmayan değer 400 döner.
+
+    * `meta.total`, süzgeçlerden sonraki ve sayfalamadan önceki kayıt sayısıdır;
+      `meta.totalPages = ceil(total / pageSize)` (kayıt yoksa 0).
+    * Sıralama, süzülmüş sonuç kümesinin TAMAMINA uygulanır; sayfalama sıralanmış
+      küme üzerinde yapılır. Sıralama değeri eşit olan kayıtlar `id` artan sırada
+      gelir.
+    * Son sayfadan sonraki bir sayfa istenirse 200 ile boş `data` döner.
+
+    ## 7. Müsaitlik kuralı
+
+    Bir araç bir [alış, dönüş] aralığı için ancak şu iki koşul birlikte
+    sağlanırsa müsaittir:
+
+    1. Aracın durumu `available` olmalıdır (`maintenance` ve `retired` araçlar
+       kiralanamaz).
+    2. Araç, `confirmed` veya `active` durumundaki başka hiçbir rezervasyonla
+       çakışmamalıdır. `confirmed` veya `active` durumundaki her rezervasyon
+       aracı bloke eder. İki kiralama arasında en az 2 saat hazırlık süresi
+       bulunmalıdır: A ve B kiralamaları, `A.pickupAt < B.returnAt + 2 saat` VE
+       `B.pickupAt < A.returnAt + 2 saat` ise çakışır (tam 2 saat ara
+       yeterlidir).
+
+    `cancelled` ve `completed` rezervasyonlar aracı bloke etmez; iptal edilen bir
+    rezervasyonun aracı ve zaman aralığı yeniden kiralanabilir. Hesapta her zaman
+    planlanan `pickupAt` / `returnAt` değerleri kullanılır.
+
+    ## 8. Fiyatlandırma kuralları
+
+    Fiyat `PriceBreakdown` nesnesi olarak döner ve şu sırayla hesaplanır:
+
+    1. **Kiralama günü (`days`)**: `returnAt − pickupAt` süresindeki tamamlanmış
+       24 saatlik dilimlerin sayısıdır; artan süre 60 dakikayı AŞIYORSA bir gün
+       eklenir (60 dakikaya kadar aşım tolerans sayılır). Sonuç en az 1'dir.
+       Örnekler: 24 sa → 1; 25 sa → 1; 25 sa 1 dk → 2; 5 sa → 1.
+    2. **Kiralama bedeli (`baseAmount`)** = `days × dailyRate` (aracın günlük
+       ücreti).
+    3. **Uzun süre indirimi (`durationDiscount`)**: 7–13 gün için `baseAmount`
+       tutarının %10'u, 14 gün ve üzeri için %20'si; 7 günden kısa kiralamada 0.
+    4. **Kupon indirimi (`couponDiscount`)**:
+       * `BAHAR15`: `baseAmount` tutarının %15'i. En az 3 günlük kiralamada
+         geçerlidir. Her müşteri bu kuponu en fazla BİR rezervasyonda
+         kullanabilir; `cancelled` durumundaki rezervasyonlar bu sayıma girmez.
+       * `TURNA300`: 300,00 TL. `baseAmount` en az 2.000,00 TL ise geçerlidir;
+         kullanım sayısı sınırı yoktur.
+       * Tanınmayan kod 422 `COUPON_INVALID`; koşulu sağlanmayan kupon 422
+         `COUPON_NOT_APPLICABLE`; hakkı bitmiş BAHAR15 422 `COUPON_ALREADY_USED`
+         döner.
+       * Uzun süre indirimi ile kupon indirimi BİRLEŞTİRİLMEZ. İkisi de
+         geçerliyse yalnızca tutarı büyük olan uygulanır, diğeri 0 olur
+         (eşitlikte uzun süre indirimi uygulanır). Kupon indirimi 0'a düşse bile
+         `couponCode` rezervasyonda kayıtlı kalır ve BAHAR15 için kullanım hakkı
+         harcanmış sayılır.
+    5. **Ekstralar (`extras`)**:
+       * `cocuk_koltugu`: günlük 120,00 TL; en fazla 7 gün ücretlendirilir.
+       * `navigasyon`: günlük 90,00 TL.
+       * `ek_surucu`: günlük 150,00 TL.
+       * `tam_koruma`: indirimlerden ÖNCEKİ `baseAmount` tutarının %18'i.
+
+       `extrasTotal` bunların toplamıdır.
+    6. **Genç sürücü bedeli (`youngDriverFee`)**: sürücü alış gününde 25 yaşını
+       doldurmamışsa günlük 200,00 TL; en fazla 10 gün ücretlendirilir. Aksi
+       halde 0.
+    7. **Tek yön bedeli (`oneWayFee`)**: dönüş şubesi alış şubesinden farklıysa
+       900,00 TL; aksi halde 0.
+    8. **Ara toplam (`subtotal`)** = `baseAmount − durationDiscount −
+       couponDiscount + extrasTotal + youngDriverFee + oneWayFee`.
+    9. **KDV (`vat`)** = `subtotal` tutarının %20'si (kuruşa yarım yukarı
+       yuvarlanır). **Toplam (`total`)** = `subtotal + vat`.
+
+    Örnek: `arc_02` (günlük 1.450,00 TL), 8 gün, ekstralar `cocuk_koltugu` ve
+    `tam_koruma`, kupon yok, 30 yaşında sürücü, aynı şubeye iade →
+    `baseAmount` 11600.00; `durationDiscount` 1160.00; `cocuk_koltugu` 840.00;
+    `tam_koruma` 2088.00; `subtotal` 13368.00; `vat` 2673.60; `total` 16041.60.
+
+    ## 9. Sürücü kuralları
+
+    Sürücünün yaşı ve ehliyet süresi, alış anının (`pickupAt`) Türkiye saatine
+    göre takvim gününde ("alış günü") hesaplanır; yıl dönümü alış gününe denk
+    geliyorsa o yıl tamamlanmış sayılır.
+
+    * Sürücü alış gününde 21 yaşını doldurmuş olmalıdır; değilse 422
+      `DRIVER_TOO_YOUNG`.
+    * Ehliyet alış gününde en az 2 tam yıllık olmalıdır; değilse 422
+      `LICENSE_TOO_NEW`.
+
+    ## 10. Süre kuralları
+
+    * `returnAt`, `pickupAt` değerinden en az 1 saat sonra olmalıdır; değilse 422
+      `INVALID_PERIOD`.
+    * `pickupAt`, şu andan en az 2 saat sonra olmalıdır (tam 2 saat geçerlidir);
+      değilse 422 `PICKUP_TOO_SOON`.
+    * `pickupAt`, şu andan en fazla 90 gün (90 × 24 saat) sonra olabilir; değilse
+      422 `PICKUP_TOO_FAR`.
+    * Kiralama günü sayısı en fazla 30 olabilir; değilse 422 `RENTAL_TOO_LONG`.
+servers:
+  - url: http://localhost:3210
+    description: Test sunucusu (adres ve port ekip tarafından bildirilir; varsayılan port 3210)
+security:
+  - bearerAuth: []
+tags:
+  - name: genel
+    description: Sağlık kontrolü
+  - name: araclar
+    description: Araç arama
+  - name: rezervasyonlar
+    description: Teklif, rezervasyon, teslim ve iade
+  - name: faturalar
+    description: Faturalar ve gelir raporu
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      tags: [genel]
+      summary: Servis sağlık kontrolü ve sunucu saati
+      description: Kimlik doğrulama gerektirmez.
+      security: []
+      responses:
+        '200':
+          description: Servis çalışıyor
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, now]
+                properties:
+                  status: { type: string, examples: ['ok'] }
+                  service: { type: string }
+                  now:
+                    type: string
+                    format: date-time
+                    description: Sabit sunucu saati (bölüm 2).
+
+  /vehicles:
+    get:
+      operationId: listVehicles
+      tags: [araclar]
+      summary: Araçları listele ve ara
+      description: |
+        Tüm roller çağırabilir.
+
+        Müşteri rolüne `retired` durumundaki araçlar hiç listelenmez;
+        `maintenance` durumundaki araçlar listelenir ama kiralanamaz. Personel
+        ve yönetici tüm araçları görür.
+
+        `availableFrom` ve `availableTo` birlikte verilirse yalnızca o aralık
+        için Müsaitlik kuralına (bölüm 7) göre müsait olan araçlar döner.
+        Yalnızca biri verilirse veya `availableTo`, `availableFrom` değerinden
+        sonra değilse 400 döner.
+
+        Varsayılan sıralama `id` artandır. Sıralama ve sayfalama bölüm 6'ya
+        göre yapılır.
+      parameters:
+        - name: branchId
+          in: query
+          schema: { $ref: '#/components/schemas/BranchId' }
+        - name: class
+          in: query
+          schema: { $ref: '#/components/schemas/VehicleClass' }
+        - name: transmission
+          in: query
+          schema: { type: string, enum: [manuel, otomatik] }
+        - name: minSeats
+          in: query
+          description: En az bu kadar koltuğu olan araçlar.
+          schema: { type: integer, minimum: 1, maximum: 9 }
+        - name: availableFrom
+          in: query
+          schema: { type: string, format: date-time }
+        - name: availableTo
+          in: query
+          schema: { type: string, format: date-time }
+        - name: sort
+          in: query
+          schema: { type: string, enum: [id, dailyRate, seats], default: id }
+        - name: order
+          in: query
+          schema: { type: string, enum: [asc, desc], default: asc }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Araç listesi
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Vehicle' }
+                  meta: { $ref: '#/components/schemas/PageMeta' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /quotes:
+    post:
+      operationId: createQuote
+      tags: [rezervasyonlar]
+      summary: Fiyat teklifi al
+      description: |
+        Yalnızca müşteri çağırabilir; personel ve yönetici 403 alır.
+
+        Hiçbir kayıt oluşturmaz ve kupon hakkı harcamaz. Rezervasyon
+        oluşturmadaki bütün doğrulamaları ve iş kurallarını (bölüm 7–10, kupon
+        koşulları dahil) aynen uygular ve aynı hata kodlarını döner. Başarılı
+        teklifin `price` nesnesi, aynı girdilerle o anda oluşturulacak
+        rezervasyonun `price` nesnesiyle aynıdır.
+
+        Alış şubesi her zaman aracın şubesidir. `returnBranchId` verilmezse
+        aracın şubesi kabul edilir.
+
+        * `vehicleId` bulunamazsa 404 `VEHICLE_NOT_FOUND`.
+        * Aracın durumu `available` değilse 409 `VEHICLE_OUT_OF_SERVICE`.
+        * Araç istenen aralıkta başka bir rezervasyon nedeniyle müsait değilse
+          409 `VEHICLE_ALREADY_BOOKED`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BookingRequest' }
+      responses:
+        '200':
+          description: Fiyat teklifi
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Quote' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+
+  /reservations:
+    get:
+      operationId: listReservations
+      tags: [rezervasyonlar]
+      summary: Rezervasyonları listele
+      description: |
+        Tüm roller çağırabilir. Müşteri yalnızca kendi rezervasyonlarını;
+        personel alış şubesi veya dönüş şubesi kendi şubesi olan
+        rezervasyonları; yönetici tümünü görür.
+
+        `pickupFrom` / `pickupTo`: `pickupAt` değerinin Türkiye saatine göre
+        takvim günü bu aralıkta (uçlar dahil) olan rezervasyonlar döner. İkisi
+        ayrı ayrı da verilebilir. `pickupFrom`, `pickupTo` değerinden büyükse
+        400 döner.
+
+        Varsayılan sıralama `pickupAt` artandır. Sıralama ve sayfalama bölüm
+        6'ya göre yapılır.
+      parameters:
+        - name: status
+          in: query
+          schema: { $ref: '#/components/schemas/ReservationStatus' }
+        - name: vehicleId
+          in: query
+          schema: { type: string }
+        - name: pickupFrom
+          in: query
+          schema: { type: string, format: date }
+        - name: pickupTo
+          in: query
+          schema: { type: string, format: date }
+        - name: sort
+          in: query
+          description: '`total`, `price.total` değerine göre sıralar.'
+          schema: { type: string, enum: [pickupAt, createdAt, total], default: pickupAt }
+        - name: order
+          in: query
+          schema: { type: string, enum: [asc, desc], default: asc }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Rezervasyon listesi
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Reservation' }
+                  meta: { $ref: '#/components/schemas/PageMeta' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      operationId: createReservation
+      tags: [rezervasyonlar]
+      summary: Rezervasyon oluştur
+      description: |
+        Rezervasyonu yalnızca müşteri, kendi adına oluşturur; personel ve
+        yönetici 403 alır.
+
+        Başarılı istek 201 ile `confirmed` durumunda bir rezervasyon döner.
+        Doğrulamalar, iş kuralları ve hata kodları `POST /quotes` ile aynıdır
+        (bölüm 7–10).
+
+        **Idempotency-Key**: İstek bu başlıkla gönderilirse ve aynı kullanıcı
+        aynı anahtarı aynı gövdeyle yeniden gönderirse yeni kayıt OLUŞTURULMAZ;
+        ilk oluşturulan rezervasyon **200** ile döner (201 değil). Aynı anahtar
+        farklı bir gövdeyle gönderilirse 409 `IDEMPOTENCY_KEY_REUSED` döner.
+        Yalnızca başarılı (201) istekler anahtarla ilişkilendirilir. Anahtarlar
+        kullanıcıya özeldir: bir kullanıcının kullandığı anahtar başka bir
+        kullanıcının isteklerini etkilemez.
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema: { type: string, minLength: 1, maxLength: 64 }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/BookingRequest' }
+      responses:
+        '200':
+          description: Aynı Idempotency-Key ile tekrar gönderim; daha önce oluşturulan rezervasyon
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '201':
+          description: Oluşturulan rezervasyon
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+
+  /reservations/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ReservationId'
+    get:
+      operationId: getReservation
+      tags: [rezervasyonlar]
+      summary: Tek bir rezervasyonu getir
+      description: |
+        Tüm roller çağırabilir. Erişim kapsamı liste ucuyla aynıdır: müşteri
+        yalnızca kendi rezervasyonunu, personel alış veya dönüş şubesi kendi
+        şubesi olan rezervasyonu, yönetici tümünü görebilir. Kapsam dışındaki
+        rezervasyon için 403 döner.
+      responses:
+        '200':
+          description: Rezervasyon
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    patch:
+      operationId: updateReservation
+      tags: [rezervasyonlar]
+      summary: Rezervasyonu değiştir
+      description: |
+        Müşteri (yalnızca kendi rezervasyonu) ve yönetici çağırabilir; personel
+        403 alır.
+
+        Yalnızca `confirmed` durumundaki rezervasyon değiştirilebilir; diğer
+        durumlarda 409 `INVALID_STATE` döner.
+
+        Değiştirilebilen alanlar: `pickupAt`, `returnAt`, `returnBranchId`,
+        `extras` (gönderilen `extras` listesi öncekinin yerine geçer). En az bir
+        alan gönderilmelidir. Araç, kupon ve sürücü bilgileri değiştirilemez.
+
+        Değişiklikten sonraki rezervasyon, yeni oluşturulan bir rezervasyonla
+        aynı doğrulamalara tabidir (bölüm 7–10; müsaitlik kontrolünde
+        rezervasyonun kendisi, BAHAR15 hakkı kontrolünde rezervasyonun kendi
+        kullanımı sayılmaz) ve aynı hata kodlarını döner.
+
+        Fiyat, tüm fiyatlandırma kuralları (bölüm 8) yeni değerlere göre baştan
+        uygulanarak yeniden hesaplanır; sonuç, aynı girdilerle yeni oluşturulacak
+        bir rezervasyonun fiyatıyla aynıdır.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReservationUpdate' }
+      responses:
+        '200':
+          description: Güncellenmiş rezervasyon
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+
+  /reservations/{id}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      operationId: cancelReservation
+      tags: [rezervasyonlar]
+      summary: Rezervasyonu iptal et
+      description: |
+        Müşteri (yalnızca kendi rezervasyonu) ve yönetici çağırabilir; personel
+        403 alır. İstek gövdesi yoktur.
+
+        Yalnızca `confirmed` durumundaki rezervasyon iptal edilebilir; diğer
+        bütün durumlarda (zaten iptal edilmiş rezervasyon dahil) 409
+        `INVALID_STATE` döner.
+
+        Başarılı iptalde durum `cancelled` olur ve `cancellation` nesnesi
+        doldurulur. İptal ücreti (`cancellation.fee`, KDV hariç), alışa kalan
+        süreye (`pickupAt − şu an`) göre belirlenir ve iptali kimin yaptığından
+        bağımsızdır:
+
+        * 48 saatten FAZLA kaldıysa: 0.
+        * 48 saat veya daha az, ama 24 saatten fazla kaldıysa: bir günlük ücret
+          (`price.dailyRate`).
+        * 24 saat veya daha az kaldıysa: iki günlük ücret
+          (`2 × price.dailyRate`).
+        * İptal ücreti hiçbir durumda rezervasyonun `price.subtotal` değerini
+          aşamaz; aşıyorsa `price.subtotal` uygulanır.
+
+        İptal ücreti için fatura oluşturulmaz.
+      responses:
+        '200':
+          description: İptal edilmiş rezervasyon
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+
+  /reservations/{id}/pickup:
+    parameters:
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      operationId: pickupReservation
+      tags: [rezervasyonlar]
+      summary: Aracı müşteriye teslim et
+      description: |
+        Şube personeli ve yönetici çağırabilir; müşteri 403 alır. Personel
+        yalnızca rezervasyonun ALIŞ şubesinin (`pickupBranchId`) personeliyse
+        işlemi yapabilir; başka şubenin personeli 403 alır.
+
+        Sunucu saati sabit olduğu için teslimin gerçekleştiği an gövdede
+        `pickedUpAt` ile bildirilir.
+
+        * Durum `confirmed` olmalıdır; değilse 409 `INVALID_STATE`.
+        * `pickedUpAt`, planlanan `pickupAt` değerinden en fazla 1 saat önce
+          olabilir; daha erkense 422 `PICKUP_TOO_EARLY`.
+        * `pickedUpAt`, planlanan `returnAt` değerinden önce olmalıdır; değilse
+          422 `INVALID_PERIOD`.
+
+        Başarılı işlemde durum `active` olur ve `pickupRecord` doldurulur.
+        `note` gönderilirse rezervasyonun `staffNote` alanına yazılır (önceki
+        notun yerine geçer). Faturalama her zaman planlanan `pickupAt` –
+        `returnAt` üzerinden yapılır; geç teslim alma indirime yol açmaz.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PickupRequest' }
+      responses:
+        '200':
+          description: Teslim edilmiş (active) rezervasyon
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+
+  /reservations/{id}/return:
+    parameters:
+      - $ref: '#/components/parameters/ReservationId'
+    post:
+      operationId: returnReservation
+      tags: [rezervasyonlar]
+      summary: Aracı iade al ve faturayı oluştur
+      description: |
+        Şube personeli ve yönetici çağırabilir; müşteri 403 alır. Personel
+        yalnızca rezervasyonun DÖNÜŞ şubesinin (`returnBranchId`) personeliyse
+        işlemi yapabilir; başka şubenin personeli 403 alır.
+
+        Sunucu saati sabit olduğu için iadenin gerçekleştiği an gövdede
+        `returnedAt` ile bildirilir.
+
+        * Durum `active` olmalıdır; değilse 409 `INVALID_STATE`.
+        * `returnedAt`, `pickupRecord.at` değerinden sonra olmalıdır; değilse
+          422 `INVALID_PERIOD`.
+        * `odometerKm`, `pickupRecord.odometerKm` değerinden küçük olamaz;
+          küçükse 422 `ODOMETER_INVALID`.
+
+        Başarılı işlemde durum `completed` olur, `returnRecord` doldurulur ve
+        bir fatura oluşturulur (`invoiceId`). `note` gönderilirse `staffNote`
+        alanına yazılır (önceki notun yerine geçer).
+
+        **Fatura**: `issuedAt` = `returnedAt`. Fatura rezervasyonun ALIŞ şubesi
+        adına kesilir (`branchId` = `pickupBranchId`). Kalemler, rezervasyon
+        fiyatının kalemleri (`price` nesnesindeki tutarlarla aynı; indirimler
+        eksi tutarlı kalemdir) ile aşağıdaki iade kalemleridir. Tutarı 0 olan
+        kalem faturada yer almaz. `subtotal` kalem tutarlarının toplamıdır;
+        `vat` = `subtotal` tutarının %20'si (kuruşa yarım yukarı yuvarlanır);
+        `total` = `subtotal + vat`.
+
+        * **Erken iade**: ücret iadesi yapılmaz; kiralama bedeli her zaman
+          planlanan gün sayısı (`price.days`) üzerinden faturalanır.
+        * **Gecikme (`gecikme`)**: gecikme = `returnedAt − planlanan returnAt`.
+          Gecikme 60 dakikayı aşmıyorsa bedel alınmaz. Aşıyorsa bedel = başlayan
+          saat sayısı × günlük ücretin %10'u (çarpımın sonucu kuruşa
+          yuvarlanır); başlayan saatler planlanan dönüş anından itibaren sayılır
+          (tolerans düşülmez). Bedel, gecikmenin her başlayan 24 saati için bir
+          günlük ücreti aşamaz: üst sınır = `ceil(gecikme / 24 saat) ×
+          dailyRate`. Örnekler: 2 sa 10 dk gecikme → 3 başlayan saat → günlük
+          ücretin %30'u; 14 sa gecikme → üst sınır nedeniyle bir günlük ücret.
+        * **Kilometre aşımı (`asim_km`)**: kilometre hakkı `250 × price.days`
+          km'dir. Kat edilen yol (`returnRecord.odometerKm −
+          pickupRecord.odometerKm`) hakkı aşıyorsa, aşan her km için aracın
+          `extraKmRate` tutarı alınır.
+        * **Eksik yakıt (`yakit`)**: yakıt seviyesi 0–8 arasında (sekizlik)
+          ölçülür. İade seviyesi teslim seviyesinden düşükse eksik her sekizlik
+          için 220,00 TL alınır; fazla yakıt için iade yapılmaz.
+        * **Hasar (`hasar`)**: `damageAmount` tutarı faturaya yansıtılır.
+          Rezervasyonda `tam_koruma` ekstrası varsa hasar bedeli müşteriye
+          yansıtılmaz (kalem oluşmaz).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ReturnRequest' }
+      responses:
+        '200':
+          description: Tamamlanmış (completed) rezervasyon; fatura `invoiceId` ile bulunur
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Reservation' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+
+  /invoices:
+    get:
+      operationId: listInvoices
+      tags: [faturalar]
+      summary: Faturaları listele
+      description: |
+        Tüm roller çağırabilir. Müşteri yalnızca kendi faturalarını; personel
+        yalnızca kendi şubesi adına kesilmiş faturaları; yönetici tümünü görür.
+
+        `issuedFrom` / `issuedTo`: `issuedAt` değerinin Türkiye saatine göre
+        takvim günü bu aralıkta (uçlar dahil) olan faturalar döner. İkisi ayrı
+        ayrı da verilebilir. `issuedFrom`, `issuedTo` değerinden büyükse 400
+        döner.
+
+        Sıralama `issuedAt` artandır (eşitlikte `id` artan). Sayfalama bölüm
+        6'ya göre yapılır.
+      parameters:
+        - name: status
+          in: query
+          schema: { type: string, enum: [issued, void] }
+        - name: issuedFrom
+          in: query
+          schema: { type: string, format: date }
+        - name: issuedTo
+          in: query
+          schema: { type: string, format: date }
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Fatura listesi
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [data, meta]
+                properties:
+                  data:
+                    type: array
+                    items: { $ref: '#/components/schemas/Invoice' }
+                  meta: { $ref: '#/components/schemas/PageMeta' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /invoices/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string, examples: ['fat_5001'] }
+    get:
+      operationId: getInvoice
+      tags: [faturalar]
+      summary: Tek bir faturayı getir
+      description: |
+        Tüm roller çağırabilir. Erişim kapsamı liste ucuyla aynıdır: müşteri
+        yalnızca kendi faturasını, personel yalnızca kendi şubesi adına kesilmiş
+        faturayı, yönetici tümünü görebilir. Kapsam dışındaki fatura için 403
+        döner.
+      responses:
+        '200':
+          description: Fatura
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/Invoice' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /reports/revenue:
+    get:
+      operationId: getRevenueReport
+      tags: [faturalar]
+      summary: Şube bazında gelir raporu
+      description: |
+        Yalnızca yönetici çağırabilir; müşteri ve personel 403 alır.
+
+        `issuedAt` değeri `from` – `to` aralığında (Türkiye saatine göre takvim
+        günü, uçlar dahil) olan faturaların şube (`branchId`) bazında toplamını
+        verir. Rapora yalnızca durumu `issued` olan faturalar girer; `void`
+        faturalar hiçbir koşulda dahil edilmez.
+
+        `branchId` verilirse yalnızca o şube raporlanır (`rows` tek satırdır).
+        Verilmezse `rows` üç şubeyi de `branchId` alfabetik sırasıyla içerir
+        (faturası olmayan şube sıfırlarla yer alır). `totals`, `rows`
+        satırlarının toplamıdır.
+
+        `from` ve `to` zorunludur; `from`, `to` değerinden büyükse 400 döner.
+      parameters:
+        - name: from
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: to
+          in: query
+          required: true
+          schema: { type: string, format: date }
+        - name: branchId
+          in: query
+          schema: { $ref: '#/components/schemas/BranchId' }
+      responses:
+        '200':
+          description: Gelir raporu
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/RevenueReport' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PageSize:
+      name: pageSize
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 50, default: 20 }
+    ReservationId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, examples: ['rez_1001'] }
+  responses:
+    BadRequest:
+      description: Geçersiz istek (400 `VALIDATION_ERROR`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Kimlik doğrulanamadı (401 `UNAUTHENTICATED`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Yetki yok (403 `FORBIDDEN`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Kaynak bulunamadı (404 `NOT_FOUND` veya `VEHICLE_NOT_FOUND`)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Conflict:
+      description: Durum çakışması (409; kodlar için bölüm 5)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    BusinessRule:
+      description: İş kuralı ihlali (422; kodlar ilgili kuralın yanında)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+  schemas:
+    BranchId:
+      type: string
+      enum: [ANK, IST, IZM]
+      description: 'Şube kodu: ANK (Ankara), IST (İstanbul), IZM (İzmir).'
+    VehicleClass:
+      type: string
+      enum: [ekonomi, orta, suv, premium]
+    ReservationStatus:
+      type: string
+      enum: [confirmed, active, completed, cancelled]
+      description: >
+        confirmed: onaylı, araç henüz teslim edilmedi. active: araç müşteride.
+        completed: araç iade alındı, fatura kesildi. cancelled: iptal edildi.
+    ExtraCode:
+      type: string
+      enum: [cocuk_koltugu, navigasyon, ek_surucu, tam_koruma]
+    Vehicle:
+      type: object
+      required: [id, make, model, class, transmission, seats, branchId, dailyRate, extraKmRate, status]
+      properties:
+        id: { type: string, examples: ['arc_01'] }
+        make: { type: string }
+        model: { type: string }
+        class: { $ref: '#/components/schemas/VehicleClass' }
+        transmission: { type: string, enum: [manuel, otomatik] }
+        seats: { type: integer }
+        branchId: { $ref: '#/components/schemas/BranchId' }
+        dailyRate:
+          type: number
+          description: Günlük kira ücreti (TL, KDV hariç).
+        extraKmRate:
+          type: number
+          description: Kilometre hakkı aşıldığında km başına alınan tutar (TL, KDV hariç).
+        status:
+          type: string
+          enum: [available, maintenance, retired]
+    BookingRequest:
+      type: object
+      description: >
+        `POST /quotes` ve `POST /reservations` gövdesi. Şemada tanımlı olmayan
+        alan 400 ile reddedilir.
+      required: [vehicleId, pickupAt, returnAt, driverBirthDate, licenseIssuedOn]
+      additionalProperties: false
+      properties:
+        vehicleId: { type: string }
+        pickupAt: { type: string, format: date-time }
+        returnAt: { type: string, format: date-time }
+        returnBranchId:
+          $ref: '#/components/schemas/BranchId'
+          description: Verilmezse aracın şubesi.
+        extras:
+          type: array
+          description: >
+            İstenen ekstralar. Verilmezse boş liste. Listede olmayan bir ekstra
+            kodu ya da aynı kodun tekrarı 400 `VALIDATION_ERROR` ile reddedilir.
+          items: { $ref: '#/components/schemas/ExtraCode' }
+          uniqueItems: true
+          maxItems: 4
+        couponCode:
+          type: ['string', 'null']
+          maxLength: 40
+        driverBirthDate:
+          type: string
+          format: date
+          description: Sürücünün doğum tarihi (bölüm 9).
+        licenseIssuedOn:
+          type: string
+          format: date
+          description: Sürücü ehliyetinin verildiği tarih (bölüm 9).
+    Quote:
+      type: object
+      required: [vehicleId, pickupBranchId, returnBranchId, pickupAt, returnAt, extras, couponCode, price]
+      properties:
+        vehicleId: { type: string }
+        pickupBranchId: { $ref: '#/components/schemas/BranchId' }
+        returnBranchId: { $ref: '#/components/schemas/BranchId' }
+        pickupAt: { type: string, format: date-time }
+        returnAt: { type: string, format: date-time }
+        extras:
+          type: array
+          items: { $ref: '#/components/schemas/ExtraCode' }
+        couponCode: { type: ['string', 'null'] }
+        price: { $ref: '#/components/schemas/PriceBreakdown' }
+    PriceBreakdown:
+      type: object
+      description: Bölüm 8'deki kurallara göre hesaplanan fiyat dökümü.
+      required: [days, dailyRate, baseAmount, durationDiscount, couponDiscount, extras, extrasTotal, youngDriverFee, oneWayFee, subtotal, vat, total, currency]
+      properties:
+        days: { type: integer, minimum: 1, maximum: 30 }
+        dailyRate: { type: number }
+        baseAmount: { type: number }
+        durationDiscount: { type: number, minimum: 0 }
+        couponDiscount: { type: number, minimum: 0 }
+        extras:
+          type: array
+          items:
+            type: object
+            required: [code, amount]
+            properties:
+              code: { $ref: '#/components/schemas/ExtraCode' }
+              amount: { type: number }
+        extrasTotal: { type: number }
+        youngDriverFee: { type: number }
+        oneWayFee: { type: number }
+        subtotal: { type: number }
+        vat: { type: number }
+        total: { type: number }
+        currency: { type: string, const: TRY }
+    Reservation:
+      type: object
+      required: [id, customerId, vehicleId, pickupBranchId, returnBranchId, pickupAt, returnAt, status, extras, couponCode, driverBirthDate, licenseIssuedOn, price, createdAt, cancellation, pickupRecord, returnRecord, invoiceId]
+      properties:
+        id: { type: string, examples: ['rez_1001'] }
+        customerId: { type: string, examples: ['mus_1'] }
+        vehicleId: { type: string }
+        pickupBranchId: { $ref: '#/components/schemas/BranchId' }
+        returnBranchId: { $ref: '#/components/schemas/BranchId' }
+        pickupAt: { type: string, format: date-time }
+        returnAt: { type: string, format: date-time }
+        status: { $ref: '#/components/schemas/ReservationStatus' }
+        extras:
+          type: array
+          items: { $ref: '#/components/schemas/ExtraCode' }
+        couponCode: { type: ['string', 'null'] }
+        driverBirthDate: { type: string, format: date }
+        licenseIssuedOn: { type: string, format: date }
+        price: { $ref: '#/components/schemas/PriceBreakdown' }
+        createdAt: { type: string, format: date-time }
+        cancellation:
+          type: ['object', 'null']
+          description: Yalnızca iptal edilmiş rezervasyonda dolu.
+          required: [cancelledAt, fee]
+          properties:
+            cancelledAt: { type: string, format: date-time }
+            fee:
+              type: number
+              description: İptal ücreti (TL, KDV hariç).
+        pickupRecord:
+          type: ['object', 'null']
+          description: Teslim kaydı; araç teslim edilmeden önce null.
+          required: [at, odometerKm, fuelLevel]
+          properties:
+            at: { type: string, format: date-time }
+            odometerKm: { type: integer }
+            fuelLevel: { type: integer, minimum: 0, maximum: 8 }
+        returnRecord:
+          type: ['object', 'null']
+          description: İade kaydı; araç iade alınmadan önce null.
+          required: [at, odometerKm, fuelLevel]
+          properties:
+            at: { type: string, format: date-time }
+            odometerKm: { type: integer }
+            fuelLevel: { type: integer, minimum: 0, maximum: 8 }
+        invoiceId:
+          type: ['string', 'null']
+          description: İade sırasında oluşturulan geçerli faturanın kimliği.
+        staffNote:
+          type: ['string', 'null']
+          description: >
+            Personelin iç notu. Yalnızca personel ve yönetici rollerine döner
+            (not yoksa null). Müşteri rolüne verilen yanıtlarda bu alan HİÇBİR
+            uçta yer almaz.
+    ReservationUpdate:
+      type: object
+      description: En az bir alan gönderilmelidir. Şemada tanımlı olmayan alan 400 ile reddedilir.
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        pickupAt: { type: string, format: date-time }
+        returnAt: { type: string, format: date-time }
+        returnBranchId: { $ref: '#/components/schemas/BranchId' }
+        extras:
+          type: array
+          items: { $ref: '#/components/schemas/ExtraCode' }
+          uniqueItems: true
+          maxItems: 4
+    PickupRequest:
+      type: object
+      required: [pickedUpAt, odometerKm, fuelLevel]
+      additionalProperties: false
+      properties:
+        pickedUpAt: { type: string, format: date-time }
+        odometerKm: { type: integer, minimum: 0, maximum: 2000000 }
+        fuelLevel:
+          type: integer
+          minimum: 0
+          maximum: 8
+          description: Yakıt seviyesi, sekizlik (8 = dolu depo).
+        note: { type: string, maxLength: 500 }
+    ReturnRequest:
+      type: object
+      required: [returnedAt, odometerKm, fuelLevel]
+      additionalProperties: false
+      properties:
+        returnedAt: { type: string, format: date-time }
+        odometerKm: { type: integer, minimum: 0, maximum: 2000000 }
+        fuelLevel: { type: integer, minimum: 0, maximum: 8 }
+        damageAmount:
+          type: number
+          minimum: 0
+          maximum: 1000000
+          multipleOf: 0.01
+          default: 0
+          description: Tespit edilen hasar bedeli (TL, KDV hariç).
+        note: { type: string, maxLength: 500 }
+    InvoiceLine:
+      type: object
+      required: [code, description, amount]
+      properties:
+        code:
+          type: string
+          enum: [kiralama, sure_indirimi, kupon_indirimi, cocuk_koltugu, navigasyon, ek_surucu, tam_koruma, genc_surucu, tek_yon, gecikme, asim_km, yakit, hasar]
+        description: { type: string }
+        amount:
+          type: number
+          description: Kalem tutarı (TL, KDV hariç); indirim kalemlerinde eksi.
+    Invoice:
+      type: object
+      required: [id, reservationId, customerId, branchId, status, issuedAt, lines, subtotal, vat, total, currency]
+      properties:
+        id: { type: string, examples: ['fat_5001'] }
+        reservationId: { type: string }
+        customerId: { type: string }
+        branchId:
+          $ref: '#/components/schemas/BranchId'
+          description: Faturanın adına kesildiği şube (rezervasyonun alış şubesi).
+        status:
+          type: string
+          enum: [issued, void]
+          description: >
+            issued: geçerli fatura. void: muhasebe tarafından iptal edilmiş
+            fatura (bu API'de fatura iptal işlemi yoktur).
+        issuedAt: { type: string, format: date-time }
+        lines:
+          type: array
+          items: { $ref: '#/components/schemas/InvoiceLine' }
+        subtotal: { type: number }
+        vat: { type: number }
+        total: { type: number }
+        currency: { type: string, const: TRY }
+    RevenueReport:
+      type: object
+      required: [from, to, branchId, currency, rows, totals]
+      properties:
+        from: { type: string, format: date }
+        to: { type: string, format: date }
+        branchId:
+          type: ['string', 'null']
+          description: İstekte verilen şube süzgeci; verilmediyse null.
+        currency: { type: string, const: TRY }
+        rows:
+          type: array
+          items:
+            type: object
+            required: [branchId, invoiceCount, subtotal, vat, total]
+            properties:
+              branchId: { $ref: '#/components/schemas/BranchId' }
+              invoiceCount: { type: integer }
+              subtotal: { type: number }
+              vat: { type: number }
+              total: { type: number }
+        totals:
+          type: object
+          required: [invoiceCount, subtotal, vat, total]
+          properties:
+            invoiceCount: { type: integer }
+            subtotal: { type: number }
+            vat: { type: number }
+            total: { type: number }
+    PageMeta:
+      type: object
+      required: [page, pageSize, total, totalPages]
+      properties:
+        page: { type: integer }
+        pageSize: { type: integer }
+        total:
+          type: integer
+          description: Süzgeçlerden sonraki, sayfalamadan önceki kayıt sayısı.
+        totalPages: { type: integer }
+    Error:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string, examples: ['VALIDATION_ERROR'] }
+        message: { type: string }
+        details:
+          type: array
+          items: { type: string }

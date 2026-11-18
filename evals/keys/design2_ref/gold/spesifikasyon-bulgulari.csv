@@ -1,0 +1,6 @@
+bulgu_id;bolumler;tur;aciklama
+B-01;A-4,7.1;CELISKI;Ek-A örnek A-4 kural 7.1 ile çelişiyor: YE, NTB (153,12) yerine TB (174,00) üzerinden hesaplanmış (11,31). Kurala göre YE 9,95, KDV 32,61, TU 195,68 olmalı. Öneri: örneği düzeltin.
+B-02;2.4,8.2;CELISKI;Kesim saatinin kendisi: 2.4 'kesim saatinden önce' diyor (17:00 ertesi iş günü), 8.2 'kesim saati dahil' diyor (17:00 aynı gün). Öneri: iki maddeyi aynı ifadeye getirin. Testlerde 16:59 ve 17:01 kullanıldı.
+B-03;7.2,9.3;BELIRSIZLIK;ERR_BEYAN_LIMIT (7.2) hata öncelik listesinde (9.3) yok. Başka bir hatayla birlikte oluştuğunda hangi kodun döneceği belirsiz. Öneri: listeye ekleyin.
+B-04;G11,G7,G8;ERISILEMEZ;G11 hiçbir zaman gerçekleşemez: TESLIM_EDILEMEDI durumuna yalnızca G7 ile (deneme_sayisi 1 veya 2) girilir. 3. deneme G8 ile SUBEDE_BEKLIYOR durumuna gider. Öneri: G11'i kaldırın ya da 3. denemenin akışını netleştirin.
+B-05;10.3,10.6;BELIRSIZLIK;Şubede bekleme süresinin ve gun parametresinin birimi yazılmamış: takvim günü mü iş günü mü (pazar ve Ek-B günleri sayılıyor mu)? Öneri: birimi yazın.

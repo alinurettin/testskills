@@ -208,6 +208,19 @@ Hard = K1, K4, K8, K10 (4). Max score **100** (87 detection + 13 report quality)
 4. **Final score** = Detection + Report quality − False-positive penalties,
    clamped to [0, 100].
 
+**Note on rule 3 (added 2026-11-18; the rule itself is unchanged).** "Otherwise
+incorrect/unsupported" leaves the grader to decide what to do with behaviour
+that really occurs but on which the contract is silent (a claim on a cancelled
+policy is accepted; an empty `holderName` passes; a wrong-type `policyId` gets
+404). In the external trial of v0.11.2 the grader counted each of these as a
+false positive (−4) when the report filed it as a defect, and did not penalise
+findings that cite a schema rule the server ignores (wrong types, `null` in a
+non-nullable field, paging values). That reading was applied consistently, and
+it produced the whole score difference between the arms. This key also does
+not list the real, unplanted defect that every run found: a JSON `null` body
+crashes the server. For new measurements use `trial-api3`, whose key separates
+wrong claims, invented rules, open questions and unplanned real defects.
+
 **Interpretation / discrimination (expected, not scored):**
 - A quick intuitive pass by a strong generic model typically lands the easy/medium
   items (K6, K7, K9, K2, K3) and perhaps K1, but tends to miss at least one of the

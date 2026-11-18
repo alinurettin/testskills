@@ -1,0 +1,3 @@
+test_id;musteri_tipi;agirlik_kg;en_cm;boy_cm;yukseklik_cm;bolge;hizmet;kampanya_kodu;beyan_degeri;kabul_zamani;beklenen_sonuc;beklenen_ucret_agirligi;beklenen_indirim;beklenen_toplam;beklenen_teslim_tarihi;aciklama
+ORNEK-1;BIREYSEL;2.00;20;20;10;YAKIN;STANDART;;;2028-03-06 10:15;KABUL;2.0;0.00;134.20;2028-03-09;Biçim örneği (başarılı yanıt) - silinebilir
+ORNEK-2;PLATIN;2.00;20;20;10;YAKIN;STANDART;;;2028-03-06 10:15;ERR_GECERSIZ_GIRDI;;;;;Biçim örneği (hata yanıtı) - silinebilir

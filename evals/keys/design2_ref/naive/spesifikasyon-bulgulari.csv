@@ -1,0 +1,7 @@
+bulgu_id;bolumler;tur;aciklama
+B-01;A-4;CELISKI;A-4 örneğinde yakıt ek ücreti yanlış görünüyor.
+B-02;8.2,8.6;CELISKI;Cumartesi kesim saati 13:00 ama gişeler 15:00'e kadar açık.
+B-03;10.6;BELIRSIZLIK;Bekleme süresi iş günü mü takvim günü mü?
+B-04;6.3;BELIRSIZLIK;İndirim seçimi örnekle açıklanabilir.
+B-05;5.1;ONERI;Tarife tablosuna 40 kg üstü için not eklenebilir.
+B-06;11.2;ONERI;Kısıtlar tablo halinde verilebilir.

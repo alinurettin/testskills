@@ -1,5 +1,10 @@
 # Değişiklik günlüğü
 
+**Yayımlanmamış (18 Kasım 2026)**: iki yeni, daha zor deneme
+- `evals/trial-api3` (araç kiralama API'si, 16 ekili hata, 7 tuzak, sözleşmenin sustuğu 14 davranış) ve `evals/trial-design2` (kargo ücretlendirme ve gönderi yaşam döngüsü, tamamen betikle puanlanır). İkisini de skill'leri görmeyen tasarımcılar hazırladı.
+- API anahtarında ceza sınıfları ayrıldı: yanlış iddia −4, uydurma kural −2, açık soru 0, anahtarda olmayan gerçek kusur 0. `api2.md` anahtarına eski kuralın nasıl okunduğu not edildi.
+- Pilot: yardımsız Claude Fable 5.2 yeni denemelerde 95/100 aldı ve 16 ekili hatanın 16'sını buldu. Denemeler en güçlü model için hâlâ tavanda; skill'li/skill'siz karşılaştırma yapılmadı. Ayrıntı: `docs/EVALUATION.md` §11.
+
 **0.11.3**: Dış kör denemenin sonuçları ve ilk düzeltmeler
 - Değerlendirme: 0.11.2, Antigravity içinde Gemini 4 Hydrogen ile 18 koşuda ölçüldü; puanlamayı GPT-6.1 Terra kör yaptı. Skill'li kol önde çıkmadı: ortalama %87,9'a karşı %93,3. Ayrıntı ve sınırlar: `docs/EVALUATION.md` §10.
 - API: kusur ile açık soru ayrımı. Sözleşmenin sustuğu davranış kusur olarak değil, açık soru olarak raporlanır. Denemede skill'li koşular ekili hataların hepsini buldu, puanı bu ayrımı yapmadığı için kaybetti.
